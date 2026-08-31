@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell \"Get-ChildItem -Path 'D:\\\\flutter_hadith_app\\\\flutter_application_1\\\\assets' -Recurse -Force 2>&1 | Select-Object -First 30\")",
+      "Bash(powershell -Command \"Get-ChildItem 'D:\\\\\\\\flutter_hadith_app\\\\\\\\flutter_application_1\\\\\\\\assets' -Recurse | Select-Object FullName | head -20\")"
+    ]
+  }
+}
