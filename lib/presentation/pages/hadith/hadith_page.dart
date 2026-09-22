@@ -1,45 +1,43 @@
 /// Hadith main page with collections list and search
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart'
-import 'package:go_router/go_router.dart'
-import '../../../core/theme/app_theme.dart'
-import '../../../core/constants/app_constants.dart'
-import '../../../presentation/providers/app_providers.dart'
-import '../../widgets/common/app_scaffold.dart'
-import '../../widgets/common/section_header.dart'
-import '../../widgets/hadith/collection_card.dart'
-import '../../widgets/hadith/hadith_search_bar.dart'
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../../core/constants/app_constants.dart';
+import '../../../presentation/providers/app_providers.dart';
+import '../../../shared/models/hadith_models.dart';
+import '../../../shared/models/settings_models.dart';
+import '../../widgets/common/app_scaffold.dart';
+import '../../widgets/hadith/collection_card.dart';
+import '../../widgets/hadith/hadith_search_bar.dart';
 
 class HadithPage extends ConsumerStatefulWidget {
-  const HadithPage({super.key})
+  const HadithPage({super.key});
 
   @override
-  ConsumerState<HadithPage> createState() => _HadithPageState()
+  ConsumerState<HadithPage> createState() => _HadithPageState();
 }
 
-class _HadithPageState extends ConsumerState<HadithPage> with SingleTickerProviderStateMixin {
-  late TabController _tabController
-  final ScrollController _scrollController = ScrollController()
+class _HadithPageState extends ConsumerState<HadithPage>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
-    super.initState()
-    _tabController = TabController(length: 2, vsync: this)
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
   void dispose() {
-    _tabController.dispose()
-    _scrollController.dispose()
-    super.dispose()
+    _tabController.dispose();
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context)
-
     return AppScaffold(
       title: 'Hadith',
       showBackButton: false,
@@ -74,38 +72,28 @@ class _HadithPageState extends ConsumerState<HadithPage> with SingleTickerProvid
           ),
         ],
       ),
-    )
+    );
   }
 
   Widget _buildCollectionsTab() {
-    final collectionsAsync = ref.watch(hadithCollectionsProvider)
+    final collectionsAsync = ref.watch(hadithCollectionsProvider);
 
     return collectionsAsync.when(
       data: (collections) => RefreshIndicator(
         onRefresh: () async => ref.refresh(hadithCollectionsProvider),
-        child: AnimationLimiter(
-          child: ListView.separated(
-            controller: _scrollController,
-            padding: const EdgeInsets.all(AppConstants.spacingMD),
-            itemCount: collections.length,
-            separatorBuilder: (_, __) => const SizedBox(height: AppConstants.spacingMD),
-            itemBuilder: (context, index) {
-              final collection = collections[index]
-              return AnimationConfiguration.staggeredList(
-                position: index,
-                duration: AppConstants.mediumAnimation,
-                child: SlideAnimation(
-                  verticalOffset: 50.0,
-                  child: FadeInAnimation(
-                    child: CollectionCard(
-                      collection: collection,
-                      onTap: () => context.go('/hadith/collection/${collection.id}'),
-                    ),
-                  ),
-                ),
-              )
-            },
-          ),
+        child: ListView.separated(
+          controller: _scrollController,
+          padding: const EdgeInsets.all(AppConstants.spacingMD),
+          itemCount: collections.length,
+          separatorBuilder: (_, __) =>
+              const SizedBox(height: AppConstants.spacingMD),
+          itemBuilder: (context, index) {
+            final collection = collections[index];
+            return CollectionCard(
+              collection: collection,
+              onTap: () => context.go('/hadith/collection/${collection.id}'),
+            );
+          },
         ),
       ),
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -124,42 +112,32 @@ class _HadithPageState extends ConsumerState<HadithPage> with SingleTickerProvid
           ],
         ),
       ),
-    )
+    );
   }
 
   Widget _buildTopicsTab() {
-    final topicsAsync = ref.watch(hadithTopicsProvider)
+    final topicsAsync = ref.watch(topLevelHadithTopicsProvider);
 
     return topicsAsync.when(
       data: (topics) => RefreshIndicator(
-        onRefresh: () async => ref.refresh(hadithTopicsProvider),
-        child: AnimationLimiter(
-          child: ListView.separated(
-            padding: const EdgeInsets.all(AppConstants.spacingMD),
-            itemCount: topics.length,
-            separatorBuilder: (_, __) => const SizedBox(height: AppConstants.spacingMD),
-            itemBuilder: (context, index) {
-              final topic = topics[index]
-              return AnimationConfiguration.staggeredList(
-                position: index,
-                duration: AppConstants.mediumAnimation,
-                child: SlideAnimation(
-                  verticalOffset: 50.0,
-                  child: FadeInAnimation(
-                    child: _TopicCard(
-                      topic: topic,
-                      onTap: () => context.go('/hadith/topic/${topic.id}'),
-                    ),
-                  ),
-                ),
-              )
-            },
-          ),
+        onRefresh: () async => ref.refresh(topLevelHadithTopicsProvider),
+        child: ListView.separated(
+          padding: const EdgeInsets.all(AppConstants.spacingMD),
+          itemCount: topics.length,
+          separatorBuilder: (_, __) =>
+              const SizedBox(height: AppConstants.spacingMD),
+          itemBuilder: (context, index) {
+            final topic = topics[index];
+            return _TopicCard(
+              topic: topic,
+              onTap: () => context.go('/hadith/topic/${topic.id}'),
+            );
+          },
         ),
       ),
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, stack) => Center(child: Text('Error: $error')),
-    )
+    );
   }
 
   void _showFilterBottomSheet() {
@@ -168,20 +146,20 @@ class _HadithPageState extends ConsumerState<HadithPage> with SingleTickerProvid
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => _FilterBottomSheet(),
-    )
+    );
   }
 }
 
 /// Topic Card
 class _TopicCard extends StatelessWidget {
-  final HadithTopic topic
-  final VoidCallback onTap
+  final HadithTopic topic;
+  final VoidCallback onTap;
 
-  const _TopicCard({required this.topic, required this.onTap})
+  const _TopicCard({required this.topic, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context)
+    final theme = Theme.of(context);
 
     return InkWell(
       onTap: onTap,
@@ -235,10 +213,12 @@ class _TopicCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: _getGradeColor(topic.grade).withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(AppConstants.radiusFull),
+                    borderRadius:
+                        BorderRadius.circular(AppConstants.radiusFull),
                   ),
                   child: Text(
                     topic.grade.arabicName,
@@ -260,27 +240,27 @@ class _TopicCard extends StatelessWidget {
           ],
         ),
       ),
-    )
+    );
   }
 
   Color _getGradeColor(HadithGrade grade) {
     switch (grade) {
       case HadithGrade.sahih:
-        return const Color(0xFF006D4C)
+        return const Color(0xFF006D4C);
       case HadithGrade.hasan:
-        return const Color(0xFFD4A843)
+        return const Color(0xFFD4A843);
       case HadithGrade.daif:
-        return Colors.orange
+        return Colors.orange;
       case HadithGrade.mawdu:
-        return Colors.red
-      case HadithGrade.mursal:
-        return Colors.purple
-      case HadithGrade.muttasil:
-        return Colors.blue
-      case HadithGrade.munqati:
-        return Colors.teal
+        return Colors.red;
+      case HadithGrade.munkar:
+        return Colors.purple;
+      case HadithGrade.mudtarib:
+        return Colors.teal;
+      case HadithGrade.muallal:
+        return Colors.brown;
       case HadithGrade.unknown:
-        return Colors.grey
+        return Colors.grey;
     }
   }
 }
@@ -289,8 +269,8 @@ class _TopicCard extends StatelessWidget {
 class _FilterBottomSheet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context)
-    final settings = ref.watch(settingsProvider)
+    final theme = Theme.of(context);
+    final settings = ref.watch(settingsProvider);
 
     return settings.when(
       data: (settings) => Container(
@@ -341,20 +321,28 @@ class _FilterBottomSheet extends ConsumerWidget {
                   Wrap(
                     spacing: AppConstants.spacingSM,
                     runSpacing: AppConstants.spacingSM,
-                    children: HadithGrade.values.where((g) => g != HadithGrade.unknown).map((grade) {
-                      final isSelected = settings.hadithDisplay.minGrade.index <= grade.index
+                    children: HadithGrade.values
+                        .where((g) => g != HadithGrade.unknown)
+                        .map((grade) {
+                      final minGradeIndex =
+                          settings.hadithDisplay.minGrade?.index ??
+                              HadithGrade.unknown.index;
+                      final isSelected = minGradeIndex <= grade.index;
                       return FilterChip(
                         label: Text(grade.arabicName),
                         selected: isSelected,
                         onSelected: (_) {
-                          ref.read(settingsProvider.notifier).updateHadithDisplay(
-                            settings.hadithDisplay.copyWith(minGrade: grade),
-                          )
-                          Navigator.pop(context)
+                          ref
+                              .read(settingsProvider.notifier)
+                              .updateHadithDisplay(
+                                settings.hadithDisplay
+                                    .copyWith(minGrade: grade),
+                              );
+                          Navigator.pop(context);
                         },
                         selectedColor: theme.colorScheme.primaryContainer,
                         checkmarkColor: theme.colorScheme.onPrimaryContainer,
-                      )
+                      );
                     }).toList(),
                   ),
 
@@ -372,17 +360,19 @@ class _FilterBottomSheet extends ConsumerWidget {
                     spacing: AppConstants.spacingSM,
                     runSpacing: AppConstants.spacingSM,
                     children: AppLanguage.values.map((lang) {
-                      final isSelected = lang == settings.language
+                      final isSelected = lang == settings.language;
                       return FilterChip(
                         label: Text(lang.name),
                         selected: isSelected,
                         onSelected: (_) {
-                          ref.read(settingsProvider.notifier).updateLanguage(lang)
-                          Navigator.pop(context)
+                          ref
+                              .read(settingsProvider.notifier)
+                              .updateLanguage(lang);
+                          Navigator.pop(context);
                         },
                         selectedColor: theme.colorScheme.primaryContainer,
                         checkmarkColor: theme.colorScheme.onPrimaryContainer,
-                      )
+                      );
                     }).toList(),
                   ),
 
@@ -395,6 +385,6 @@ class _FilterBottomSheet extends ConsumerWidget {
       ),
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (_, __) => const Center(child: Text('Error loading settings')),
-    )
+    );
   }
 }

@@ -76,8 +76,10 @@ class AppTheme {
       filledButtonTheme: _buildFilledButtonTheme(colorScheme),
       outlinedButtonTheme: _buildOutlinedButtonTheme(colorScheme),
       textButtonTheme: _buildTextButtonTheme(colorScheme),
-      inputDecorationTheme: _buildInputDecorationTheme(colorScheme, isDark: false),
-      bottomNavigationBarTheme: _buildBottomNavTheme(colorScheme, isDark: false),
+      inputDecorationTheme:
+          _buildInputDecorationTheme(colorScheme, isDark: false),
+      bottomNavigationBarTheme:
+          _buildBottomNavTheme(colorScheme, isDark: false),
       navigationBarTheme: _buildNavigationBarTheme(colorScheme, isDark: false),
       tabBarTheme: _buildTabBarTheme(colorScheme),
       chipTheme: _buildChipTheme(colorScheme, isDark: false),
@@ -95,7 +97,7 @@ class AppTheme {
       tooltipTheme: _buildTooltipTheme(colorScheme, isDark: false),
       popupMenuTheme: _buildPopupMenuTheme(colorScheme, isDark: false),
       extensions: [
-        _QuranHadithThemeExtension.light(),
+        QuranHadithThemeExtension.light(),
       ],
     );
   }
@@ -144,7 +146,8 @@ class AppTheme {
       filledButtonTheme: _buildFilledButtonTheme(colorScheme),
       outlinedButtonTheme: _buildOutlinedButtonTheme(colorScheme),
       textButtonTheme: _buildTextButtonTheme(colorScheme),
-      inputDecorationTheme: _buildInputDecorationTheme(colorScheme, isDark: true),
+      inputDecorationTheme:
+          _buildInputDecorationTheme(colorScheme, isDark: true),
       bottomNavigationBarTheme: _buildBottomNavTheme(colorScheme, isDark: true),
       navigationBarTheme: _buildNavigationBarTheme(colorScheme, isDark: true),
       tabBarTheme: _buildTabBarTheme(colorScheme),
@@ -163,7 +166,7 @@ class AppTheme {
       tooltipTheme: _buildTooltipTheme(colorScheme, isDark: true),
       popupMenuTheme: _buildPopupMenuTheme(colorScheme, isDark: true),
       extensions: [
-        _QuranHadithThemeExtension.dark(),
+        QuranHadithThemeExtension.dark(),
       ],
     );
   }
@@ -294,7 +297,8 @@ class AppTheme {
     );
   }
 
-  static AppBarTheme _buildAppBarTheme(ColorScheme colorScheme, {required bool isDark}) {
+  static AppBarTheme _buildAppBarTheme(ColorScheme colorScheme,
+      {required bool isDark}) {
     return AppBarTheme(
       centerTitle: true,
       elevation: 0,
@@ -325,7 +329,8 @@ class AppTheme {
     );
   }
 
-  static CardThemeData _buildCardTheme(ColorScheme colorScheme, {required bool isDark}) {
+  static CardThemeData _buildCardTheme(ColorScheme colorScheme,
+      {required bool isDark}) {
     return CardThemeData(
       color: colorScheme.surfaceContainerHigh,
       surfaceTintColor: colorScheme.surfaceTint,
@@ -345,7 +350,8 @@ class AppTheme {
     );
   }
 
-  static ElevatedButtonThemeData _buildElevatedButtonTheme(ColorScheme colorScheme) {
+  static ElevatedButtonThemeData _buildElevatedButtonTheme(
+      ColorScheme colorScheme) {
     return ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         elevation: 0,
@@ -380,7 +386,8 @@ class AppTheme {
     );
   }
 
-  static FilledButtonThemeData _buildFilledButtonTheme(ColorScheme colorScheme) {
+  static FilledButtonThemeData _buildFilledButtonTheme(
+      ColorScheme colorScheme) {
     return FilledButtonThemeData(
       style: FilledButton.styleFrom(
         backgroundColor: colorScheme.primary,
@@ -400,7 +407,8 @@ class AppTheme {
     );
   }
 
-  static OutlinedButtonThemeData _buildOutlinedButtonTheme(ColorScheme colorScheme) {
+  static OutlinedButtonThemeData _buildOutlinedButtonTheme(
+      ColorScheme colorScheme) {
     return OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         foregroundColor: colorScheme.primary,
@@ -439,7 +447,9 @@ class AppTheme {
     );
   }
 
-  static InputDecorationTheme _buildInputDecorationTheme(ColorScheme colorScheme, {required bool isDark}) {
+  static InputDecorationTheme _buildInputDecorationTheme(
+      ColorScheme colorScheme,
+      {required bool isDark}) {
     return InputDecorationTheme(
       filled: true,
       fillColor: colorScheme.surfaceContainerHighest,
@@ -492,7 +502,9 @@ class AppTheme {
     );
   }
 
-  static BottomNavigationBarThemeData _buildBottomNavTheme(ColorScheme colorScheme, {required bool isDark}) {
+  static BottomNavigationBarThemeData _buildBottomNavTheme(
+      ColorScheme colorScheme,
+      {required bool isDark}) {
     return BottomNavigationBarThemeData(
       backgroundColor: colorScheme.surface,
       selectedItemColor: colorScheme.primary,
@@ -513,7 +525,9 @@ class AppTheme {
     );
   }
 
-  static NavigationBarThemeData _buildNavigationBarTheme(ColorScheme colorScheme, {required bool isDark}) {
+  static NavigationBarThemeData _buildNavigationBarTheme(
+      ColorScheme colorScheme,
+      {required bool isDark}) {
     return NavigationBarThemeData(
       backgroundColor: colorScheme.surface,
       surfaceTintColor: colorScheme.surfaceTint,
@@ -573,7 +587,8 @@ class AppTheme {
     );
   }
 
-  static ChipThemeData _buildChipTheme(ColorScheme colorScheme, {required bool isDark}) {
+  static ChipThemeData _buildChipTheme(ColorScheme colorScheme,
+      {required bool isDark}) {
     return ChipThemeData(
       backgroundColor: colorScheme.surfaceContainerHighest,
       disabledColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
@@ -604,7 +619,8 @@ class AppTheme {
     );
   }
 
-  static DividerThemeData _buildDividerTheme(ColorScheme colorScheme, {required bool isDark}) {
+  static DividerThemeData _buildDividerTheme(ColorScheme colorScheme,
+      {required bool isDark}) {
     return DividerThemeData(
       color: colorScheme.outlineVariant,
       thickness: 0.5,
@@ -614,7 +630,8 @@ class AppTheme {
     );
   }
 
-  static ListTileThemeData _buildListTileTheme(ColorScheme colorScheme, {required bool isDark}) {
+  static ListTileThemeData _buildListTileTheme(ColorScheme colorScheme,
+      {required bool isDark}) {
     return ListTileThemeData(
       contentPadding: const EdgeInsets.symmetric(
         horizontal: AppConstants.spacingMD,
@@ -648,7 +665,8 @@ class AppTheme {
     );
   }
 
-  static DialogThemeData _buildDialogTheme(ColorScheme colorScheme, {required bool isDark}) {
+  static DialogThemeData _buildDialogTheme(ColorScheme colorScheme,
+      {required bool isDark}) {
     return DialogThemeData(
       backgroundColor: colorScheme.surface,
       surfaceTintColor: colorScheme.surfaceTint,
@@ -670,7 +688,8 @@ class AppTheme {
     );
   }
 
-  static BottomSheetThemeData _buildBottomSheetTheme(ColorScheme colorScheme, {required bool isDark}) {
+  static BottomSheetThemeData _buildBottomSheetTheme(ColorScheme colorScheme,
+      {required bool isDark}) {
     return BottomSheetThemeData(
       backgroundColor: colorScheme.surface,
       surfaceTintColor: colorScheme.surfaceTint,
@@ -701,10 +720,6 @@ class AppTheme {
       ),
       behavior: SnackBarBehavior.floating,
       elevation: 4,
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppConstants.spacingMD,
-        vertical: AppConstants.spacingSM,
-      ),
     );
   }
 
@@ -722,7 +737,8 @@ class AppTheme {
     );
   }
 
-  static ProgressIndicatorThemeData _buildProgressIndicatorTheme(ColorScheme colorScheme) {
+  static ProgressIndicatorThemeData _buildProgressIndicatorTheme(
+      ColorScheme colorScheme) {
     return ProgressIndicatorThemeData(
       color: colorScheme.primary,
       linearTrackColor: colorScheme.primaryContainer,
@@ -800,7 +816,8 @@ class AppTheme {
     );
   }
 
-  static TooltipThemeData _buildTooltipTheme(ColorScheme colorScheme, {required bool isDark}) {
+  static TooltipThemeData _buildTooltipTheme(ColorScheme colorScheme,
+      {required bool isDark}) {
     return TooltipThemeData(
       decoration: BoxDecoration(
         color: colorScheme.inverseSurface,
@@ -827,7 +844,8 @@ class AppTheme {
     );
   }
 
-  static PopupMenuThemeData _buildPopupMenuTheme(ColorScheme colorScheme, {required bool isDark}) {
+  static PopupMenuThemeData _buildPopupMenuTheme(ColorScheme colorScheme,
+      {required bool isDark}) {
     return PopupMenuThemeData(
       color: colorScheme.surface,
       surfaceTintColor: colorScheme.surfaceTint,
@@ -836,17 +854,20 @@ class AppTheme {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppConstants.radiusMD),
       ),
-      labelTextStyle: GoogleFonts.notoSansArabic(
-        fontSize: 14,
-        fontWeight: FontWeight.w400,
-        color: colorScheme.onSurface,
+      labelTextStyle: WidgetStateProperty.all(
+        GoogleFonts.notoSansArabic(
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          color: colorScheme.onSurface,
+        ),
       ),
     );
   }
 }
 
 /// Custom theme extension for Quran/Hadith specific colors
-class _QuranHadithThemeExtension extends ThemeExtension<_QuranHadithThemeExtension> {
+class QuranHadithThemeExtension
+    extends ThemeExtension<QuranHadithThemeExtension> {
   final Color bismillahColor;
   final Color ayahNumberColor;
   final Color sajdahColor;
@@ -859,7 +880,7 @@ class _QuranHadithThemeExtension extends ThemeExtension<_QuranHadithThemeExtensi
   final Gradient quranGradient;
   final Gradient hadithGradient;
 
-  const _QuranHadithThemeExtension({
+  const QuranHadithThemeExtension({
     required this.bismillahColor,
     required this.ayahNumberColor,
     required this.sajdahColor,
@@ -873,8 +894,8 @@ class _QuranHadithThemeExtension extends ThemeExtension<_QuranHadithThemeExtensi
     required this.hadithGradient,
   });
 
-  factory _QuranHadithThemeExtension.light() {
-    return const _QuranHadithThemeExtension(
+  factory QuranHadithThemeExtension.light() {
+    return const QuranHadithThemeExtension(
       bismillahColor: Color(0xFF006D4C),
       ayahNumberColor: Color(0xFFD4A843),
       sajdahColor: Color(0xFFC62828),
@@ -897,8 +918,8 @@ class _QuranHadithThemeExtension extends ThemeExtension<_QuranHadithThemeExtensi
     );
   }
 
-  factory _QuranHadithThemeExtension.dark() {
-    return const _QuranHadithThemeExtension(
+  factory QuranHadithThemeExtension.dark() {
+    return const QuranHadithThemeExtension(
       bismillahColor: Color(0xFF1A8A6B),
       ayahNumberColor: Color(0xFFE8C56D),
       sajdahColor: Color(0xFFEF5350),
@@ -922,7 +943,7 @@ class _QuranHadithThemeExtension extends ThemeExtension<_QuranHadithThemeExtensi
   }
 
   @override
-  _QuranHadithThemeExtension copyWith({
+  QuranHadithThemeExtension copyWith({
     Color? bismillahColor,
     Color? ayahNumberColor,
     Color? sajdahColor,
@@ -935,7 +956,7 @@ class _QuranHadithThemeExtension extends ThemeExtension<_QuranHadithThemeExtensi
     Gradient? quranGradient,
     Gradient? hadithGradient,
   }) {
-    return _QuranHadithThemeExtension(
+    return QuranHadithThemeExtension(
       bismillahColor: bismillahColor ?? this.bismillahColor,
       ayahNumberColor: ayahNumberColor ?? this.ayahNumberColor,
       sajdahColor: sajdahColor ?? this.sajdahColor,
@@ -951,18 +972,22 @@ class _QuranHadithThemeExtension extends ThemeExtension<_QuranHadithThemeExtensi
   }
 
   @override
-  _QuranHadithThemeExtension lerp(ThemeExtension<_QuranHadithThemeExtension>? other, double t) {
-    if (other is! _QuranHadithThemeExtension) return this;
-    return _QuranHadithThemeExtension(
+  QuranHadithThemeExtension lerp(
+      ThemeExtension<QuranHadithThemeExtension>? other, double t) {
+    if (other is! QuranHadithThemeExtension) return this;
+    return QuranHadithThemeExtension(
       bismillahColor: Color.lerp(bismillahColor, other.bismillahColor, t)!,
       ayahNumberColor: Color.lerp(ayahNumberColor, other.ayahNumberColor, t)!,
       sajdahColor: Color.lerp(sajdahColor, other.sajdahColor, t)!,
       juzMarkerColor: Color.lerp(juzMarkerColor, other.juzMarkerColor, t)!,
       bookmarkColor: Color.lerp(bookmarkColor, other.bookmarkColor, t)!,
-      hadithGradeSahih: Color.lerp(hadithGradeSahih, other.hadithGradeSahih, t)!,
-      hadithGradeHasan: Color.lerp(hadithGradeHasan, other.hadithGradeHasan, t)!,
+      hadithGradeSahih:
+          Color.lerp(hadithGradeSahih, other.hadithGradeSahih, t)!,
+      hadithGradeHasan:
+          Color.lerp(hadithGradeHasan, other.hadithGradeHasan, t)!,
       hadithGradeDaif: Color.lerp(hadithGradeDaif, other.hadithGradeDaif, t)!,
-      searchHighlightColor: Color.lerp(searchHighlightColor, other.searchHighlightColor, t)!,
+      searchHighlightColor:
+          Color.lerp(searchHighlightColor, other.searchHighlightColor, t)!,
       quranGradient: Gradient.lerp(quranGradient, other.quranGradient, t)!,
       hadithGradient: Gradient.lerp(hadithGradient, other.hadithGradient, t)!,
     );
@@ -971,5 +996,9 @@ class _QuranHadithThemeExtension extends ThemeExtension<_QuranHadithThemeExtensi
 
 /// Extension to easily access the custom theme
 extension QuranHadithTheme on ThemeData {
-  _QuranHadithThemeExtension get quranHadith => extension<_QuranHadithThemeExtension>()!;
+  QuranHadithThemeExtension get quranHadith =>
+      extension<QuranHadithThemeExtension>() ??
+      (brightness == Brightness.dark
+          ? QuranHadithThemeExtension.dark()
+          : QuranHadithThemeExtension.light());
 }

@@ -65,13 +65,20 @@ class NarratorChainCard extends StatelessWidget {
                   _buildStat(
                     context,
                     Icons.verified_outlined,
-                    narrators.where((n) => n.reliability == NarratorReliability.thiqa).length.toString(),
+                    narrators
+                        .where(
+                            (n) => n.reliability == NarratorReliability.thiqa)
+                        .length
+                        .toString(),
                     'Thiqa',
                   ),
                   _buildStat(
                     context,
                     Icons.history,
-                    narrators.where((n) => n.deathYear != null).length.toString(),
+                    narrators
+                        .where((n) => n.deathYear != null)
+                        .length
+                        .toString(),
                     'Dated',
                   ),
                 ],
@@ -99,8 +106,7 @@ class NarratorChainCard extends StatelessWidget {
               index: index + 1,
               total: narrators.length,
             ),
-            if (!isLast)
-              _buildConnector(context),
+            if (!isLast) _buildConnector(context),
           ],
         );
       }).toList(),
@@ -188,7 +194,8 @@ class _NarratorNode extends StatelessWidget {
                 width: 28,
                 height: 28,
                 decoration: BoxDecoration(
-                  color: _getReliabilityColor(narrator.reliability).withValues(alpha: 0.15),
+                  color: _getReliabilityColor(narrator.reliability)
+                      .withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: _getReliabilityColor(narrator.reliability),
@@ -229,10 +236,12 @@ class _NarratorNode extends StatelessWidget {
                   if (narrator.kunya.isNotEmpty) ...[
                     const SizedBox(width: AppConstants.spacingSM),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
                         color: theme.colorScheme.primaryContainer,
-                        borderRadius: BorderRadius.circular(AppConstants.radiusFull),
+                        borderRadius:
+                            BorderRadius.circular(AppConstants.radiusFull),
                       ),
                       child: Text(
                         narrator.kunya,
@@ -245,7 +254,6 @@ class _NarratorNode extends StatelessWidget {
                   ],
                 ],
               ),
-
               if (narrator.nameArabic.isNotEmpty) ...[
                 const SizedBox(height: AppConstants.spacingXS),
                 Text(
@@ -257,17 +265,18 @@ class _NarratorNode extends StatelessWidget {
                   textDirection: TextDirection.rtl,
                 ),
               ],
-
               const SizedBox(height: AppConstants.spacingXS),
-
               Row(
                 children: [
                   // Reliability badge
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: _getReliabilityColor(narrator.reliability).withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(AppConstants.radiusFull),
+                      color: _getReliabilityColor(narrator.reliability)
+                          .withValues(alpha: 0.15),
+                      borderRadius:
+                          BorderRadius.circular(AppConstants.radiusFull),
                     ),
                     child: Text(
                       narrator.reliability.arabicName,
@@ -300,7 +309,6 @@ class _NarratorNode extends StatelessWidget {
                   ),
                 ],
               ),
-
               if (narrator.biography.isNotEmpty) ...[
                 const SizedBox(height: AppConstants.spacingSM),
                 Text(

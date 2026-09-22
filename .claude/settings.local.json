@@ -2,7 +2,24 @@
   "permissions": {
     "allow": [
       "Bash(powershell \"Get-ChildItem -Path 'D:\\\\flutter_hadith_app\\\\flutter_application_1\\\\assets' -Recurse -Force 2>&1 | Select-Object -First 30\")",
-      "Bash(powershell -Command \"Get-ChildItem 'D:\\\\\\\\flutter_hadith_app\\\\\\\\flutter_application_1\\\\\\\\assets' -Recurse | Select-Object FullName | head -20\")"
+      "Bash(powershell -Command \"Get-ChildItem 'D:\\\\\\\\flutter_hadith_app\\\\\\\\flutter_application_1\\\\\\\\assets' -Recurse | Select-Object FullName | head -20\")",
+      "Bash(flutter analyze *)",
+      "Bash(cat C:\\\\Users\\\\sohai\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\D--flutter-hadith-app-flutter-application-1\\\\4a0307a3-e922-4e14-bd4d-b812c08bb15b\\\\tasks\\\\bnsp6r7mx.output)",
+      "Bash(flutter run *)",
+      "Bash(flutter pub *)",
+      "mcp__ide__getDiagnostics",
+      "Bash(flutter build *)",
+      "Bash(dart format *)",
+      "WebFetch(domain:api.quran.com)",
+      "Bash(curl -L -o \"D:/flutter_hadith_app/flutter_application_1/assets/fonts/Amiri-Regular.ttf\" \"https://github.com/google/fonts/raw/main/ofl/amiri/Amiri-Regular.ttf\")",
+      "Bash(curl -L -o \"D:/flutter_hadith_app/flutter_application_1/assets/fonts/Amiri-Bold.ttf\" \"https://github.com/google/fonts/raw/main/ofl/amiri/Amiri-Bold.ttf\")",
+      "Bash(curl -s \"https://api.quran.com/api/v4/chapters\")",
+      "Bash(curl -s \"https://api.quran.com/api/v4/juzs\")",
+      "Bash(curl -s \"https://api.quran.com/api/v4/resources/translations\")",
+      "Bash(curl -s \"https://api.quran.com/api/v4/resources/recitations\")",
+      "Bash(curl -s \"https://api.quran.com/api/v4/verses/by_chapter/1?translations=131&fields=text_uthmani,text_imlaei_simple&per_page=3\")",
+      "Bash(curl -s \"https://api.quran.com/api/v4/verses/by_chapter/1?translations=131&fields=text_uthmani,text_imlaei_simple&per_page=1&language=en\")",
+      "Bash(python3 -m json.tool)"
     ]
   }
 }

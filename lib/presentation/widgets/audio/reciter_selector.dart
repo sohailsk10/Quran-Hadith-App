@@ -242,7 +242,8 @@ class _ReciterTile extends StatelessWidget {
         padding: const EdgeInsets.all(AppConstants.spacingMD),
         decoration: BoxDecoration(
           color: isSelected
-              ? quranHadithTheme.quranGradient.colors!.first.withValues(alpha: 0.1)
+              ? quranHadithTheme.quranGradient.colors!.first
+                  .withValues(alpha: 0.1)
               : theme.colorScheme.surfaceContainerHigh,
           borderRadius: BorderRadius.circular(AppConstants.radiusMD),
           border: Border.all(
@@ -286,10 +287,10 @@ class _ReciterTile extends StatelessWidget {
                           : theme.colorScheme.onSurface,
                     ),
                   ),
-                  if (reciter.style.isNotEmpty) ...[
+                  if (reciter.styleName.isNotEmpty) ...[
                     const SizedBox(height: AppConstants.spacingXS),
                     Text(
-                      reciter.style,
+                      reciter.styleName,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
@@ -370,9 +371,9 @@ class _ReciterMenuItem extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              if (reciter.style.isNotEmpty)
+              if (reciter.styleName.isNotEmpty)
                 Text(
-                  reciter.style,
+                  reciter.styleName,
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -459,9 +460,9 @@ class ReciterListItem extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: AppConstants.spacingXS),
-                  if (reciter.style.isNotEmpty)
+                  if (reciter.styleName.isNotEmpty)
                     Text(
-                      reciter.style,
+                      reciter.styleName,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),

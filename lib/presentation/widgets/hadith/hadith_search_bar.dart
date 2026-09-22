@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../presentation/providers/app_providers.dart';
+import '../../../shared/models/hadith_models.dart';
 
 class HadithSearchBar extends ConsumerStatefulWidget {
   final ValueChanged<String> onSearch;
@@ -169,7 +170,8 @@ class _SuggestionsOverlay extends StatelessWidget {
           ),
           child: ListView.separated(
             shrinkWrap: true,
-            padding: const EdgeInsets.symmetric(vertical: AppConstants.spacingSM),
+            padding:
+                const EdgeInsets.symmetric(vertical: AppConstants.spacingSM),
             itemCount: suggestions.length,
             separatorBuilder: (context, index) => Divider(
               height: 1,
@@ -230,7 +232,8 @@ class HadithFilterBottomSheet extends ConsumerWidget {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                  color:
+                      theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -272,14 +275,14 @@ class HadithFilterBottomSheet extends ConsumerWidget {
                         spacing: AppConstants.spacingSM,
                         runSpacing: AppConstants.spacingSM,
                         children: collections.map((collection) {
-                          final isSelected = currentFilter.collections
-                              .contains(collection.id);
+                          final isSelected =
+                              currentFilter.collections.contains(collection.id);
                           return FilterChip(
                             label: Text(collection.name),
                             selected: isSelected,
                             onSelected: (selected) {
-                              final newCollections = Set<String>.from(
-                                currentFilter.collections);
+                              final newCollections =
+                                  Set<String>.from(currentFilter.collections);
                               if (selected) {
                                 newCollections.add(collection.id);
                               } else {
@@ -311,14 +314,14 @@ class HadithFilterBottomSheet extends ConsumerWidget {
                       children: HadithAuthenticity.values
                           .where((a) => a != HadithAuthenticity.unknown)
                           .map((authenticity) {
-                        final isSelected = currentFilter.authenticities
-                            .contains(authenticity);
+                        final isSelected =
+                            currentFilter.authenticities.contains(authenticity);
                         return FilterChip(
                           label: Text(authenticity.displayName),
                           selected: isSelected,
                           onSelected: (selected) {
                             final newAuths = Set<HadithAuthenticity>.from(
-                              currentFilter.authenticities);
+                                currentFilter.authenticities);
                             if (selected) {
                               newAuths.add(authenticity);
                             } else {
@@ -347,8 +350,8 @@ class HadithFilterBottomSheet extends ConsumerWidget {
                           label: Text(grade.displayName),
                           selected: isSelected,
                           onSelected: (selected) {
-                            final newGrades = Set<HadithGrade>.from(
-                              currentFilter.grades);
+                            final newGrades =
+                                Set<HadithGrade>.from(currentFilter.grades);
                             if (selected) {
                               newGrades.add(grade);
                             } else {

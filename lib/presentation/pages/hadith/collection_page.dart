@@ -2,14 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../presentation/providers/app_providers.dart';
 import '../../../shared/models/hadith_models.dart';
 import '../../widgets/common/app_scaffold.dart';
-import '../../widgets/common/section_header.dart';
 import '../../widgets/hadith/book_card.dart';
 
 class CollectionPage extends ConsumerStatefulWidget {
@@ -21,7 +19,8 @@ class CollectionPage extends ConsumerStatefulWidget {
   ConsumerState<CollectionPage> createState() => _CollectionPageState();
 }
 
-class _CollectionPageState extends ConsumerState<CollectionPage> with SingleTickerProviderStateMixin {
+class _CollectionPageState extends ConsumerState<CollectionPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final ScrollController _scrollController = ScrollController();
 
@@ -40,15 +39,13 @@ class _CollectionPageState extends ConsumerState<CollectionPage> with SingleTick
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return AppScaffold(
       title: 'Collection',
       child: Consumer(
         builder: (context, ref, _) {
           final collectionsAsync = ref.watch(hadithCollectionsProvider);
-          final booksAsync = ref.watch(hadithBooksProvider(widget.collectionId));
-          final chaptersAsync = ref.watch(hadithChaptersProvider(widget.collectionId));
+          final booksAsync =
+              ref.watch(hadithBooksProvider(widget.collectionId));
 
           return collectionsAsync.when(
             data: (collections) {
@@ -78,7 +75,7 @@ class _CollectionPageState extends ConsumerState<CollectionPage> with SingleTick
                       controller: _tabController,
                       children: [
                         _buildBooksTab(booksAsync),
-                        _buildChaptersTab(chaptersAsync),
+                        _buildChaptersTab(),
                       ],
                     ),
                   ),
@@ -105,7 +102,8 @@ class _CollectionPageState extends ConsumerState<CollectionPage> with SingleTick
         borderRadius: BorderRadius.circular(AppConstants.radiusLG),
         boxShadow: [
           BoxShadow(
-            color: quranHadithTheme.hadithGradient.colors.first.withValues(alpha: 0.3),
+            color: quranHadithTheme.hadithGradient.colors.first
+                .withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -153,22 +151,32 @@ class _CollectionPageState extends ConsumerState<CollectionPage> with SingleTick
               ),
             ],
           ),
+          if (collection.description.isNotEmpty) ...[
+            const SizedBox(height: AppConstants.spacingMD),
+            Text(
+              collection.description,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: Colors.white.withValues(alpha: 0.9),
+                height: 1.4,
+              ),
+            ),
+          ],
           const SizedBox(height: AppConstants.spacingMD),
-          Row(
+          Wrap(
+            spacing: AppConstants.spacingSM,
+            runSpacing: AppConstants.spacingXS,
             children: [
               _StatChip(
                 icon: Icons.article_outlined,
                 label: '${collection.totalHadiths} Hadiths',
               ),
-              const SizedBox(width: AppConstants.spacingMD),
               _StatChip(
                 icon: Icons.book_outlined,
                 label: '${collection.totalBooks} Books',
               ),
-              const SizedBox(width: AppConstants.spacingMD),
               _StatChip(
-                icon: Icons.topic_outlined,
-                label: '${collection.totalChapters} Chapters',
+                icon: Icons.translate_rounded,
+                label: 'Translations: English & Urdu',
               ),
             ],
           ),
@@ -180,30 +188,22 @@ class _CollectionPageState extends ConsumerState<CollectionPage> with SingleTick
   Widget _buildBooksTab(AsyncValue<List<HadithBook>> booksAsync) {
     return booksAsync.when(
       data: (books) => RefreshIndicator(
-        onRefresh: () async => ref.refresh(booksProvider(widget.collectionId)),
-        child: AnimationLimiter(
-          child: ListView.separated(
-            controller: _scrollController,
-            padding: const EdgeInsets.all(AppConstants.spacingMD),
-            itemCount: books.length,
-            separatorBuilder: (_, __) => const SizedBox(height: AppConstants.spacingMD),
-            itemBuilder: (context, index) {
-              final book = books[index];
-              return AnimationConfiguration.staggeredList(
-                position: index,
-                duration: AppConstants.mediumAnimation,
-                child: SlideAnimation(
-                  verticalOffset: 50.0,
-                  child: FadeInAnimation(
-                    child: BookCard(
-                      book: book,
-                      onTap: () => context.go('/hadith/collection/${widget.collectionId}/book/${book.number}'),
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
+        onRefresh: () async =>
+            ref.refresh(hadithBooksProvider(widget.collectionId)),
+        child: ListView.separated(
+          controller: _scrollController,
+          padding: const EdgeInsets.all(AppConstants.spacingMD),
+          itemCount: books.length,
+          separatorBuilder: (_, __) =>
+              const SizedBox(height: AppConstants.spacingMD),
+          itemBuilder: (context, index) {
+            final book = books[index];
+            return BookCard(
+              book: book,
+              onTap: () => context.go(
+                  '/hadith/collection/${widget.collectionId}/book/${book.number}'),
+            );
+          },
         ),
       ),
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -211,39 +211,24 @@ class _CollectionPageState extends ConsumerState<CollectionPage> with SingleTick
     );
   }
 
-  Widget _buildChaptersTab(AsyncValue<List<HadithChapter>> chaptersAsync) {
-    return chaptersAsync.when(
-      data: (chapters) => RefreshIndicator(
-        onRefresh: () async => ref.refresh(chaptersProvider(widget.collectionId)),
-        child: AnimationLimiter(
-          child: ListView.separated(
-            padding: const EdgeInsets.all(AppConstants.spacingMD),
-            itemCount: chapters.length,
-            separatorBuilder: (_, __) => const SizedBox(height: AppConstants.spacingMD),
-            itemBuilder: (context, index) {
-              final chapter = chapters[index];
-              return AnimationConfiguration.staggeredList(
-                position: index,
-                duration: AppConstants.mediumAnimation,
-                child: SlideAnimation(
-                  verticalOffset: 50.0,
-                  child: FadeInAnimation(
-                    child: _ChapterCard(
-                      chapter: chapter,
-                      onTap: () {
-                        // Navigate to first hadith in chapter
-                        context.go('/hadith/collection/${widget.collectionId}/book/${chapter.bookNumber}/hadith/${chapter.startHadithNumber}');
-                      },
-                    ),
-                  ),
-                ),
-              );
-            },
+  Widget _buildChaptersTab() {
+    // This is a placeholder - chapters are per book, not per collection
+    // In a real app, this might show a summary or redirect
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.topic_outlined,
+              size: 64, color: Theme.of(context).colorScheme.onSurfaceVariant),
+          const SizedBox(height: 16),
+          Text('Select a Book to view its Chapters'),
+          const SizedBox(height: 16),
+          FilledButton(
+            onPressed: () => _tabController.animateTo(0),
+            child: const Text('View Books'),
           ),
-        ),
+        ],
       ),
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => Center(child: Text('Error: $error')),
     );
   }
 
@@ -257,7 +242,8 @@ class _CollectionPageState extends ConsumerState<CollectionPage> with SingleTick
           Text('Error: $error'),
           const SizedBox(height: 16),
           ElevatedButton(
-            onPressed: () => ref.refresh(hadithCollectionProvider(widget.collectionId)),
+            onPressed: () => ref
+                .refresh(hadithCollectionDetailProvider(widget.collectionId)),
             child: const Text('Retry'),
           ),
         ],
@@ -295,73 +281,6 @@ class _StatChip extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _ChapterCard extends StatelessWidget {
-  final HadithChapter chapter;
-  final VoidCallback onTap;
-
-  const _ChapterCard({required this.chapter, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppConstants.radiusMD),
-      child: Container(
-        padding: const EdgeInsets.all(AppConstants.spacingMD),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceContainerHigh,
-          borderRadius: BorderRadius.circular(AppConstants.radiusMD),
-          border: Border.all(color: theme.colorScheme.outlineVariant),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(AppConstants.radiusMD),
-              ),
-              child: Icon(
-                Icons.topic_outlined,
-                color: theme.colorScheme.onPrimaryContainer,
-                size: 24,
-              ),
-            ),
-            const SizedBox(width: AppConstants.spacingMD),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    chapter.title,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: AppConstants.spacingXS),
-                  Text(
-                    'Book ${chapter.bookNumber} • ${chapter.hadithCount} hadiths',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              Icons.chevron_right,
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ],
-        ),
       ),
     );
   }

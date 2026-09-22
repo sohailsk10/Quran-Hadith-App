@@ -1,7 +1,7 @@
 /// Riverpod providers for the Quran & Hadith App
 
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../data/datasources/local/quran_local_datasource.dart';
 import '../../data/datasources/local/hadith_local_datasource.dart';
 import '../../data/datasources/remote/quran_remote_datasource.dart';
@@ -13,13 +13,13 @@ import '../../shared/models/quran_models.dart';
 import '../../shared/models/hadith_models.dart';
 import '../../core/constants/app_constants.dart';
 import 'package:dio/dio.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 
-part 'app_providers.g.dart';
+// Export HadithBookDetail from remote datasource for provider usage
+export '../../data/datasources/remote/hadith_remote_datasource.dart'
+    show HadithBookDetail;
 
 /// Dio provider
-@riverpod
-Dio dio(DioRef ref) {
+final dioProvider = Provider<Dio>((ref) {
   return Dio(BaseOptions(
     connectTimeout: const Duration(seconds: 30),
     receiveTimeout: const Duration(seconds: 30),
@@ -28,80 +28,63 @@ Dio dio(DioRef ref) {
       'Content-Type': 'application/json',
     },
   ));
-}
+});
 
 /// Quran Local DataSource provider
-@riverpod
-QuranLocalDataSource quranLocalDataSource(QuranLocalDataSourceRef ref) {
+final quranLocalDataSourceProvider = Provider<QuranLocalDataSource>((ref) {
   return QuranLocalDataSource();
-}
+});
 
 /// Hadith Local DataSource provider
-@riverpod
-HadithLocalDataSource hadithLocalDataSource(HadithLocalDataSourceRef ref) {
+final hadithLocalDataSourceProvider = Provider<HadithLocalDataSource>((ref) {
   return HadithLocalDataSource();
-}
+});
 
 /// Quran Remote DataSource provider
-@riverpod
-QuranRemoteDataSource quranRemoteDataSource(QuranRemoteDataSourceRef ref) {
-  return QuranRemoteDataSource(dio: ref.watch(dioProvider));
-}
+final quranRemoteDataSourceProvider = Provider<QuranRemoteDataSource>((ref) {
+  return QuranRemoteDataSource();
+});
 
 /// Hadith Remote DataSource provider
-@riverpod
-HadithRemoteDataSource hadithRemoteDataSource(HadithRemoteDataSourceRef ref) {
-  return HadithRemoteDataSource(dio: ref.watch(dioProvider));
-}
+final hadithRemoteDataSourceProvider = Provider<HadithRemoteDataSource>((ref) {
+  return HadithRemoteDataSource();
+});
 
 /// Quran Repository provider
-@riverpod
-QuranRepository quranRepository(QuranRepositoryRef ref) {
+final quranRepositoryProvider = Provider<QuranRepository>((ref) {
   return QuranRepository(
     localDataSource: ref.watch(quranLocalDataSourceProvider),
     remoteDataSource: ref.watch(quranRemoteDataSourceProvider),
   );
-}
+});
 
 /// Hadith Repository provider
-@riverpod
-HadithRepository hadithRepository(HadithRepositoryRef ref) {
+final hadithRepositoryProvider = Provider<HadithRepository>((ref) {
   return HadithRepository(
     localDataSource: ref.watch(hadithLocalDataSourceProvider),
     remoteDataSource: ref.watch(hadithRemoteDataSourceProvider),
   );
-}
+});
 
 /// Initialize repositories provider
-@riverpod
-Future<void> initializeRepositories(InitializeRepositoriesRef ref) async {
+final initializeRepositoriesProvider = FutureProvider<void>((ref) async {
   await ref.watch(quranRepositoryProvider).init();
   await ref.watch(hadithRepositoryProvider).init();
-}
+});
 
-/// Settings provider
-@riverpod
-class Settings extends _$Settings {
+/// Settings notifier
+class SettingsNotifier extends AsyncNotifier<AppSettings> {
   @override
   Future<AppSettings> build() async {
     final repository = ref.watch(quranRepositoryProvider);
-    final result = await repository.getSettings();
-    return result.fold(
-      (error) => const AppSettings(),
-      (settings) => settings,
-    );
+    return await repository.getSettings();
   }
 
   Future<void> updateSettings(AppSettings settings) async {
     state = const AsyncLoading();
     final repository = ref.read(quranRepositoryProvider);
-    final result = await repository.saveSettings(settings);
-    state = await AsyncValue.guard(() async {
-      result.fold(
-        (error) => throw error,
-        (_) => settings,
-      );
-    });
+    await repository.saveSettings(settings);
+    state = AsyncData(settings);
   }
 
   Future<void> updateThemeMode(ThemeMode themeMode) async {
@@ -116,7 +99,8 @@ class Settings extends _$Settings {
 
   Future<void> updateTranslation(String translationId) async {
     final current = state.valueOrNull ?? const AppSettings();
-    await updateSettings(current.copyWith(selectedTranslationId: translationId));
+    await updateSettings(
+        current.copyWith(selectedTranslationId: translationId));
   }
 
   Future<void> updateQuranDisplay(QuranDisplaySettings quranDisplay) async {
@@ -143,632 +127,479 @@ class Settings extends _$Settings {
     final current = state.valueOrNull ?? const AppSettings();
     await updateSettings(current.copyWith(privacy: privacy));
   }
+
+  // Compatibility aliases
+  Future<void> updateNotificationSettings(
+      NotificationSettings notifications) async {
+    await updateNotifications(notifications);
+  }
+
+  Future<void> updatePrivacySettings(PrivacySettings privacy) async {
+    await updatePrivacy(privacy);
+  }
+
+  Future<void> updateAnimationsEnabled(bool enabled) async {
+    final current = state.valueOrNull ?? const AppSettings();
+    await updateSettings(current.copyWith(animationsEnabled: enabled));
+  }
+
+  Future<void> updateFontScale(double scale) async {
+    final current = state.valueOrNull ?? const AppSettings();
+    await updateSettings(current.copyWith(fontScale: scale));
+  }
+
+  Future<void> resetToDefaults() async {
+    await updateSettings(const AppSettings());
+  }
 }
 
-/// Quran Surahs provider
-@riverpod
-class Surahs extends _$Surahs {
+final settingsProvider = AsyncNotifierProvider<SettingsNotifier, AppSettings>(
+  SettingsNotifier.new,
+);
+
+/// Quran Surahs notifier
+class SurahsNotifier extends AsyncNotifier<List<Surah>> {
   @override
   Future<List<Surah>> build() async {
-    final repository = ref.watch(quranRepositoryProvider);
-    final result = await repository.getAllSurahs();
-    return result.fold(
-      (error) => throw error,
-      (surahs) => surahs,
-    );
+    return await ref.watch(quranRepositoryProvider).getAllSurahs();
   }
 
   Future<void> refresh() async {
     state = const AsyncLoading();
-    final repository = ref.read(quranRepositoryProvider);
-    final result = await repository.getAllSurahs(forceRefresh: true);
-    state = AsyncValue.data(result.fold((error) => throw error, (surahs) => surahs));
-  }
-}
-
-/// Selected Surah provider
-@riverpod
-class SelectedSurah extends _$SelectedSurah {
-  @override
-  Future<Surah?> build(int surahNumber) async {
-    final repository = ref.watch(quranRepositoryProvider);
-    final result = await repository.getSurah(surahNumber);
-    return result.fold(
-      (error) => throw error,
-      (surah) => surah,
+    state = await AsyncValue.guard(
+      () => ref.read(quranRepositoryProvider).getAllSurahs(forceRefresh: true),
     );
   }
 }
 
-/// Surah Ayahs provider
-@riverpod
-class SurahAyahs extends _$SurahAyahs {
+final surahsProvider = AsyncNotifierProvider<SurahsNotifier, List<Surah>>(
+  SurahsNotifier.new,
+);
+
+/// Selected Surah provider (family)
+final selectedSurahProvider =
+    FutureProvider.family<Surah?, int>((ref, surahNumber) async {
+  return await ref.watch(quranRepositoryProvider).getSurah(surahNumber);
+});
+
+/// Surah Ayahs notifier (family)
+class SurahAyahsNotifier extends FamilyAsyncNotifier<List<Ayah>, int> {
   @override
   Future<List<Ayah>> build(int surahNumber) async {
     final settings = ref.watch(settingsProvider).valueOrNull;
-    final translationId = settings?.selectedTranslationId ?? AppConstants.defaultTranslation;
-    final repository = ref.watch(quranRepositoryProvider);
-    final result = await repository.getAyahsBySurah(surahNumber, translationId: translationId);
-    return result.fold(
-      (error) => throw error,
-      (ayahs) => ayahs,
-    );
+    final translationId =
+        settings?.selectedTranslationId ?? AppConstants.defaultTranslation;
+    return await ref
+        .watch(quranRepositoryProvider)
+        .getAyahsBySurah(surahNumber, translationId: translationId);
   }
 
-  Future<void> refresh() async {
+  Future<void> refresh(int surahNumber) async {
     state = const AsyncLoading();
-    final settings = ref.read(settingsProvider).valueOrNull;
-    final translationId = settings?.selectedTranslationId ?? AppConstants.defaultTranslation;
-    final repository = ref.read(quranRepositoryProvider);
-    final surahNumber = state.valueOrNull?.first.surahNumber ?? 1;
-    final result = await repository.getAyahsBySurah(surahNumber, translationId: translationId, forceRefresh: true);
-    state = AsyncValue.data(result.fold((error) => throw error, (ayahs) => ayahs));
+    state = await AsyncValue.guard(() async {
+      final settings = ref.read(settingsProvider).valueOrNull;
+      final translationId =
+          settings?.selectedTranslationId ?? AppConstants.defaultTranslation;
+      return ref.read(quranRepositoryProvider).getAyahsBySurah(surahNumber,
+          translationId: translationId, forceRefresh: true);
+    });
   }
 }
 
-/// Ayah provider
-@riverpod
-class Ayah extends _$Ayah {
-  @override
-  Future<Ayah?> build(int surahNumber, int ayahNumber) async {
-    final settings = ref.watch(settingsProvider).valueOrNull;
-    final translationId = settings?.selectedTranslationId ?? AppConstants.defaultTranslation;
-    final repository = ref.watch(quranRepositoryProvider);
-    final result = await repository.getAyah(surahNumber, ayahNumber, translationId: translationId);
-    return result.fold(
-      (error) => throw error,
-      (ayah) => ayah,
-    );
-  }
-}
+final surahAyahsProvider =
+    AsyncNotifierProvider.family<SurahAyahsNotifier, List<Ayah>, int>(
+  SurahAyahsNotifier.new,
+);
+
+/// Single Ayah provider (family with surah and ayah number)
+final ayahProvider =
+    FutureProvider.family<Ayah?, (int, int)>((ref, args) async {
+  final (surahNumber, ayahNumber) = args;
+  final settings = ref.watch(settingsProvider).valueOrNull;
+  final translationId =
+      settings?.selectedTranslationId ?? AppConstants.defaultTranslation;
+  return await ref
+      .watch(quranRepositoryProvider)
+      .getAyah(surahNumber, ayahNumber, translationId: translationId);
+});
 
 /// Juz provider
-@riverpod
-class Juzs extends _$Juzs {
-  @override
-  Future<List<Juz>> build() async {
-    final repository = ref.watch(quranRepositoryProvider);
-    final result = await repository.getAllJuz();
-    return result.fold(
-      (error) => throw error,
-      (juz) => juz,
-    );
-  }
-}
+final juzProvider = FutureProvider<List<Juz>>((ref) async {
+  return await ref.watch(quranRepositoryProvider).getAllJuz();
+});
 
-/// Juz Ayahs provider
-@riverpod
-class JuzAyahs extends _$JuzAyahs {
-  @override
-  Future<List<Ayah>> build(int juzNumber) async {
-    final settings = ref.watch(settingsProvider).valueOrNull;
-    final translationId = settings?.selectedTranslationId ?? AppConstants.defaultTranslation;
-    final repository = ref.watch(quranRepositoryProvider);
-    final result = await repository.getAyahsByJuz(juzNumber, translationId: translationId);
-    return result.fold(
-      (error) => throw error,
-      (ayahs) => ayahs,
-    );
-  }
-}
+/// Juz Ayahs provider (family)
+final juzAyahsProvider =
+    FutureProvider.family<List<Ayah>, int>((ref, juzNumber) async {
+  final settings = ref.watch(settingsProvider).valueOrNull;
+  final translationId =
+      settings?.selectedTranslationId ?? AppConstants.defaultTranslation;
+  return await ref
+      .watch(quranRepositoryProvider)
+      .getAyahsByJuz(juzNumber, translationId: translationId);
+});
 
-/// Page Ayahs provider
-@riverpod
-class PageAyahs extends _$PageAyahs {
-  @override
-  Future<List<Ayah>> build(int pageNumber) async {
-    final settings = ref.watch(settingsProvider).valueOrNull;
-    final translationId = settings?.selectedTranslationId ?? AppConstants.defaultTranslation;
-    final repository = ref.watch(quranRepositoryProvider);
-    final result = await repository.getAyahsByPage(pageNumber, translationId: translationId);
-    return result.fold(
-      (error) => throw error,
-      (ayahs) => ayahs,
-    );
-  }
-}
+/// Page Ayahs provider (family)
+final pageAyahsProvider =
+    FutureProvider.family<List<Ayah>, int>((ref, pageNumber) async {
+  final settings = ref.watch(settingsProvider).valueOrNull;
+  final translationId =
+      settings?.selectedTranslationId ?? AppConstants.defaultTranslation;
+  return await ref
+      .watch(quranRepositoryProvider)
+      .getAyahsByPage(pageNumber, translationId: translationId);
+});
 
 /// Translations provider
-@riverpod
-class Translations extends _$Translations {
-  @override
-  Future<List<TranslationInfo>> build() async {
-    final repository = ref.watch(quranRepositoryProvider);
-    final result = await repository.getAllTranslations();
-    return result.fold(
-      (error) => throw error,
-      (translations) => translations,
-    );
-  }
-}
+final translationsProvider = FutureProvider<List<TranslationInfo>>((ref) async {
+  return await ref.watch(quranRepositoryProvider).getAllTranslations();
+});
 
 /// Reciters provider
-@riverpod
-class Reciters extends _$Reciters {
-  @override
-  Future<List<ReciterInfo>> build() async {
-    final repository = ref.watch(quranRepositoryProvider);
-    final result = await repository.getAllReciters();
-    return result.fold(
-      (error) => throw error,
-      (reciters) => reciters,
-    );
-  }
-}
+final recitersProvider = FutureProvider<List<ReciterInfo>>((ref) async {
+  return await ref.watch(quranRepositoryProvider).getAllReciters();
+});
 
-/// Bookmarks provider
-@riverpod
-class QuranBookmarks extends _$QuranBookmarks {
+/// Quran Bookmarks notifier
+class QuranBookmarksNotifier extends AsyncNotifier<List<QuranBookmark>> {
   @override
   Future<List<QuranBookmark>> build() async {
-    final repository = ref.watch(quranRepositoryProvider);
-    final result = await repository.getAllBookmarks();
-    return result.fold(
-      (error) => throw error,
-      (bookmarks) => bookmarks,
-    );
+    return await ref.watch(quranRepositoryProvider).getAllBookmarks();
   }
 
   Future<void> add(QuranBookmark bookmark) async {
-    final repository = ref.read(quranRepositoryProvider);
-    final result = await repository.addBookmark(bookmark);
-    result.fold(
-      (error) => throw error,
-      (_) => refresh(),
-    );
+    await ref.read(quranRepositoryProvider).addBookmark(bookmark);
+    await refresh();
   }
 
   Future<void> remove(String id) async {
-    final repository = ref.read(quranRepositoryProvider);
-    final result = await repository.removeBookmark(id);
-    result.fold(
-      (error) => throw error,
-      (_) => refresh(),
-    );
+    await ref.read(quranRepositoryProvider).removeBookmark(id);
+    await refresh();
+  }
+
+  Future<void> removeBookmark(String id) async {
+    await remove(id);
+  }
+
+  Future<void> clearAll() async {
+    state = const AsyncLoading();
+    // Clear from local storage by getting all and removing individually
+    final bookmarks = await ref.read(quranRepositoryProvider).getAllBookmarks();
+    for (final bookmark in bookmarks) {
+      await ref.read(quranRepositoryProvider).removeBookmark(bookmark.id);
+    }
+    state = const AsyncData([]);
   }
 
   Future<void> refresh() async {
     state = const AsyncLoading();
-    final repository = ref.read(quranRepositoryProvider);
-    final result = await repository.getAllBookmarks();
-    state = AsyncValue.data(result.fold((error) => throw error, (bookmarks) => bookmarks));
+    state = await AsyncValue.guard(
+      () => ref.read(quranRepositoryProvider).getAllBookmarks(),
+    );
   }
 }
 
-/// Reading Progress provider
-@riverpod
-class ReadingProgress extends _$ReadingProgress {
+final quranBookmarksProvider =
+    AsyncNotifierProvider<QuranBookmarksNotifier, List<QuranBookmark>>(
+  QuranBookmarksNotifier.new,
+);
+
+/// Reading Progress notifier
+class ReadingProgressNotifier extends AsyncNotifier<List<ReadingProgress>> {
   @override
   Future<List<ReadingProgress>> build() async {
-    final repository = ref.watch(quranRepositoryProvider);
-    final result = await repository.getAllReadingProgress();
-    return result.fold(
-      (error) => throw error,
-      (progress) => progress,
-    );
+    return await ref.watch(quranRepositoryProvider).getAllReadingProgress();
   }
 
   Future<void> save(ReadingProgress progress) async {
-    final repository = ref.read(quranRepositoryProvider);
-    final result = await repository.saveReadingProgress(progress);
-    result.fold(
-      (error) => throw error,
-      (_) => refresh(),
-    );
+    await ref.read(quranRepositoryProvider).saveReadingProgress(progress);
+    await refresh();
   }
 
   Future<void> refresh() async {
     state = const AsyncLoading();
-    final repository = ref.read(quranRepositoryProvider);
-    final result = await repository.getAllReadingProgress();
-    state = AsyncValue.data(result.fold((error) => throw error, (progress) => progress));
-  }
-}
-
-/// Tafsir provider
-@riverpod
-class Tafsir extends _$Tafsir {
-  @override
-  Future<List<Tafsir>> build(int surahNumber, int ayahNumber) async {
-    final repository = ref.watch(quranRepositoryProvider);
-    final result = await repository.getTafsirForAyah(surahNumber, ayahNumber);
-    return result.fold(
-      (error) => throw error,
-      (tafsir) => tafsir,
+    state = await AsyncValue.guard(
+      () => ref.read(quranRepositoryProvider).getAllReadingProgress(),
     );
   }
 }
 
-/// Quran Search provider
-@riverpod
-class QuranSearch extends _$QuranSearch {
-  @override
-  Future<List<QuranSearchResult>> build(String query) async {
-    if (query.trim().isEmpty) return [];
+final readingProgressProvider =
+    AsyncNotifierProvider<ReadingProgressNotifier, List<ReadingProgress>>(
+  ReadingProgressNotifier.new,
+);
 
-    final settings = ref.watch(settingsProvider).valueOrNull;
-    final translationId = settings?.selectedTranslationId ?? AppConstants.defaultTranslation;
-    final repository = ref.watch(quranRepositoryProvider);
-    final result = await repository.search(query: query, translationId: translationId);
-    return result.fold(
-      (error) => throw error,
-      (results) => results,
-    );
-  }
-}
+/// Tafsir provider (family)
+final tafsirProvider =
+    FutureProvider.family<List<Tafsir>, (int, int)>((ref, args) async {
+  final (surahNumber, ayahNumber) = args;
+  return await ref
+      .watch(quranRepositoryProvider)
+      .getTafsirForAyah(surahNumber, ayahNumber);
+});
 
-/// Hadith Collections provider
-@riverpod
-class HadithCollections extends _$HadithCollections {
+/// Quran Search provider (family)
+final quranSearchProvider =
+    FutureProvider.family<List<QuranSearchResult>, String>((ref, query) async {
+  if (query.trim().isEmpty) return [];
+  final settings = ref.watch(settingsProvider).valueOrNull;
+  final translationId =
+      settings?.selectedTranslationId ?? AppConstants.defaultTranslation;
+  return await ref
+      .watch(quranRepositoryProvider)
+      .search(query: query, translationId: translationId);
+});
+
+/// Hadith Collections notifier
+class HadithCollectionsNotifier extends AsyncNotifier<List<HadithCollection>> {
   @override
   Future<List<HadithCollection>> build() async {
-    final repository = ref.watch(hadithRepositoryProvider);
-    final result = await repository.getAllCollections();
-    return result.fold(
-      (error) => throw error,
-      (collections) => collections,
-    );
+    return await ref.watch(hadithRepositoryProvider).getAllCollections();
   }
 
   Future<void> refresh() async {
     state = const AsyncLoading();
-    final repository = ref.read(hadithRepositoryProvider);
-    final result = await repository.getAllCollections(forceRefresh: true);
-    state = AsyncValue.data(result.fold((error) => throw error, (collections) => collections));
-  }
-}
-
-/// Collection Detail provider
-@riverpod
-class HadithCollectionDetail extends _$HadithCollectionDetail {
-  @override
-  Future<HadithCollectionDetail> build(String collectionId) async {
-    final repository = ref.watch(hadithRepositoryProvider);
-    final result = await repository.getCollectionDetail(collectionId);
-    return result.fold(
-      (error) => throw error,
-      (detail) => detail,
+    state = await AsyncValue.guard(
+      () => ref
+          .read(hadithRepositoryProvider)
+          .getAllCollections(forceRefresh: true),
     );
   }
 }
 
-/// Books provider
-@riverpod
-class HadithBooks extends _$HadithBooks {
-  @override
-  Future<List<HadithBook>> build(String collectionId) async {
-    final repository = ref.watch(hadithRepositoryProvider);
-    final result = await repository.getBooksByCollection(collectionId);
-    return result.fold(
-      (error) => throw error,
-      (books) => books,
-    );
-  }
-}
+final hadithCollectionsProvider =
+    AsyncNotifierProvider<HadithCollectionsNotifier, List<HadithCollection>>(
+  HadithCollectionsNotifier.new,
+);
 
-/// Chapters provider
-@riverpod
-class HadithChapters extends _$HadithChapters {
-  @override
-  Future<List<HadithChapter>> build(String bookId) async {
-    final repository = ref.watch(hadithRepositoryProvider);
-    final result = await repository.getChaptersByBook(bookId);
-    return result.fold(
-      (error) => throw error,
-      (chapters) => chapters,
-    );
-  }
-}
+/// Collection Detail provider (family)
+final hadithCollectionDetailProvider =
+    FutureProvider.family<HadithCollectionDetail, String>(
+        (ref, collectionId) async {
+  return await ref
+      .watch(hadithRepositoryProvider)
+      .getCollectionDetail(collectionId);
+});
+
+/// Books provider (family)
+final hadithBooksProvider =
+    FutureProvider.family<List<HadithBook>, String>((ref, collectionId) async {
+  return await ref
+      .watch(hadithRepositoryProvider)
+      .getBooksByCollection(collectionId);
+});
+
+/// Chapters provider (family)
+final hadithChaptersProvider =
+    FutureProvider.family<List<HadithChapter>, String>((ref, bookId) async {
+  return await ref.watch(hadithRepositoryProvider).getChaptersByBook(bookId);
+});
 
 /// Hadiths by Book provider
-@riverpod
-class HadithsByBook extends _$HadithsByBook {
-  @override
-  Future<HadithBookDetail> build({
-    required String collectionId,
-    required int bookNumber,
-    int page = 1,
-  }) async {
-    final repository = ref.watch(hadithRepositoryProvider);
-    final result = await repository.getHadithsByBook(collectionId, bookNumber, page: page);
-    return result.fold(
-      (error) => throw error,
-      (detail) => detail,
-    );
-  }
-}
+typedef HadithsByBookArgs = ({String collectionId, int bookNumber, int page});
 
-/// Hadiths by Chapter provider
-@riverpod
-class HadithsByChapter extends _$HadithsByChapter {
-  @override
-  Future<List<Hadith>> build(String chapterId) async {
-    final repository = ref.watch(hadithRepositoryProvider);
-    final result = await repository.getHadithsByChapter(chapterId);
-    return result.fold(
-      (error) => throw error,
-      (hadiths) => hadiths,
-    );
-  }
-}
+final hadithsByBookProvider =
+    FutureProvider.family<HadithBookDetail, HadithsByBookArgs>(
+        (ref, args) async {
+  return await ref.watch(hadithRepositoryProvider).getHadithsByBook(
+        args.collectionId,
+        args.bookNumber,
+        page: args.page,
+      );
+});
 
-/// Single Hadith provider
-@riverpod
-class HadithDetail extends _$HadithDetail {
-  @override
-  Future<Hadith?> build(String collectionId, int hadithNumber) async {
-    final repository = ref.watch(hadithRepositoryProvider);
-    final result = await repository.getHadith(collectionId, hadithNumber);
-    return result.fold(
-      (error) => throw error,
-      (hadith) => hadith,
-    );
-  }
-}
+/// Hadiths by Chapter provider (family)
+final hadithsByChapterProvider =
+    FutureProvider.family<List<Hadith>, String>((ref, chapterId) async {
+  return await ref
+      .watch(hadithRepositoryProvider)
+      .getHadithsByChapter(chapterId);
+});
 
-/// Favorite Hadiths provider
-@riverpod
-class FavoriteHadiths extends _$FavoriteHadiths {
+/// Single Hadith provider (family)
+final hadithDetailProvider =
+    FutureProvider.family<Hadith?, (String, int)>((ref, args) async {
+  final (collectionId, hadithNumber) = args;
+  return await ref
+      .watch(hadithRepositoryProvider)
+      .getHadith(collectionId, hadithNumber);
+});
+
+/// Favorite Hadiths notifier
+class FavoriteHadithsNotifier extends AsyncNotifier<List<Hadith>> {
   @override
   Future<List<Hadith>> build() async {
-    final repository = ref.watch(hadithRepositoryProvider);
-    final result = await repository.getFavoriteHadiths();
-    return result.fold(
-      (error) => throw error,
-      (hadiths) => hadiths,
-    );
+    return await ref.watch(hadithRepositoryProvider).getFavoriteHadiths();
   }
 
   Future<void> toggle(String hadithId, bool isFavorite) async {
-    final repository = ref.read(hadithRepositoryProvider);
-    final result = await repository.toggleFavorite(hadithId, isFavorite);
-    result.fold(
-      (error) => throw error,
-      (_) => refresh(),
-    );
+    await ref
+        .read(hadithRepositoryProvider)
+        .toggleFavorite(hadithId, isFavorite);
+    await refresh();
   }
 
   Future<void> refresh() async {
     state = const AsyncLoading();
-    final repository = ref.read(hadithRepositoryProvider);
-    final result = await repository.getFavoriteHadiths();
-    state = AsyncValue.data(result.fold((error) => throw error, (hadiths) => hadiths));
-  }
-}
-
-/// Hadith Search provider
-@riverpod
-class HadithSearch extends _$HadithSearch {
-  @override
-  Future<List<Hadith>> build(String query) async {
-    if (query.trim().isEmpty) return [];
-
-    final settings = ref.watch(settingsProvider).valueOrNull;
-    final languageCode = settings?.language.code ?? 'en';
-    final repository = ref.watch(hadithRepositoryProvider);
-    final result = await repository.search(query: query, languageCode: languageCode);
-    return result.fold(
-      (error) => throw error,
-      (hadiths) => hadiths,
+    state = await AsyncValue.guard(
+      () => ref.read(hadithRepositoryProvider).getFavoriteHadiths(),
     );
   }
 }
+
+final favoriteHadithsProvider =
+    AsyncNotifierProvider<FavoriteHadithsNotifier, List<Hadith>>(
+  FavoriteHadithsNotifier.new,
+);
+
+/// Hadith Search provider (family)
+final hadithSearchProvider =
+    FutureProvider.family<List<Hadith>, String>((ref, query) async {
+  if (query.trim().isEmpty) return [];
+  final settings = ref.watch(settingsProvider).valueOrNull;
+  final languageCode = settings?.language.code ?? 'en';
+  return await ref
+      .watch(hadithRepositoryProvider)
+      .search(query: query, languageCode: languageCode);
+});
 
 /// Narrators provider
-@riverpod
-class Narrators extends _$Narrators {
-  @override
-  Future<List<Narrator>> build() async {
-    final repository = ref.watch(hadithRepositoryProvider);
-    final result = await repository.getAllNarrators();
-    return result.fold(
-      (error) => throw error,
-      (narrators) => narrators,
-    );
-  }
-}
+final narratorsProvider = FutureProvider<List<Narrator>>((ref) async {
+  return await ref.watch(hadithRepositoryProvider).getAllNarrators();
+});
 
 /// Topics provider
-@riverpod
-class HadithTopics extends _$HadithTopics {
-  @override
-  Future<List<HadithTopic>> build() async {
-    final repository = ref.watch(hadithRepositoryProvider);
-    final result = await repository.getAllTopics();
-    return result.fold(
-      (error) => throw error,
-      (topics) => topics,
-    );
-  }
-}
+final hadithTopicsProvider = FutureProvider<List<HadithTopic>>((ref) async {
+  return await ref.watch(hadithRepositoryProvider).getAllTopics();
+});
 
 /// Top Level Topics provider
-@riverpod
-class TopLevelHadithTopics extends _$TopLevelHadithTopics {
-  @override
-  Future<List<HadithTopic>> build() async {
-    final repository = ref.watch(hadithRepositoryProvider);
-    final result = await repository.getTopLevelTopics();
-    return result.fold(
-      (error) => throw error,
-      (topics) => topics,
-    );
-  }
-}
+final topLevelHadithTopicsProvider =
+    FutureProvider<List<HadithTopic>>((ref) async {
+  return await ref.watch(hadithRepositoryProvider).getTopLevelTopics();
+});
 
-/// Child Topics provider
-@riverpod
-class ChildHadithTopics extends _$ChildHadithTopics {
-  @override
-  Future<List<HadithTopic>> build(String parentId) async {
-    final repository = ref.watch(hadithRepositoryProvider);
-    final result = await repository.getChildTopics(parentId);
-    return result.fold(
-      (error) => throw error,
-      (topics) => topics,
-    );
-  }
-}
+/// Hadith Topic provider (family)
+final hadithTopicProvider =
+    FutureProvider.family<HadithTopic, String>((ref, topicId) async {
+  return await ref.watch(hadithRepositoryProvider).getHadithTopic(topicId);
+});
 
-/// Hadith Bookmarks provider
-@riverpod
-class HadithBookmarks extends _$HadithBookmarks {
+/// Related Topics provider (family)
+final relatedTopicsProvider =
+    FutureProvider.family<List<HadithTopic>, String>((ref, topicId) async {
+  return await ref.watch(hadithRepositoryProvider).getRelatedTopics(topicId);
+});
+
+/// Child Topics provider (family)
+final childHadithTopicsProvider =
+    FutureProvider.family<List<HadithTopic>, String>((ref, parentId) async {
+  return await ref.watch(hadithRepositoryProvider).getChildTopics(parentId);
+});
+
+/// Hadith Bookmarks notifier
+class HadithBookmarksNotifier extends AsyncNotifier<List<HadithBookmark>> {
   @override
   Future<List<HadithBookmark>> build() async {
-    final repository = ref.watch(hadithRepositoryProvider);
-    final result = await repository.getAllBookmarks();
-    return result.fold(
-      (error) => throw error,
-      (bookmarks) => bookmarks,
-    );
+    return await ref.watch(hadithRepositoryProvider).getAllBookmarks();
   }
 
   Future<void> add(HadithBookmark bookmark) async {
-    final repository = ref.read(hadithRepositoryProvider);
-    final result = await repository.addBookmark(bookmark);
-    result.fold(
-      (error) => throw error,
-      (_) => refresh(),
-    );
+    await ref.read(hadithRepositoryProvider).addBookmark(bookmark);
+    await refresh();
+  }
+
+  Future<void> addBookmark(HadithBookmark bookmark) async {
+    await add(bookmark);
   }
 
   Future<void> remove(String id) async {
-    final repository = ref.read(hadithRepositoryProvider);
-    final result = await repository.removeBookmark(id);
-    result.fold(
-      (error) => throw error,
-      (_) => refresh(),
-    );
+    await ref.read(hadithRepositoryProvider).removeBookmark(id);
+    await refresh();
+  }
+
+  Future<void> removeBookmark(String id) async {
+    await remove(id);
+  }
+
+  Future<void> clearAll() async {
+    state = const AsyncLoading();
+    final bookmarks =
+        await ref.read(hadithRepositoryProvider).getAllBookmarks();
+    for (final bookmark in bookmarks) {
+      await ref.read(hadithRepositoryProvider).removeBookmark(bookmark.id);
+    }
+    state = const AsyncData([]);
   }
 
   Future<void> refresh() async {
     state = const AsyncLoading();
-    final repository = ref.read(hadithRepositoryProvider);
-    final result = await repository.getAllBookmarks();
-    state = AsyncValue.data(result.fold((error) => throw error, (bookmarks) => bookmarks));
-  }
-}
-
-/// Hadiths by Topic provider
-@riverpod
-class HadithsByTopic extends _$HadithsByTopic {
-  @override
-  Future<List<Hadith>> build(String topicId) async {
-    final repository = ref.watch(hadithRepositoryProvider);
-    final result = await repository.getHadithsByTopic(topicId);
-    return result.fold(
-      (error) => throw error,
-      (hadiths) => hadiths,
+    state = await AsyncValue.guard(
+      () => ref.read(hadithRepositoryProvider).getAllBookmarks(),
     );
   }
 }
 
-/// Narrators for a specific hadith
-@riverpod
-class HadithNarrators extends _$HadithNarrators {
-  @override
-  Future<List<Narrator>> build(List<String> narratorIds) async {
-    if (narratorIds.isEmpty) return [];
+final hadithBookmarksProvider =
+    AsyncNotifierProvider<HadithBookmarksNotifier, List<HadithBookmark>>(
+  HadithBookmarksNotifier.new,
+);
 
-    final repository = ref.watch(hadithRepositoryProvider);
-    final result = await repository.getNarratorsByIds(narratorIds);
-    return result.fold(
-      (error) => throw error,
-      (narrators) => narrators,
-    );
-  }
-}
+/// Hadiths by Topic provider (family)
+final hadithsByTopicProvider =
+    FutureProvider.family<List<Hadith>, String>((ref, topicId) async {
+  return await ref.watch(hadithRepositoryProvider).getHadithsByTopic(topicId);
+});
+
+/// Narrators for specific hadith IDs (family)
+final hadithNarratorsProvider =
+    FutureProvider.family<List<Narrator>, List<String>>(
+        (ref, narratorIds) async {
+  if (narratorIds.isEmpty) return [];
+  return await ref
+      .watch(hadithRepositoryProvider)
+      .getNarratorsByIds(narratorIds);
+});
 
 /// Related hadiths provider
-@riverpod
-class RelatedHadiths extends _$RelatedHadiths {
-  @override
-  Future<List<Hadith>> build({
-    required String collectionId,
-    required int hadithNumber,
-    int limit = 10,
-  }) async {
-    final repository = ref.watch(hadithRepositoryProvider);
-    final result = await repository.getRelatedHadiths(
-      collectionId: collectionId,
-      hadithNumber: hadithNumber,
-      limit: limit,
-    );
-    return result.fold(
-      (error) => throw error,
-      (hadiths) => hadiths,
-    );
-  }
-}
+typedef RelatedHadithsArgs = ({
+  String collectionId,
+  int hadithNumber,
+  int limit
+});
 
-/// Random Hadith provider
-@riverpod
-class RandomHadith extends _$RandomHadith {
+final relatedHadithsProvider =
+    FutureProvider.family<List<Hadith>, RelatedHadithsArgs>((ref, args) async {
+  return await ref.watch(hadithRepositoryProvider).getRelatedHadiths(
+        collectionId: args.collectionId,
+        hadithNumber: args.hadithNumber,
+        limit: args.limit,
+      );
+});
+
+/// Random Hadith notifier
+class RandomHadithNotifier extends AsyncNotifier<Hadith?> {
   @override
-  Future<Hadith?> build({String? collectionId}) async {
-    final repository = ref.watch(hadithRepositoryProvider);
-    final result = await repository.getRandomHadith(collectionId: collectionId);
-    return result.fold(
-      (error) => throw error,
-      (hadith) => hadith,
-    );
+  Future<Hadith?> build() async {
+    return await ref.watch(hadithRepositoryProvider).getRandomHadith();
   }
 
   Future<void> refresh({String? collectionId}) async {
     state = const AsyncLoading();
-    final repository = ref.read(hadithRepositoryProvider);
-    final result = await repository.getRandomHadith(collectionId: collectionId);
-    state = AsyncValue.data(result.fold((error) => throw error, (hadith) => hadith));
+    state = await AsyncValue.guard(
+      () => ref
+          .read(hadithRepositoryProvider)
+          .getRandomHadith(collectionId: collectionId),
+    );
   }
 }
 
-/// Audio Player State provider
-@riverpod
-class AudioPlayerState extends _$AudioPlayerState {
-  @override
-  AudioPlayerStateData build() {
-    return const AudioPlayerStateData();
-  }
+final randomHadithProvider =
+    AsyncNotifierProvider<RandomHadithNotifier, Hadith?>(
+  RandomHadithNotifier.new,
+);
 
-  void setPlaying(bool playing) {
-    state = state.copyWith(isPlaying: playing);
-  }
-
-  void setCurrentAyah(Ayah? ayah) {
-    state = state.copyWith(currentAyah: ayah);
-  }
-
-  void setPlaylist(List<Ayah> playlist) {
-    state = state.copyWith(playlist: playlist, currentIndex: 0);
-  }
-
-  void setCurrentIndex(int index) {
-    state = state.copyWith(currentIndex: index);
-  }
-
-  void setRepeatMode(AudioRepeatMode mode) {
-    state = state.copyWith(repeatMode: mode);
-  }
-
-  void setPlaybackSpeed(PlaybackSpeed speed) {
-    state = state.copyWith(playbackSpeed: speed);
-  }
-
-  void next() {
-    if (state.currentIndex < state.playlist.length - 1) {
-      state = state.copyWith(currentIndex: state.currentIndex + 1);
-    } else if (state.repeatMode == AudioRepeatMode.all) {
-      state = state.copyWith(currentIndex: 0);
-    }
-  }
-
-  void previous() {
-    if (state.currentIndex > 0) {
-      state = state.copyWith(currentIndex: state.currentIndex - 1);
-    }
-  }
-}
-
+/// Audio Player State data class
 @immutable
 class AudioPlayerStateData {
   final bool isPlaying;
@@ -806,34 +637,53 @@ class AudioPlayerStateData {
   }
 }
 
-/// Download State provider
-@riverpod
-class DownloadState extends _$DownloadState {
+/// Audio Player State notifier
+class AudioPlayerStateNotifier extends Notifier<AudioPlayerStateData> {
   @override
-  Map<String, DownloadProgress> build() {
-    return {};
+  AudioPlayerStateData build() => const AudioPlayerStateData();
+
+  void setPlaying(bool playing) => state = state.copyWith(isPlaying: playing);
+  void setCurrentAyah(Ayah? ayah) => state = state.copyWith(currentAyah: ayah);
+  void setPlaylist(List<Ayah> playlist) =>
+      state = state.copyWith(playlist: playlist, currentIndex: 0);
+  void setCurrentIndex(int index) =>
+      state = state.copyWith(currentIndex: index);
+  void setRepeatMode(AudioRepeatMode mode) =>
+      state = state.copyWith(repeatMode: mode);
+  void setPlaybackSpeed(PlaybackSpeed speed) =>
+      state = state.copyWith(playbackSpeed: speed);
+
+  void next() {
+    if (state.currentIndex < state.playlist.length - 1) {
+      state = state.copyWith(currentIndex: state.currentIndex + 1);
+    } else if (state.repeatMode == AudioRepeatMode.all) {
+      state = state.copyWith(currentIndex: 0);
+    }
   }
 
-  void updateProgress(String id, DownloadProgress progress) {
-    state = {...state, id: progress};
-  }
-
-  void remove(String id) {
-    final newState = Map<String, DownloadProgress>.from(state);
-    newState.remove(id);
-    state = newState;
-  }
-
-  void clear() {
-    state = {};
+  void previous() {
+    if (state.currentIndex > 0) {
+      state = state.copyWith(currentIndex: state.currentIndex - 1);
+    }
   }
 }
 
+/// Juzs provider
+final juzsProvider = FutureProvider<List<Juz>>((ref) async {
+  return await ref.watch(quranRepositoryProvider).getAllJuz();
+});
+
+final audioPlayerStateProvider =
+    NotifierProvider<AudioPlayerStateNotifier, AudioPlayerStateData>(
+  AudioPlayerStateNotifier.new,
+);
+
+/// Download Progress data class
 @immutable
 class DownloadProgress {
   final String id;
   final String title;
-  final double progress; // 0.0 to 1.0
+  final double progress;
   final int downloadedBytes;
   final int totalBytes;
   final DownloadStatus status;
@@ -874,3 +724,26 @@ enum DownloadStatus {
   failed,
   cancelled,
 }
+
+/// Download State notifier
+class DownloadStateNotifier extends Notifier<Map<String, DownloadProgress>> {
+  @override
+  Map<String, DownloadProgress> build() => {};
+
+  void updateProgress(String id, DownloadProgress progress) {
+    state = {...state, id: progress};
+  }
+
+  void remove(String id) {
+    final newState = Map<String, DownloadProgress>.from(state);
+    newState.remove(id);
+    state = newState;
+  }
+
+  void clear() => state = {};
+}
+
+final downloadStateProvider =
+    NotifierProvider<DownloadStateNotifier, Map<String, DownloadProgress>>(
+  DownloadStateNotifier.new,
+);

@@ -8,6 +8,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../presentation/providers/app_providers.dart';
 import '../../../shared/models/quran_models.dart';
 import '../../../shared/models/hadith_models.dart';
+import '../../../shared/models/settings_models.dart';
 import '../../widgets/common/app_scaffold.dart';
 import '../../widgets/audio/audio_controls.dart';
 import '../../widgets/audio/audio_progress_bar.dart';
@@ -20,7 +21,8 @@ class AudioPlayerPage extends ConsumerStatefulWidget {
   ConsumerState<AudioPlayerPage> createState() => _AudioPlayerPageState();
 }
 
-class _AudioPlayerPageState extends ConsumerState<AudioPlayerPage> with SingleTickerProviderStateMixin {
+class _AudioPlayerPageState extends ConsumerState<AudioPlayerPage>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _opacityAnimation;
@@ -54,7 +56,7 @@ class _AudioPlayerPageState extends ConsumerState<AudioPlayerPage> with SingleTi
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final quranHadithTheme = theme.quranHadith;
-    final audioState = ref.watch(audioPlayerProvider);
+    final audioState = ref.watch(audioPlayerStateProvider);
 
     return Scaffold(
       body: Container(
@@ -62,19 +64,15 @@ class _AudioPlayerPageState extends ConsumerState<AudioPlayerPage> with SingleTi
           gradient: quranHadithTheme.quranGradient,
         ),
         child: SafeArea(
-          child: audioState.when(
-            data: (state) => _buildPlayerContent(context, state),
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, stack) => Center(child: Text('Error: $error')),
-          ),
+          child: _buildPlayerContent(context, audioState),
         ),
       ),
     );
   }
 
-  Widget _buildPlayerContent(BuildContext context, AudioPlayerState state) {
+  Widget _buildPlayerContent(BuildContext context, AudioPlayerStateData state) {
     final theme = Theme.of(context);
-    final currentItem = state.currentItem;
+    final currentItem = state.currentAyah;
 
     if (currentItem == null) {
       return _buildEmptyState();
@@ -95,7 +93,7 @@ class _AudioPlayerPageState extends ConsumerState<AudioPlayerPage> with SingleTi
                 // Album Art / Surah Info
                 Expanded(
                   flex: 3,
-                  child: _buildAlbumArt(currentItem),
+                  child: _buildAlbumArt(currentItem, state),
                 ),
 
                 // Progress Bar
@@ -143,7 +141,7 @@ class _AudioPlayerPageState extends ConsumerState<AudioPlayerPage> with SingleTi
     );
   }
 
-  Widget _buildAlbumArt(AudioItem currentItem) {
+  Widget _buildAlbumArt(Ayah currentItem, AudioPlayerStateData state) {
     final theme = Theme.of(context);
 
     return Center(
@@ -177,7 +175,7 @@ class _AudioPlayerPageState extends ConsumerState<AudioPlayerPage> with SingleTi
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    currentItem.type == AudioType.quran
+                    state.playlist.isNotEmpty && state.currentAyah != null
                         ? Icons.menu_book_rounded
                         : Icons.library_books_rounded,
                     size: 80,
@@ -185,18 +183,18 @@ class _AudioPlayerPageState extends ConsumerState<AudioPlayerPage> with SingleTi
                   ),
                   const SizedBox(height: AppConstants.spacingMD),
                   Text(
-                    currentItem.type == AudioType.quran
+                    currentItem != null
                         ? 'Surah ${currentItem.surahNumber}'
-                        : currentItem.collectionId,
+                        : 'Hadith',
                     style: theme.textTheme.headlineMedium?.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  if (currentItem.type == AudioType.quran) ...[
+                  if (currentItem != null) ...[
                     const SizedBox(height: AppConstants.spacingXS),
                     Text(
-                      'Ayah ${currentItem.ayahNumber}',
+                      'Ayah ${currentItem.ayahInSurah}',
                       style: theme.textTheme.titleLarge?.copyWith(
                         color: Colors.white.withValues(alpha: 0.7),
                       ),
@@ -213,11 +211,22 @@ class _AudioPlayerPageState extends ConsumerState<AudioPlayerPage> with SingleTi
           Consumer(
             builder: (context, ref, _) {
               final recitersAsync = ref.watch(recitersProvider);
+              final reciterId = state.playlist.isNotEmpty
+                  ? state.playlist.first.audioUrls.keys.firstOrNull ?? ''
+                  : '';
               return recitersAsync.when(
                 data: (reciters) {
                   final reciter = reciters.firstWhere(
-                    (r) => r.id == currentItem.reciterId,
-                    orElse: () => reciters.first,
+                    (r) => r.id == reciterId,
+                    orElse: () => reciters.isNotEmpty
+                        ? reciters.first
+                        : ReciterInfo(
+                            id: '',
+                            name: 'Unknown',
+                            nameArabic: '',
+                            style: RecitationStyle.murattal,
+                            country: '',
+                          ),
                   );
                   return Column(
                     children: [
@@ -230,7 +239,7 @@ class _AudioPlayerPageState extends ConsumerState<AudioPlayerPage> with SingleTi
                       ),
                       const SizedBox(height: AppConstants.spacingXS),
                       Text(
-                        reciter.style,
+                        reciter.style.name,
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: Colors.white.withValues(alpha: 0.7),
                         ),
@@ -248,31 +257,37 @@ class _AudioPlayerPageState extends ConsumerState<AudioPlayerPage> with SingleTi
     );
   }
 
-  Widget _buildProgressSection(AudioPlayerState state) {
+  Widget _buildProgressSection(AudioPlayerStateData state) {
+    final position = Duration.zero;
+    final duration = state.currentAyah?.audioDuration ?? Duration.zero;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppConstants.spacingLG, vertical: AppConstants.spacingMD),
+      padding: const EdgeInsets.symmetric(
+          horizontal: AppConstants.spacingLG, vertical: AppConstants.spacingMD),
       child: Column(
         children: [
           AudioProgressBar(
-            progress: state.progress,
-            buffered: state.buffered,
-            onSeek: (position) => ref.read(audioPlayerProvider.notifier).seek(position),
+            position: position,
+            duration: duration,
+            onSeek: (value) {
+              // Seek implementation would go here
+            },
           ),
           const SizedBox(height: AppConstants.spacingSM),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                _formatDuration(state.position),
+                _formatDuration(position),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Colors.white.withValues(alpha: 0.7),
-                ),
+                      color: Colors.white.withValues(alpha: 0.7),
+                    ),
               ),
               Text(
-                _formatDuration(state.duration),
+                _formatDuration(duration),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Colors.white.withValues(alpha: 0.7),
-                ),
+                      color: Colors.white.withValues(alpha: 0.7),
+                    ),
               ),
             ],
           ),
@@ -281,26 +296,29 @@ class _AudioPlayerPageState extends ConsumerState<AudioPlayerPage> with SingleTi
     );
   }
 
-  Widget _buildMainControls(AudioPlayerState state) {
+  Widget _buildMainControls(AudioPlayerStateData state) {
     final theme = Theme.of(context);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppConstants.spacingXL, vertical: AppConstants.spacingMD),
+      padding: const EdgeInsets.symmetric(
+          horizontal: AppConstants.spacingXL, vertical: AppConstants.spacingMD),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           // Shuffle
           _ControlButton(
             icon: Icons.shuffle_rounded,
-            isActive: state.shuffleMode,
-            onTap: () => ref.read(audioPlayerProvider.notifier).toggleShuffle(),
+            isActive: false,
+            onTap: () => ref
+                .read(audioPlayerStateProvider.notifier)
+                .setRepeatMode(AudioRepeatMode.all),
           ),
 
           // Previous
           _ControlButton(
             icon: Icons.skip_previous_rounded,
             size: 48,
-            onTap: () => ref.read(audioPlayerProvider.notifier).previous(),
+            onTap: () => ref.read(audioPlayerStateProvider.notifier).previous(),
           ),
 
           // Play/Pause
@@ -318,18 +336,18 @@ class _AudioPlayerPageState extends ConsumerState<AudioPlayerPage> with SingleTi
             ),
             child: IconButton(
               icon: Icon(
-                state.isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                state.isPlaying
+                    ? Icons.pause_rounded
+                    : Icons.play_arrow_rounded,
                 color: theme.quranHadith.quranGradient.colors.first,
                 size: 32,
               ),
               iconSize: 32,
               padding: const EdgeInsets.all(24),
               onPressed: () {
-                if (state.isPlaying) {
-                  ref.read(audioPlayerProvider.notifier).pause();
-                } else {
-                  ref.read(audioPlayerProvider.notifier).play();
-                }
+                ref
+                    .read(audioPlayerStateProvider.notifier)
+                    .setPlaying(!state.isPlaying);
               },
             ),
           ),
@@ -338,13 +356,13 @@ class _AudioPlayerPageState extends ConsumerState<AudioPlayerPage> with SingleTi
           _ControlButton(
             icon: Icons.skip_next_rounded,
             size: 48,
-            onTap: () => ref.read(audioPlayerProvider.notifier).next(),
+            onTap: () => ref.read(audioPlayerStateProvider.notifier).next(),
           ),
 
           // Repeat
           _ControlButton(
             icon: _getRepeatIcon(state.repeatMode),
-            isActive: state.repeatMode != RepeatMode.off,
+            isActive: state.repeatMode != AudioRepeatMode.none,
             onTap: () => _cycleRepeatMode(state.repeatMode),
           ),
         ],
@@ -352,7 +370,7 @@ class _AudioPlayerPageState extends ConsumerState<AudioPlayerPage> with SingleTi
     );
   }
 
-  Widget _buildAdditionalControls(AudioPlayerState state) {
+  Widget _buildAdditionalControls(AudioPlayerStateData state) {
     final theme = Theme.of(context);
 
     return Padding(
@@ -363,22 +381,21 @@ class _AudioPlayerPageState extends ConsumerState<AudioPlayerPage> with SingleTi
           // Speed
           _SecondaryControl(
             icon: Icons.speed_rounded,
-            label: '${state.playbackSpeed.toStringAsFixed(1)}x',
+            label: '${state.playbackSpeed.value.toStringAsFixed(1)}x',
             onTap: _showSpeedSelector,
           ),
 
           // Sleep Timer
           _SecondaryControl(
             icon: Icons.bedtime_rounded,
-            label: state.sleepTimer > 0 ? _formatDuration(state.sleepTimer) : 'Sleep Timer',
-            isActive: state.sleepTimer > 0,
+            label: 'Sleep Timer',
             onTap: _showSleepTimerDialog,
           ),
 
           // Queue
           _SecondaryControl(
             icon: Icons.queue_music_rounded,
-            label: 'Queue (${state.queue.length})',
+            label: 'Queue (${state.playlist.length})',
             onTap: _showQueue,
           ),
 
@@ -431,31 +448,34 @@ class _AudioPlayerPageState extends ConsumerState<AudioPlayerPage> with SingleTi
     );
   }
 
-  IconData _getRepeatIcon(RepeatMode mode) {
+  IconData _getRepeatIcon(AudioRepeatMode mode) {
     switch (mode) {
-      case RepeatMode.off:
+      case AudioRepeatMode.none:
         return Icons.repeat_rounded;
-      case RepeatMode.one:
+      case AudioRepeatMode.ayah:
         return Icons.repeat_one_rounded;
-      case RepeatMode.all:
+      case AudioRepeatMode.surah:
         return Icons.repeat_rounded;
-      case RepeatMode.ayah:
-        return Icons.repeat_one_rounded;
-      case RepeatMode.surah:
+      case AudioRepeatMode.all:
         return Icons.repeat_rounded;
     }
   }
 
-  void _cycleRepeatMode(RepeatMode current) {
-    final modes = [RepeatMode.off, RepeatMode.one, RepeatMode.all, RepeatMode.surah];
+  void _cycleRepeatMode(AudioRepeatMode current) {
+    final modes = [
+      AudioRepeatMode.none,
+      AudioRepeatMode.ayah,
+      AudioRepeatMode.surah,
+      AudioRepeatMode.all
+    ];
     final currentIndex = modes.indexOf(current);
     final nextIndex = (currentIndex + 1) % modes.length;
-    ref.read(audioPlayerProvider.notifier).setRepeatMode(modes[nextIndex]);
+    ref.read(audioPlayerStateProvider.notifier).setRepeatMode(modes[nextIndex]);
   }
 
   void _showSpeedSelector() {
     final speeds = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0];
-    final currentSpeed = ref.read(audioPlayerProvider).value?.playbackSpeed ?? 1.0;
+    final currentSpeed = ref.read(audioPlayerStateProvider).playbackSpeed.value;
 
     showModalBottomSheet(
       context: context,
@@ -468,8 +488,8 @@ class _AudioPlayerPageState extends ConsumerState<AudioPlayerPage> with SingleTi
               Text(
                 'Playback Speed',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+                      fontWeight: FontWeight.w600,
+                    ),
               ),
               const SizedBox(height: AppConstants.spacingLG),
               Wrap(
@@ -482,11 +502,16 @@ class _AudioPlayerPageState extends ConsumerState<AudioPlayerPage> with SingleTi
                     label: Text('${speed}x'),
                     selected: isSelected,
                     onSelected: (_) {
-                      ref.read(audioPlayerProvider.notifier).setPlaybackSpeed(speed);
+                      ref
+                          .read(audioPlayerStateProvider.notifier)
+                          .setPlaybackSpeed(PlaybackSpeed.values
+                              .firstWhere((e) => e.value == speed));
                       Navigator.pop(context);
                     },
-                    selectedColor: Theme.of(context).colorScheme.primaryContainer,
-                    checkmarkColor: Theme.of(context).colorScheme.onPrimaryContainer,
+                    selectedColor:
+                        Theme.of(context).colorScheme.primaryContainer,
+                    checkmarkColor:
+                        Theme.of(context).colorScheme.onPrimaryContainer,
                   );
                 }).toList(),
               ),
@@ -499,15 +524,14 @@ class _AudioPlayerPageState extends ConsumerState<AudioPlayerPage> with SingleTi
   }
 
   void _showSleepTimerDialog() {
-    final currentTimer = ref.read(audioPlayerProvider).value?.sleepTimer ?? 0;
     final options = [
-      (0, 'Off'),
-      (5 * 60, '5 minutes'),
-      (10 * 60, '10 minutes'),
-      (15 * 60, '15 minutes'),
-      (30 * 60, '30 minutes'),
-      (60 * 60, '1 hour'),
-      (90 * 60, '1.5 hours'),
+      (Duration.zero, 'Off'),
+      (Duration(minutes: 5), '5 minutes'),
+      (Duration(minutes: 10), '10 minutes'),
+      (Duration(minutes: 15), '15 minutes'),
+      (Duration(minutes: 30), '30 minutes'),
+      (Duration(hours: 1), '1 hour'),
+      (Duration(minutes: 90), '1.5 hours'),
     ];
 
     showModalBottomSheet(
@@ -521,20 +545,21 @@ class _AudioPlayerPageState extends ConsumerState<AudioPlayerPage> with SingleTi
               Text(
                 'Sleep Timer',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+                      fontWeight: FontWeight.w600,
+                    ),
               ),
               const SizedBox(height: AppConstants.spacingLG),
               ...options.map((option) => ListTile(
-                title: Text(option.$2),
-                trailing: currentTimer == option.$1
-                    ? Icon(Icons.check, color: Theme.of(context).colorScheme.primary)
-                    : null,
-                onTap: () {
-                  ref.read(audioPlayerProvider.notifier).setSleepTimer(option.$1);
-                  Navigator.pop(context);
-                },
-              )),
+                    title: Text(option.$2),
+                    trailing: option.$1 == Duration.zero
+                        ? Icon(Icons.check,
+                            color: Theme.of(context).colorScheme.primary)
+                        : null,
+                    onTap: () {
+                      // TODO: Implement sleep timer
+                      Navigator.pop(context);
+                    },
+                  )),
               const SizedBox(height: AppConstants.spacingLG),
             ],
           ),
@@ -544,7 +569,7 @@ class _AudioPlayerPageState extends ConsumerState<AudioPlayerPage> with SingleTi
   }
 
   void _showQueue() {
-    final queue = ref.read(audioPlayerProvider).value?.queue ?? [];
+    final queue = ref.read(audioPlayerStateProvider).playlist;
 
     showModalBottomSheet(
       context: context,
@@ -561,11 +586,13 @@ class _AudioPlayerPageState extends ConsumerState<AudioPlayerPage> with SingleTi
                   Text(
                     'Up Next (${queue.length})',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                          fontWeight: FontWeight.w600,
+                        ),
                   ),
                   TextButton(
-                    onPressed: () => ref.read(audioPlayerProvider.notifier).clearQueue(),
+                    onPressed: () => ref
+                        .read(audioPlayerStateProvider.notifier)
+                        .setPlaylist([]),
                     child: const Text('Clear All'),
                   ),
                 ],
@@ -576,37 +603,52 @@ class _AudioPlayerPageState extends ConsumerState<AudioPlayerPage> with SingleTi
                     ? Center(
                         child: Text(
                           'Queue is empty',
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
+                          style:
+                              Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
                         ),
                       )
                     : ListView.separated(
                         itemCount: queue.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: AppConstants.spacingSM),
+                        separatorBuilder: (_, __) =>
+                            const SizedBox(height: AppConstants.spacingSM),
                         itemBuilder: (context, index) {
                           final item = queue[index];
                           return ListTile(
                             leading: CircleAvatar(
-                              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                              backgroundColor: Theme.of(context)
+                                  .colorScheme
+                                  .primaryContainer,
                               child: Text(
                                 '${index + 1}',
-                                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                                  color: Theme.of(context).colorScheme.onPrimaryContainer,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelMedium
+                                    ?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                               ),
                             ),
                             title: Text(
-                              item.type == AudioType.quran
-                                  ? 'Surah ${item.surahNumber}, Ayah ${item.ayahNumber}'
-                                  : 'Hadith ${item.hadithNumber}',
+                              item.surahNumber != null
+                                  ? 'Surah ${item.surahNumber}, Ayah ${item.ayahInSurah}'
+                                  : 'Ayah ${item.ayahInSurah}',
                             ),
-                            subtitle: Text(item.type == AudioType.quran ? 'Quran' : 'Hadith'),
+                            subtitle: const Text('Quran'),
                             trailing: index == 0
-                                ? Icon(Icons.play_circle_fill, color: Theme.of(context).colorScheme.primary)
+                                ? Icon(Icons.play_circle_fill,
+                                    color:
+                                        Theme.of(context).colorScheme.primary)
                                 : null,
-                            onTap: () => ref.read(audioPlayerProvider.notifier).playFromQueue(index),
+                            onTap: () => ref
+                                .read(audioPlayerStateProvider.notifier)
+                                .setCurrentIndex(index),
                           );
                         },
                       ),
@@ -624,7 +666,7 @@ class _AudioPlayerPageState extends ConsumerState<AudioPlayerPage> with SingleTi
       isScrollControlled: true,
       builder: (context) => ReciterSelector(
         onReciterSelected: (reciterId) {
-          ref.read(audioPlayerProvider.notifier).setReciter(reciterId);
+          // ref.read(audioPlayerProvider.notifier).setReciter(reciterId);
           Navigator.pop(context);
         },
       ),
@@ -673,7 +715,8 @@ class _AudioPlayerPageState extends ConsumerState<AudioPlayerPage> with SingleTi
               onTap: () {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Equalizer feature coming soon')),
+                  const SnackBar(
+                      content: Text('Equalizer feature coming soon')),
                 );
               },
             ),
@@ -683,9 +726,9 @@ class _AudioPlayerPageState extends ConsumerState<AudioPlayerPage> with SingleTi
     );
   }
 
-  String _formatDuration(int milliseconds) {
-    if (milliseconds < 0) return '0:00';
-    final seconds = (milliseconds / 1000).round();
+  String _formatDuration(Duration duration) {
+    if (duration.isNegative) return '0:00';
+    final seconds = duration.inSeconds;
     final minutes = seconds ~/ 60;
     final remainingSeconds = seconds % 60;
     if (minutes >= 60) {
@@ -720,15 +763,12 @@ class _ControlButton extends StatelessWidget {
         height: size,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: isActive
-              ? Colors.white
-              : Colors.white.withValues(alpha: 0.2),
+          color: isActive ? Colors.white : Colors.white.withValues(alpha: 0.2),
         ),
         child: Icon(
           icon,
-          color: isActive
-              ? Theme.of(context).colorScheme.primary
-              : Colors.white,
+          color:
+              isActive ? Theme.of(context).colorScheme.primary : Colors.white,
           size: size * 0.5,
         ),
       ),

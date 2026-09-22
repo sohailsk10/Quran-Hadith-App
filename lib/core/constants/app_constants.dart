@@ -108,6 +108,7 @@ class AppConstants {
   static const Duration longAnimation = Duration(milliseconds: 500);
 
   // Spacing
+  static const double spacingXXS = 2.0;
   static const double spacingXS = 4.0;
   static const double spacingSM = 8.0;
   static const double spacingMD = 16.0;

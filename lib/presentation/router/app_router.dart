@@ -1,6 +1,7 @@
 /// App Router configuration using GoRouter
 
 import 'package:go_router/go_router.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../presentation/pages/splash/splash_page.dart';
 import '../../presentation/pages/home/home_page.dart';
@@ -49,7 +50,8 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: 'surah/:surahNumber',
                 name: 'surah',
                 builder: (context, state) {
-                  final surahNumber = int.parse(state.pathParameters['surahNumber']!);
+                  final surahNumber =
+                      int.parse(state.pathParameters['surahNumber']!);
                   return SurahPage(surahNumber: surahNumber);
                 },
                 routes: [
@@ -57,9 +59,12 @@ final routerProvider = Provider<GoRouter>((ref) {
                     path: 'ayah/:ayahNumber',
                     name: 'ayah',
                     builder: (context, state) {
-                      final surahNumber = int.parse(state.pathParameters['surahNumber']!);
-                      final ayahNumber = int.parse(state.pathParameters['ayahNumber']!);
-                      return AyahDetailPage(surahNumber: surahNumber, ayahNumber: ayahNumber);
+                      final surahNumber =
+                          int.parse(state.pathParameters['surahNumber']!);
+                      final ayahNumber =
+                          int.parse(state.pathParameters['ayahNumber']!);
+                      return AyahDetailPage(
+                          surahNumber: surahNumber, ayahNumber: ayahNumber);
                     },
                   ),
                 ],
@@ -68,7 +73,8 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: 'juz/:juzNumber',
                 name: 'juz',
                 builder: (context, state) {
-                  final juzNumber = int.parse(state.pathParameters['juzNumber']!);
+                  final juzNumber =
+                      int.parse(state.pathParameters['juzNumber']!);
                   return QuranPage(initialJuz: juzNumber);
                 },
               ),
@@ -76,7 +82,8 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: 'page/:pageNumber',
                 name: 'page',
                 builder: (context, state) {
-                  final pageNumber = int.parse(state.pathParameters['pageNumber']!);
+                  final pageNumber =
+                      int.parse(state.pathParameters['pageNumber']!);
                   return QuranPage(initialPage: pageNumber);
                 },
               ),
@@ -101,18 +108,25 @@ final routerProvider = Provider<GoRouter>((ref) {
                     path: 'book/:bookNumber',
                     name: 'book',
                     builder: (context, state) {
-                      final collectionId = state.pathParameters['collectionId']!;
-                      final bookNumber = int.parse(state.pathParameters['bookNumber']!);
-                      return BookPage(collectionId: collectionId, bookNumber: bookNumber);
+                      final collectionId =
+                          state.pathParameters['collectionId']!;
+                      final bookNumber =
+                          int.parse(state.pathParameters['bookNumber']!);
+                      return BookPage(
+                          collectionId: collectionId, bookNumber: bookNumber);
                     },
                     routes: [
                       GoRoute(
                         path: 'hadith/:hadithNumber',
-                        name: 'hadith',
+                        name: 'hadith-detail',
                         builder: (context, state) {
-                          final collectionId = state.pathParameters['collectionId']!;
-                          final hadithNumber = int.parse(state.pathParameters['hadithNumber']!);
-                          return HadithDetailPage(collectionId: collectionId, hadithNumber: hadithNumber);
+                          final collectionId =
+                              state.pathParameters['collectionId']!;
+                          final hadithNumber =
+                              int.parse(state.pathParameters['hadithNumber']!);
+                          return HadithDetailPage(
+                              collectionId: collectionId,
+                              hadithNumber: hadithNumber);
                         },
                       ),
                     ],
@@ -130,7 +144,8 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: 'random',
                 name: 'random-hadith',
-                builder: (context, state) => const HadithDetailPage(collectionId: 'bukhari', hadithNumber: 1),
+                builder: (context, state) => const HadithDetailPage(
+                    collectionId: 'bukhari', hadithNumber: 1),
               ),
             ],
           ),
@@ -207,10 +222,14 @@ class _BottomNavBar extends ConsumerWidget {
     final theme = Theme.of(context);
 
     int currentIndex = 0;
-    if (location.startsWith('/quran')) currentIndex = 1;
-    else if (location.startsWith('/hadith')) currentIndex = 2;
-    else if (location.startsWith('/search')) currentIndex = 3;
-    else if (location.startsWith('/bookmarks')) currentIndex = 4;
+    if (location.startsWith('/quran'))
+      currentIndex = 1;
+    else if (location.startsWith('/hadith'))
+      currentIndex = 2;
+    else if (location.startsWith('/search'))
+      currentIndex = 3;
+    else if (location.startsWith('/bookmarks'))
+      currentIndex = 4;
     else if (location.startsWith('/settings')) currentIndex = 5;
 
     return NavigationBar(

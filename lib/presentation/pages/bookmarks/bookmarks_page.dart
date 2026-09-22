@@ -2,17 +2,16 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../presentation/providers/app_providers.dart';
 import '../../../shared/models/quran_models.dart';
 import '../../../shared/models/hadith_models.dart';
+import '../../../shared/models/settings_models.dart';
 import '../../widgets/common/app_scaffold.dart';
 import '../../widgets/common/section_header.dart';
-import '../../widgets/quran/bookmark_list_item.dart';
-import '../../widgets/hadith/bookmark_list_item.dart';
+import '../../widgets/common/bookmark_list_items.dart';
 
 class BookmarksPage extends ConsumerStatefulWidget {
   const BookmarksPage({super.key});
@@ -21,7 +20,8 @@ class BookmarksPage extends ConsumerStatefulWidget {
   ConsumerState<BookmarksPage> createState() => _BookmarksPageState();
 }
 
-class _BookmarksPageState extends ConsumerState<BookmarksPage> with SingleTickerProviderStateMixin {
+class _BookmarksPageState extends ConsumerState<BookmarksPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -52,14 +52,23 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> with SingleTicker
             return quranBookmarks.when(
               data: (qBookmarks) => hadithBookmarks.when(
                 data: (hBookmarks) {
-                  if (qBookmarks.isEmpty && hBookmarks.isEmpty) return const SizedBox.shrink();
+                  if (qBookmarks.isEmpty && hBookmarks.isEmpty)
+                    return const SizedBox.shrink();
                   return PopupMenuButton<String>(
                     icon: const Icon(Icons.more_vert),
                     onSelected: (value) {
                       if (value == 'clear_quran') {
-                        _showClearDialog('Quran', () => ref.read(quranBookmarksProvider.notifier).clearAll());
+                        _showClearDialog(
+                            'Quran',
+                            () => ref
+                                .read(quranBookmarksProvider.notifier)
+                                .clearAll());
                       } else if (value == 'clear_hadith') {
-                        _showClearDialog('Hadith', () => ref.read(hadithBookmarksProvider.notifier).clearAll());
+                        _showClearDialog(
+                            'Hadith',
+                            () => ref
+                                .read(hadithBookmarksProvider.notifier)
+                                .clearAll());
                       } else if (value == 'clear_all') {
                         _showClearDialog('All', () {
                           ref.read(quranBookmarksProvider.notifier).clearAll();
@@ -95,9 +104,11 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> with SingleTicker
                           value: 'clear_all',
                           child: Row(
                             children: [
-                              Icon(Icons.delete_sweep_outlined, size: 20, color: Colors.red),
+                              Icon(Icons.delete_sweep_outlined,
+                                  size: 20, color: Colors.red),
                               SizedBox(width: 12),
-                              Text('Clear All', style: TextStyle(color: Colors.red)),
+                              Text('Clear All',
+                                  style: TextStyle(color: Colors.red)),
                             ],
                           ),
                         ),
@@ -166,31 +177,24 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> with SingleTicker
 
         return RefreshIndicator(
           onRefresh: () async => ref.refresh(quranBookmarksProvider),
-          child: AnimationLimiter(
-            child: ListView.separated(
-              padding: const EdgeInsets.all(AppConstants.spacingMD),
-              itemCount: sortedSurahs.length,
-              separatorBuilder: (_, __) => const SizedBox(height: AppConstants.spacingLG),
-              itemBuilder: (context, index) {
-                final surahNumber = sortedSurahs[index];
-                final surahBookmarks = grouped[surahNumber]!;
-                return AnimationConfiguration.staggeredList(
-                  position: index,
-                  duration: AppConstants.mediumAnimation,
-                  child: SlideAnimation(
-                    verticalOffset: 50.0,
-                    child: FadeInAnimation(
-                      child: _SurahBookmarkGroup(
-                        surahNumber: surahNumber,
-                        bookmarks: surahBookmarks,
-                        onBookmarkTap: (bookmark) => context.go('/quran/surah/${bookmark.surahNumber}/ayah/${bookmark.ayahNumber}'),
-                        onBookmarkDelete: (bookmark) => ref.read(quranBookmarksProvider.notifier).removeBookmark(bookmark.id),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
+          child: ListView.separated(
+            padding: const EdgeInsets.all(AppConstants.spacingMD),
+            itemCount: sortedSurahs.length,
+            separatorBuilder: (_, __) =>
+                const SizedBox(height: AppConstants.spacingLG),
+            itemBuilder: (context, index) {
+              final surahNumber = sortedSurahs[index];
+              final surahBookmarks = grouped[surahNumber]!;
+              return _SurahBookmarkGroup(
+                surahNumber: surahNumber,
+                bookmarks: surahBookmarks,
+                onBookmarkTap: (bookmark) => context.go(
+                    '/quran/surah/${bookmark.surahNumber}/ayah/${bookmark.ayahNumber}'),
+                onBookmarkDelete: (bookmark) => ref
+                    .read(quranBookmarksProvider.notifier)
+                    .removeBookmark(bookmark.id),
+              );
+            },
           ),
         );
       },
@@ -222,31 +226,24 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> with SingleTicker
 
         return RefreshIndicator(
           onRefresh: () async => ref.refresh(hadithBookmarksProvider),
-          child: AnimationLimiter(
-            child: ListView.separated(
-              padding: const EdgeInsets.all(AppConstants.spacingMD),
-              itemCount: grouped.length,
-              separatorBuilder: (_, __) => const SizedBox(height: AppConstants.spacingLG),
-              itemBuilder: (context, index) {
-                final collectionId = grouped.keys.elementAt(index);
-                final collectionBookmarks = grouped[collectionId]!;
-                return AnimationConfiguration.staggeredList(
-                  position: index,
-                  duration: AppConstants.mediumAnimation,
-                  child: SlideAnimation(
-                    verticalOffset: 50.0,
-                    child: FadeInAnimation(
-                      child: _CollectionBookmarkGroup(
-                        collectionId: collectionId,
-                        bookmarks: collectionBookmarks,
-                        onBookmarkTap: (bookmark) => context.go('/hadith/collection/${bookmark.collectionId}/book/${bookmark.bookNumber}/hadith/${bookmark.hadithNumber}'),
-                        onBookmarkDelete: (bookmark) => ref.read(hadithBookmarksProvider.notifier).removeBookmark(bookmark.id),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
+          child: ListView.separated(
+            padding: const EdgeInsets.all(AppConstants.spacingMD),
+            itemCount: grouped.length,
+            separatorBuilder: (_, __) =>
+                const SizedBox(height: AppConstants.spacingLG),
+            itemBuilder: (context, index) {
+              final collectionId = grouped.keys.elementAt(index);
+              final collectionBookmarks = grouped[collectionId]!;
+              return _CollectionBookmarkGroup(
+                collectionId: collectionId,
+                bookmarks: collectionBookmarks,
+                onBookmarkTap: (bookmark) => context.go(
+                    '/hadith/collection/${bookmark.collectionId}/book/${bookmark.bookNumber}/hadith/${bookmark.hadithNumber}'),
+                onBookmarkDelete: (bookmark) => ref
+                    .read(hadithBookmarksProvider.notifier)
+                    .removeBookmark(bookmark.id),
+              );
+            },
           ),
         );
       },
@@ -262,16 +259,17 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> with SingleTicker
     return quranBookmarks.when(
       data: (qBookmarks) => hadithBookmarks.when(
         data: (hBookmarks) {
-          final favorites = [
-            ...qBookmarks.where((b) => b.color == BookmarkColor.gold),
-            ...hBookmarks.where((b) => b.color == BookmarkColor.gold),
-          ];
+          final quranFavorites =
+              qBookmarks.where((b) => b.color == BookmarkColor.gold).toList();
+          final hadithFavorites =
+              hBookmarks.where((b) => b.color == BookmarkColor.gold).toList();
 
-          if (favorites.isEmpty) {
+          if (quranFavorites.isEmpty && hadithFavorites.isEmpty) {
             return _buildEmptyState(
               icon: Icons.favorite_outlined,
               title: 'No Favorites',
-              subtitle: 'Mark bookmarks as favorites (gold color) to see them here',
+              subtitle:
+                  'Mark bookmarks as favorites (gold color) to see them here',
               actionLabel: 'Browse Content',
               onAction: () => context.go('/quran'),
             );
@@ -282,35 +280,58 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> with SingleTicker
               ref.refresh(quranBookmarksProvider);
               ref.refresh(hadithBookmarksProvider);
             },
-            child: AnimationLimiter(
-              child: ListView.separated(
-                padding: const EdgeInsets.all(AppConstants.spacingMD),
-                itemCount: favorites.length,
-                separatorBuilder: (_, __) => const SizedBox(height: AppConstants.spacingMD),
-                itemBuilder: (context, index) {
-                  final item = favorites[index];
-                  return AnimationConfiguration.staggeredList(
-                    position: index,
-                    duration: AppConstants.fastAnimation,
-                    child: SlideAnimation(
-                      verticalOffset: 30.0,
-                      child: FadeInAnimation(
-                        child: item is QuranBookmark
-                            ? QuranBookmarkListItem(
-                                bookmark: item,
-                                onTap: () => context.go('/quran/surah/${item.surahNumber}/ayah/${item.ayahNumber}'),
-                                onDelete: () => ref.read(quranBookmarksProvider.notifier).removeBookmark(item.id),
-                              )
-                            : HadithBookmarkListItem(
-                                bookmark: item,
-                                onTap: () => context.go('/hadith/collection/${item.collectionId}/book/${item.bookNumber}/hadith/${item.hadithNumber}'),
-                                onDelete: () => ref.read(hadithBookmarksProvider.notifier).removeBookmark(item.id),
-                              ),
-                      ),
-                    ),
+            child: ListView.separated(
+              padding: const EdgeInsets.all(AppConstants.spacingMD),
+              itemCount: quranFavorites.length + hadithFavorites.length,
+              separatorBuilder: (_, __) =>
+                  const SizedBox(height: AppConstants.spacingMD),
+              itemBuilder: (context, index) {
+                if (index < quranFavorites.length) {
+                  final item = quranFavorites[index];
+                  return QuranBookmarkListItem(
+                    bookmark: item,
+                    settings: const QuranDisplaySettings(),
+                    onTap: () => context.go(
+                        '/quran/surah/${item.surahNumber}/ayah/${item.ayahNumber}'),
+                    onDelete: () => ref
+                        .read(quranBookmarksProvider.notifier)
+                        .removeBookmark(item.id),
                   );
-                },
-              ),
+                } else {
+                  final item = hadithFavorites[index - quranFavorites.length];
+                  return HadithBookmarkListItem(
+                    bookmark: item,
+                    hadith: Hadith(
+                      id: '',
+                      collectionId: item.collectionId,
+                      bookNumber: item.bookNumber,
+                      hadithNumber: item.hadithNumber,
+                      bookHadithNumber: null,
+                      chapterId: null,
+                      textArabic: '',
+                      translations: {},
+                      narrators: [],
+                      narratorChainArabic: '',
+                      grade: HadithGrade.unknown,
+                      gradeDetails: '',
+                      topics: [],
+                      keywords: [],
+                      reference: null,
+                      referenceUrl: null,
+                      audioUrls: {},
+                      audioDuration: null,
+                      isFavorite: false,
+                      addedToFavorites: null,
+                      metadata: {},
+                    ),
+                    onTap: () => context.go(
+                        '/hadith/collection/${item.collectionId}/book/${item.bookNumber}/hadith/${item.hadithNumber}'),
+                    onDelete: () => ref
+                        .read(hadithBookmarksProvider.notifier)
+                        .removeBookmark(item.id),
+                  );
+                }
+              },
             ),
           );
         },
@@ -341,7 +362,8 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> with SingleTicker
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
+                color:
+                    theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -368,7 +390,9 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> with SingleTicker
             ),
             const SizedBox(height: AppConstants.spacingLG),
             FilledButton.icon(
-              icon: Icon(actionLabel == 'Go to Quran' ? Icons.menu_book : Icons.library_books),
+              icon: Icon(actionLabel == 'Go to Quran'
+                  ? Icons.menu_book
+                  : Icons.library_books),
               label: Text(actionLabel),
               onPressed: onAction,
             ),
@@ -404,7 +428,8 @@ class _BookmarksPageState extends ConsumerState<BookmarksPage> with SingleTicker
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Clear $type Bookmarks?'),
-        content: Text('This will permanently delete all $type bookmarks. This action cannot be undone.'),
+        content: Text(
+            'This will permanently delete all $type bookmarks. This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -479,11 +504,13 @@ class _SurahBookmarkGroup extends StatelessWidget {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: bookmarks.length,
-          separatorBuilder: (_, __) => const SizedBox(height: AppConstants.spacingSM),
+          separatorBuilder: (_, __) =>
+              const SizedBox(height: AppConstants.spacingSM),
           itemBuilder: (context, index) {
             final bookmark = bookmarks[index];
             return QuranBookmarkListItem(
               bookmark: bookmark,
+              settings: const QuranDisplaySettings(),
               onTap: () => onBookmarkTap(bookmark),
               onDelete: () => onBookmarkDelete(bookmark),
             );
@@ -557,11 +584,35 @@ class _CollectionBookmarkGroup extends StatelessWidget {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: bookmarks.length,
-          separatorBuilder: (_, __) => const SizedBox(height: AppConstants.spacingSM),
+          separatorBuilder: (_, __) =>
+              const SizedBox(height: AppConstants.spacingSM),
           itemBuilder: (context, index) {
             final bookmark = bookmarks[index];
             return HadithBookmarkListItem(
               bookmark: bookmark,
+              hadith: Hadith(
+                id: '',
+                collectionId: bookmark.collectionId,
+                bookNumber: bookmark.bookNumber,
+                hadithNumber: bookmark.hadithNumber,
+                bookHadithNumber: null,
+                chapterId: null,
+                textArabic: '',
+                translations: {},
+                narrators: [],
+                narratorChainArabic: '',
+                grade: HadithGrade.unknown,
+                gradeDetails: '',
+                topics: [],
+                keywords: [],
+                reference: null,
+                referenceUrl: null,
+                audioUrls: {},
+                audioDuration: null,
+                isFavorite: false,
+                addedToFavorites: null,
+                metadata: {},
+              ),
               onTap: () => onBookmarkTap(bookmark),
               onDelete: () => onBookmarkDelete(bookmark),
             );

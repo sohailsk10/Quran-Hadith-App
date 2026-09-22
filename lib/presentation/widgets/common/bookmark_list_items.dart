@@ -62,10 +62,12 @@ class QuranBookmarkListItem extends StatelessWidget {
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(AppConstants.radiusFull),
+                      borderRadius:
+                          BorderRadius.circular(AppConstants.radiusFull),
                     ),
                     child: Text(
                       '${bookmark.surahNumber}:${bookmark.ayahNumber}',
@@ -97,7 +99,8 @@ class QuranBookmarkListItem extends StatelessWidget {
 
               // Arabic Text
               Text(
-                quran.getVerse(bookmark.surahNumber, bookmark.ayahNumber, verseEndSymbol: true),
+                quran.getVerse(bookmark.surahNumber, bookmark.ayahNumber,
+                    verseEndSymbol: true),
                 style: theme.textTheme.bodyLarge?.copyWith(
                   fontFamily: 'Uthmani',
                   fontSize: settings.fontSize,
@@ -136,7 +139,8 @@ class QuranBookmarkListItem extends StatelessWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.all(AppConstants.spacingMD),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.secondaryContainer.withValues(alpha: 0.5),
+                    color: theme.colorScheme.secondaryContainer
+                        .withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(AppConstants.radiusSM),
                   ),
                   child: Row(
@@ -312,7 +316,8 @@ class HadithBookmarkListItem extends StatelessWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.all(AppConstants.spacingMD),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.secondaryContainer.withValues(alpha: 0.5),
+                    color: theme.colorScheme.secondaryContainer
+                        .withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(AppConstants.radiusSM),
                   ),
                   child: Row(
@@ -375,7 +380,10 @@ class _AuthenticityBadge extends StatelessWidget {
       HadithAuthenticity.hasan => ('Hasan', Colors.blue),
       HadithAuthenticity.daif => ('Da\'if', Colors.orange),
       HadithAuthenticity.mawdu => ('Mawdu\'', Colors.red),
-      HadithAuthenticity.unknown => ('Unknown', theme.colorScheme.onSurfaceVariant),
+      HadithAuthenticity.unknown => (
+          'Unknown',
+          theme.colorScheme.onSurfaceVariant
+        ),
     };
 
     return Container(
@@ -432,15 +440,19 @@ class FavoriteItem extends StatelessWidget {
         bookmark: hadithBookmark!,
         hadith: Hadith(
           id: '',
-          collectionId: '',
-          bookId: '',
-          chapterId: '',
-          numberInBook: 0,
-          arabicText: '',
-          grade: HadithGrade.unknown,
-          authenticity: HadithAuthenticity.unknown,
+          collectionId: hadithBookmark!.collectionId,
+          bookNumber: hadithBookmark!.bookNumber,
+          hadithNumber: hadithBookmark!.hadithNumber,
+          textArabic: '',
+          translations: {},
           narrators: [],
+          narratorChainArabic: '',
+          grade: HadithGrade.unknown,
+          gradeDetails: '',
           topics: [],
+          keywords: [],
+          audioUrls: {},
+          metadata: {},
         ),
         translation: translationText,
         onTap: onTap,

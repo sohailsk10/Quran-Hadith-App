@@ -2,28 +2,26 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:quran/quran.dart' as quran;
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../presentation/providers/app_providers.dart';
 import '../../../shared/models/quran_models.dart';
+import '../../../shared/models/settings_models.dart';
 import '../../widgets/common/app_scaffold.dart';
-import '../../widgets/quran/ayah_detail_card.dart';
-import '../../widgets/quran/tafsir_card.dart';
-import '../../widgets/audio/audio_controls.dart';
 
 class AyahDetailPage extends ConsumerStatefulWidget {
   final int surahNumber;
   final int ayahNumber;
 
-  const AyahDetailPage({super.key, required this.surahNumber, required this.ayahNumber});
+  const AyahDetailPage(
+      {super.key, required this.surahNumber, required this.ayahNumber});
 
   @override
   ConsumerState<AyahDetailPage> createState() => _AyahDetailPageState();
 }
 
-class _AyahDetailPageState extends ConsumerState<AyahDetailPage> with SingleTickerProviderStateMixin {
+class _AyahDetailPageState extends ConsumerState<AyahDetailPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -40,8 +38,6 @@ class _AyahDetailPageState extends ConsumerState<AyahDetailPage> with SingleTick
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return AppScaffold(
       title: 'Ayah Detail',
       actions: [
@@ -56,44 +52,39 @@ class _AyahDetailPageState extends ConsumerState<AyahDetailPage> with SingleTick
       ],
       child: Consumer(
         builder: (context, ref, _) {
-          final ayahAsync = ref.watch(ayahProvider(widget.surahNumber, widget.ayahNumber));
-          final translationAsync = ref.watch(ayahTranslationProvider(widget.surahNumber, widget.ayahNumber));
-          final tafsirAsync = ref.watch(tafsirProvider(widget.surahNumber, widget.ayahNumber));
+          final ayahAsync =
+              ref.watch(ayahProvider((widget.surahNumber, widget.ayahNumber)));
+          final tafsirAsync = ref
+              .watch(tafsirProvider((widget.surahNumber, widget.ayahNumber)));
           final settings = ref.watch(settingsProvider);
-          final audioState = ref.watch(audioPlayerProvider);
 
           return settings.when(
             data: (settings) => ayahAsync.when(
-              data: (ayah) => translationAsync.when(
-                data: (translations) => tafsirAsync.when(
+              data: (ayah) {
+                if (ayah == null) {
+                  return _buildErrorState('Ayah not found');
+                }
+                return tafsirAsync.when(
                   data: (tafsirs) => _buildDetailContent(
                     context,
                     ayah,
-                    translations,
                     tafsirs,
                     settings,
-                    audioState,
                   ),
                   loading: () => _buildDetailContent(
                     context,
                     ayah,
-                    translations,
                     [],
                     settings,
-                    audioState,
                   ),
                   error: (error, stack) => _buildDetailContent(
                     context,
                     ayah,
-                    translations,
                     [],
                     settings,
-                    audioState,
                   ),
-                ),
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (error, stack) => _buildErrorState(error),
-              ),
+                );
+              },
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (error, stack) => _buildErrorState(error),
             ),
@@ -108,36 +99,16 @@ class _AyahDetailPageState extends ConsumerState<AyahDetailPage> with SingleTick
   Widget _buildDetailContent(
     BuildContext context,
     Ayah ayah,
-    Map<String, List<TranslationInfo>> translations,
     List<Tafsir> tafsirs,
     AppSettings settings,
-    AudioPlayerState audioState,
   ) {
-    final theme = Theme.of(context);
     final selectedTranslationId = settings.selectedTranslationId;
-    final selectedTranslation = translations[selectedTranslationId]?.firstWhere(
-      (t) => t.ayahNumber == ayah.numberInSurah,
-      orElse: () => TranslationInfo(
-        id: selectedTranslationId,
-        name: 'Translation',
-        languageCode: 'en',
-        ayahNumber: ayah.numberInSurah,
-        text: '',
-      ),
-    );
+    final translationText = ayah.getTranslation(selectedTranslationId);
 
     return Column(
       children: [
         // Ayah Detail Card
-        AyahDetailCard(
-          ayah: ayah,
-          translation: selectedTranslation?.text ?? '',
-          settings: settings,
-          surahName: quran.getSurahName(widget.surahNumber),
-          onPlay: () => ref.read(audioPlayerProvider.notifier).playAyah(widget.surahNumber, widget.ayahNumber),
-          onBookmark: _bookmarkAyah,
-          onShare: _shareAyah,
-        ),
+        _buildAyahCard(ayah, translationText, settings),
 
         // Tab Bar
         TabBar(
@@ -154,9 +125,9 @@ class _AyahDetailPageState extends ConsumerState<AyahDetailPage> with SingleTick
           child: TabBarView(
             controller: _tabController,
             children: [
-              _buildTranslationsTab(translations, settings),
+              _buildTranslationsTab(ayah, settings),
               _buildTafsirTab(tafsirs, settings),
-              _buildAudioTab(ayah, audioState),
+              _buildAudioTab(ayah, settings),
             ],
           ),
         ),
@@ -164,34 +135,153 @@ class _AyahDetailPageState extends ConsumerState<AyahDetailPage> with SingleTick
     );
   }
 
-  Widget _buildTranslationsTab(
-    Map<String, List<TranslationInfo>> translations,
-    AppSettings settings,
-  ) {
+  Widget _buildAyahCard(Ayah ayah, String translation, AppSettings settings) {
     final theme = Theme.of(context);
+    final quranHadithTheme = theme.quranHadith;
 
-    return ListView(
-      padding: const EdgeInsets.all(AppConstants.spacingMD),
-      children: translations.entries.map((entry) {
-        final translation = entry.value.firstWhere(
-          (t) => t.ayahNumber == widget.ayahNumber,
-          orElse: () => TranslationInfo(
-            id: entry.key,
-            name: entry.key,
-            languageCode: 'en',
-            ayahNumber: widget.ayahNumber,
-            text: '',
+    return Container(
+      margin: const EdgeInsets.all(AppConstants.spacingMD),
+      padding: const EdgeInsets.all(AppConstants.spacingLG),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHigh,
+        borderRadius: BorderRadius.circular(AppConstants.radiusLG),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Row(
+            children: [
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(AppConstants.radiusFull),
+                ),
+                child: Text(
+                  '${ayah.surahNumber}:${ayah.ayahInSurah}',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: theme.colorScheme.onPrimaryContainer,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              if (ayah.isSajdah) ...[
+                const SizedBox(width: AppConstants.spacingSM),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: quranHadithTheme.sajdahColor.withValues(alpha: 0.15),
+                    borderRadius:
+                        BorderRadius.circular(AppConstants.radiusFull),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.accessibility,
+                        size: 12,
+                        color: quranHadithTheme.sajdahColor,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Sajdah',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: quranHadithTheme.sajdahColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+              const Spacer(),
+              // Actions
+              IconButton(
+                onPressed: () => ref
+                    .read(audioPlayerStateProvider.notifier)
+                    .setPlaying(true),
+                icon: const Icon(Icons.play_circle_outline_rounded),
+                tooltip: 'Play audio',
+              ),
+              IconButton(
+                onPressed: _bookmarkAyah,
+                icon: const Icon(Icons.bookmark_add_outlined),
+                tooltip: 'Bookmark',
+              ),
+              IconButton(
+                onPressed: _shareAyah,
+                icon: const Icon(Icons.share_outlined),
+                tooltip: 'Share',
+              ),
+            ],
           ),
+
+          const SizedBox(height: AppConstants.spacingLG),
+
+          // Arabic Text
+          Text(
+            ayah.textUthmani,
+            style: theme.textTheme.displaySmall?.copyWith(
+              fontFamily: 'Uthmani',
+              fontSize: settings.quranDisplay.fontSize + 4,
+              height: 2.0,
+            ),
+            textAlign: TextAlign.center,
+            textDirection: TextDirection.rtl,
+          ),
+
+          if (translation.isNotEmpty) ...[
+            const SizedBox(height: AppConstants.spacingLG),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(AppConstants.spacingMD),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(AppConstants.radiusMD),
+              ),
+              child: Text(
+                translation,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontSize: settings.quranDisplay.translationFontSize + 2,
+                  height: 1.6,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTranslationsTab(Ayah ayah, AppSettings settings) {
+    return Consumer(
+      builder: (context, ref, _) {
+        final translationsAsync = ref.watch(translationsProvider);
+        return translationsAsync.when(
+          data: (translations) => ListView(
+            padding: const EdgeInsets.all(AppConstants.spacingMD),
+            children: translations.map((t) {
+              final translationText = ayah.getTranslation(t.id);
+              final isSelected = t.id == settings.selectedTranslationId;
+              return _TranslationCard(
+                translation: t,
+                translationText: translationText,
+                isSelected: isSelected,
+                onTap: () {
+                  ref.read(settingsProvider.notifier).updateTranslation(t.id);
+                },
+              );
+            }).toList(),
+          ),
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (_, __) => const Text('Error loading translations'),
         );
-        return _TranslationCard(
-          translation: translation,
-          isSelected: entry.key == settings.selectedTranslationId,
-          onTap: () {
-            ref.read(settingsProvider.notifier).updateTranslation(entry.key);
-            Navigator.pop(context);
-          },
-        );
-      }).toList(),
+      },
     );
   }
 
@@ -201,12 +291,15 @@ class _AyahDetailPageState extends ConsumerState<AyahDetailPage> with SingleTick
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.menu_book_outlined, size: 64, color: Theme.of(context).colorScheme.onSurfaceVariant),
+            Icon(Icons.menu_book_outlined,
+                size: 64,
+                color: Theme.of(context).colorScheme.onSurfaceVariant),
             const SizedBox(height: 16),
             Text('No Tafsir available for this ayah'),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () => ref.refresh(tafsirProvider(widget.surahNumber, widget.ayahNumber)),
+              onPressed: () => ref.refresh(
+                  tafsirProvider((widget.surahNumber, widget.ayahNumber))),
               child: const Text('Refresh'),
             ),
           ],
@@ -217,14 +310,15 @@ class _AyahDetailPageState extends ConsumerState<AyahDetailPage> with SingleTick
     return ListView.separated(
       padding: const EdgeInsets.all(AppConstants.spacingMD),
       itemCount: tafsirs.length,
-      separatorBuilder: (_, __) => const SizedBox(height: AppConstants.spacingMD),
+      separatorBuilder: (_, __) =>
+          const SizedBox(height: AppConstants.spacingMD),
       itemBuilder: (context, index) {
-        return TafsirCard(tafsir: tafsirs[index]);
+        return _TafsirCard(tafsir: tafsirs[index]);
       },
     );
   }
 
-  Widget _buildAudioTab(Ayah ayah, AudioPlayerState audioState) {
+  Widget _buildAudioTab(Ayah ayah, AppSettings settings) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppConstants.spacingMD),
       child: Column(
@@ -235,21 +329,18 @@ class _AyahDetailPageState extends ConsumerState<AyahDetailPage> with SingleTick
           const SizedBox(height: AppConstants.spacingLG),
 
           // Audio Controls
-          AudioControls(
-            surahNumber: widget.surahNumber,
-            ayahs: [ayah],
-            initialAyahIndex: 0,
-          ),
+          // AudioControls(
+          // ),
 
           const SizedBox(height: AppConstants.spacingLG),
 
           // Playback Speed
-          _buildPlaybackSpeedControl(audioState),
+          _buildPlaybackSpeedControl(),
 
           const SizedBox(height: AppConstants.spacingLG),
 
           // Repeat Options
-          _buildRepeatOptions(audioState),
+          _buildRepeatOptions(),
         ],
       ),
     );
@@ -259,9 +350,9 @@ class _AyahDetailPageState extends ConsumerState<AyahDetailPage> with SingleTick
     return Consumer(
       builder: (context, ref, _) {
         final recitersAsync = ref.watch(recitersProvider);
-        final settings = ref.watch(settingsProvider);
+        final settingsAsync = ref.watch(settingsProvider);
 
-        return settings.when(
+        return settingsAsync.when(
           data: (settings) => recitersAsync.when(
             data: (reciters) => Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -269,8 +360,8 @@ class _AyahDetailPageState extends ConsumerState<AyahDetailPage> with SingleTick
                 Text(
                   'Select Reciter',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                        fontWeight: FontWeight.w600,
+                      ),
                 ),
                 const SizedBox(height: AppConstants.spacingMD),
                 SizedBox(
@@ -278,29 +369,40 @@ class _AyahDetailPageState extends ConsumerState<AyahDetailPage> with SingleTick
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     itemCount: reciters.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: AppConstants.spacingMD),
+                    separatorBuilder: (_, __) =>
+                        const SizedBox(width: AppConstants.spacingMD),
                     itemBuilder: (context, index) {
                       final reciter = reciters[index];
-                      final isSelected = reciter.id == settings.audio.selectedReciterId;
+                      final isSelected =
+                          reciter.id == settings.audio.selectedReciterId;
                       return InkWell(
                         onTap: () {
-                          ref.read(settingsProvider.notifier).updateAudioSettings(
-                            settings.audio.copyWith(selectedReciterId: reciter.id),
-                          );
+                          ref
+                              .read(settingsProvider.notifier)
+                              .updateAudioSettings(
+                                settings.audio
+                                    .copyWith(selectedReciterId: reciter.id),
+                              );
                         },
-                        borderRadius: BorderRadius.circular(AppConstants.radiusMD),
+                        borderRadius:
+                            BorderRadius.circular(AppConstants.radiusMD),
                         child: Container(
                           width: 140,
                           padding: const EdgeInsets.all(AppConstants.spacingMD),
                           decoration: BoxDecoration(
                             color: isSelected
                                 ? Theme.of(context).colorScheme.primaryContainer
-                                : Theme.of(context).colorScheme.surfaceContainerHigh,
-                            borderRadius: BorderRadius.circular(AppConstants.radiusMD),
+                                : Theme.of(context)
+                                    .colorScheme
+                                    .surfaceContainerHigh,
+                            borderRadius:
+                                BorderRadius.circular(AppConstants.radiusMD),
                             border: Border.all(
                               color: isSelected
                                   ? Theme.of(context).colorScheme.primary
-                                  : Theme.of(context).colorScheme.outlineVariant,
+                                  : Theme.of(context)
+                                      .colorScheme
+                                      .outlineVariant,
                             ),
                           ),
                           child: Column(
@@ -309,18 +411,29 @@ class _AyahDetailPageState extends ConsumerState<AyahDetailPage> with SingleTick
                               Icon(
                                 Icons.person,
                                 color: isSelected
-                                    ? Theme.of(context).colorScheme.onPrimaryContainer
-                                    : Theme.of(context).colorScheme.onSurfaceVariant,
+                                    ? Theme.of(context)
+                                        .colorScheme
+                                        .onPrimaryContainer
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
                               ),
                               const SizedBox(height: AppConstants.spacingXS),
                               Text(
                                 reciter.name,
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  fontWeight: FontWeight.w500,
-                                  color: isSelected
-                                      ? Theme.of(context).colorScheme.onPrimaryContainer
-                                      : Theme.of(context).colorScheme.onSurface,
-                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                      color: isSelected
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .onPrimaryContainer
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                    ),
                                 textAlign: TextAlign.center,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
@@ -337,87 +450,111 @@ class _AyahDetailPageState extends ConsumerState<AyahDetailPage> with SingleTick
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (_, __) => const SizedBox.shrink(),
           ),
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (_, __) => const SizedBox.shrink(),
         );
       },
     );
   }
 
-  Widget _buildPlaybackSpeedControl(AudioPlayerState audioState) {
-    final speeds = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0];
+  Widget _buildPlaybackSpeedControl() {
+    return Consumer(
+      builder: (context, ref, _) {
+        final audioState = ref.watch(audioPlayerStateProvider);
+        final speeds = [
+          PlaybackSpeed.x0_5,
+          PlaybackSpeed.x0_75,
+          PlaybackSpeed.x1_0,
+          PlaybackSpeed.x1_25,
+          PlaybackSpeed.x1_5,
+          PlaybackSpeed.x2_0,
+        ];
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Playback Speed',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: AppConstants.spacingMD),
-        Wrap(
-          spacing: AppConstants.spacingSM,
-          runSpacing: AppConstants.spacingSM,
-          children: speeds.map((speed) {
-            final isSelected = audioState.playbackSpeed == speed;
-            return FilterChip(
-              label: Text('${speed}x'),
-              selected: isSelected,
-              onSelected: (_) {
-                ref.read(audioPlayerProvider.notifier).setPlaybackSpeed(speed);
-              },
-              selectedColor: Theme.of(context).colorScheme.primaryContainer,
-              checkmarkColor: Theme.of(context).colorScheme.onPrimaryContainer,
-            );
-          }).toList(),
-        ),
-      ],
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Playback Speed',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+            const SizedBox(height: AppConstants.spacingMD),
+            Wrap(
+              spacing: AppConstants.spacingSM,
+              runSpacing: AppConstants.spacingSM,
+              children: speeds.map((speed) {
+                final isSelected = audioState.playbackSpeed == speed;
+                return FilterChip(
+                  label: Text(speed.label),
+                  selected: isSelected,
+                  onSelected: (_) {
+                    ref
+                        .read(audioPlayerStateProvider.notifier)
+                        .setPlaybackSpeed(speed);
+                  },
+                  selectedColor: Theme.of(context).colorScheme.primaryContainer,
+                  checkmarkColor:
+                      Theme.of(context).colorScheme.onPrimaryContainer,
+                );
+              }).toList(),
+            ),
+          ],
+        );
+      },
     );
   }
 
-  Widget _buildRepeatOptions(AudioPlayerState audioState) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Repeat Mode',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: AppConstants.spacingMD),
-        Wrap(
-          spacing: AppConstants.spacingSM,
-          runSpacing: AppConstants.spacingSM,
-          children: RepeatMode.values.map((mode) {
-            final isSelected = audioState.repeatMode == mode;
-            return FilterChip(
-              label: Text(_getRepeatModeLabel(mode)),
-              selected: isSelected,
-              onSelected: (_) {
-                ref.read(audioPlayerProvider.notifier).setRepeatMode(mode);
-              },
-              selectedColor: Theme.of(context).colorScheme.primaryContainer,
-              checkmarkColor: Theme.of(context).colorScheme.onPrimaryContainer,
-            );
-          }).toList(),
-        ),
-      ],
+  Widget _buildRepeatOptions() {
+    return Consumer(
+      builder: (context, ref, _) {
+        final audioState = ref.watch(audioPlayerStateProvider);
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Repeat Mode',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+            const SizedBox(height: AppConstants.spacingMD),
+            Wrap(
+              spacing: AppConstants.spacingSM,
+              runSpacing: AppConstants.spacingSM,
+              children: AudioRepeatMode.values.map((mode) {
+                final isSelected = audioState.repeatMode == mode;
+                return FilterChip(
+                  label: Text(_getRepeatModeLabel(mode)),
+                  selected: isSelected,
+                  onSelected: (_) {
+                    ref
+                        .read(audioPlayerStateProvider.notifier)
+                        .setRepeatMode(mode);
+                  },
+                  selectedColor: Theme.of(context).colorScheme.primaryContainer,
+                  checkmarkColor:
+                      Theme.of(context).colorScheme.onPrimaryContainer,
+                );
+              }).toList(),
+            ),
+          ],
+        );
+      },
     );
   }
 
-  String _getRepeatModeLabel(RepeatMode mode) {
+  String _getRepeatModeLabel(AudioRepeatMode mode) {
     switch (mode) {
-      case RepeatMode.off:
+      case AudioRepeatMode.none:
         return 'Off';
-      case RepeatMode.one:
-        return 'Repeat One';
-      case RepeatMode.all:
-        return 'Repeat All';
-      case RepeatMode.ayah:
+      case AudioRepeatMode.ayah:
         return 'Repeat Ayah';
-      case RepeatMode.surah:
+      case AudioRepeatMode.surah:
         return 'Repeat Surah';
+      case AudioRepeatMode.all:
+        return 'Repeat All';
     }
   }
 
@@ -431,7 +568,8 @@ class _AyahDetailPageState extends ConsumerState<AyahDetailPage> with SingleTick
           Text('Error: $error'),
           const SizedBox(height: 16),
           ElevatedButton(
-            onPressed: () => ref.refresh(ayahProvider(widget.surahNumber, widget.ayahNumber)),
+            onPressed: () => ref
+                .refresh(ayahProvider((widget.surahNumber, widget.ayahNumber))),
             child: const Text('Retry'),
           ),
         ],
@@ -440,23 +578,22 @@ class _AyahDetailPageState extends ConsumerState<AyahDetailPage> with SingleTick
   }
 
   void _bookmarkAyah() {
-    ref.read(quranBookmarksProvider.notifier).addBookmark(
-      QuranBookmark(
-        id: 'ayah_${widget.surahNumber}_${widget.ayahNumber}_${DateTime.now().millisecondsSinceEpoch}',
-        surahNumber: widget.surahNumber,
-        ayahNumber: widget.ayahNumber,
-        surahName: quran.getSurahName(widget.surahNumber),
-        ayahText: '',
-        createdAt: DateTime.now(),
-      ),
-    );
+    ref.read(quranBookmarksProvider.notifier).add(
+          QuranBookmark(
+            id: 'ayah_${widget.surahNumber}_${widget.ayahNumber}_${DateTime.now().millisecondsSinceEpoch}',
+            surahNumber: widget.surahNumber,
+            ayahNumber: widget.ayahNumber,
+            createdAt: DateTime.now(),
+          ),
+        );
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Ayah ${widget.surahNumber}:${widget.ayahNumber} bookmarked')),
+      SnackBar(
+          content: Text(
+              'Ayah ${widget.surahNumber}:${widget.ayahNumber} bookmarked')),
     );
   }
 
   void _shareAyah() {
-    // TODO: Implement share
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Share feature coming soon')),
     );
@@ -466,11 +603,13 @@ class _AyahDetailPageState extends ConsumerState<AyahDetailPage> with SingleTick
 /// Translation Card
 class _TranslationCard extends StatelessWidget {
   final TranslationInfo translation;
+  final String translationText;
   final bool isSelected;
   final VoidCallback onTap;
 
   const _TranslationCard({
     required this.translation,
+    required this.translationText,
     required this.isSelected,
     required this.onTap,
   });
@@ -501,15 +640,17 @@ class _TranslationCard extends StatelessWidget {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: isSelected
                         ? theme.colorScheme.primary
                         : theme.colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(AppConstants.radiusFull),
+                    borderRadius:
+                        BorderRadius.circular(AppConstants.radiusFull),
                   ),
                   child: Text(
-                    translation.languageCode.toUpperCase(),
+                    translation.language.toUpperCase(),
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: isSelected
                           ? theme.colorScheme.onPrimary
@@ -540,14 +681,14 @@ class _TranslationCard extends StatelessWidget {
             ),
             const SizedBox(height: AppConstants.spacingMD),
             Text(
-              translation.text,
+              translationText,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: isSelected
                     ? theme.colorScheme.onPrimaryContainer
                     : theme.colorScheme.onSurface,
                 height: 1.6,
               ),
-              textDirection: _getTextDirection(translation.languageCode),
+              textDirection: _getTextDirection(translation.language),
             ),
           ],
         ),
@@ -557,6 +698,66 @@ class _TranslationCard extends StatelessWidget {
 
   TextDirection _getTextDirection(String languageCode) {
     const rtlLanguages = ['ar', 'ur', 'fa', 'ps', 'sd'];
-    return rtlLanguages.contains(languageCode) ? TextDirection.rtl : TextDirection.ltr;
+    return rtlLanguages.contains(languageCode)
+        ? TextDirection.rtl
+        : TextDirection.ltr;
+  }
+}
+
+/// Tafsir Card
+class _TafsirCard extends StatelessWidget {
+  final Tafsir tafsir;
+
+  const _TafsirCard({required this.tafsir});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(AppConstants.spacingMD),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primaryContainer,
+                    borderRadius:
+                        BorderRadius.circular(AppConstants.radiusFull),
+                  ),
+                  child: Text(
+                    tafsir.sourceName,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.onPrimaryContainer,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  tafsir.language.toUpperCase(),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppConstants.spacingMD),
+            Text(
+              tafsir.text,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                height: 1.6,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

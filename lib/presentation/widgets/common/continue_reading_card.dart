@@ -34,7 +34,8 @@ class ContinueReadingCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppConstants.radiusLG),
           boxShadow: [
             BoxShadow(
-              color: quranHadithTheme.quranGradient.colors.first.withValues(alpha: 0.3),
+              color: quranHadithTheme.quranGradient.colors!.first
+                  .withValues(alpha: 0.3),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -155,7 +156,7 @@ class CompactContinueReadingCard extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: quranHadithTheme.quranGradient,
+                gradient: quranHadithTheme.quranGradient,
                 borderRadius: BorderRadius.circular(AppConstants.radiusSM),
               ),
               child: const Icon(

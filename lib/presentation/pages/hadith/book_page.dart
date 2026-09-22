@@ -2,27 +2,28 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../presentation/providers/app_providers.dart';
 import '../../../shared/models/hadith_models.dart';
+import '../../../shared/models/settings_models.dart';
 import '../../widgets/common/app_scaffold.dart';
-import '../../widgets/common/section_header.dart';
 import '../../widgets/hadith/hadith_list_item.dart';
 
 class BookPage extends ConsumerStatefulWidget {
   final String collectionId;
   final int bookNumber;
 
-  const BookPage({super.key, required this.collectionId, required this.bookNumber});
+  const BookPage(
+      {super.key, required this.collectionId, required this.bookNumber});
 
   @override
   ConsumerState<BookPage> createState() => _BookPageState();
 }
 
-class _BookPageState extends ConsumerState<BookPage> with SingleTickerProviderStateMixin {
+class _BookPageState extends ConsumerState<BookPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final ScrollController _scrollController = ScrollController();
 
@@ -41,17 +42,17 @@ class _BookPageState extends ConsumerState<BookPage> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return AppScaffold(
       title: 'Book ${widget.bookNumber}',
       child: Consumer(
         builder: (context, ref, _) {
-          final booksAsync = ref.watch(hadithBooksProvider(widget.collectionId));
-          final hadithsByBookAsync = ref.watch(hadithsByBookProvider(
+          final booksAsync =
+              ref.watch(hadithBooksProvider(widget.collectionId));
+          final hadithsByBookAsync = ref.watch(hadithsByBookProvider((
             collectionId: widget.collectionId,
             bookNumber: widget.bookNumber,
-          ));
+            page: 1,
+          )));
           final settings = ref.watch(settingsProvider);
 
           return booksAsync.when(
@@ -61,37 +62,41 @@ class _BookPageState extends ConsumerState<BookPage> with SingleTickerProviderSt
                 orElse: () => throw Exception('Book not found'),
               );
               return Column(
-              children: [
-                // Book Header
-                _buildBookHeader(book),
+                children: [
+                  // Book Header
+                  _buildBookHeader(book),
 
-                // Tab Bar
-                TabBar(
-                  controller: _tabController,
-                  tabs: const [
-                    Tab(text: 'Hadiths'),
-                    Tab(text: 'Chapters'),
-                  ],
-                  isScrollable: true,
-                  tabAlignment: TabAlignment.start,
-                ),
-
-                // Tab Views
-                Expanded(
-                  child: TabBarView(
+                  // Tab Bar
+                  TabBar(
                     controller: _tabController,
-                    children: [
-                      hadithsByBookAsync.when(
-                        data: (hadithBookDetail) => _buildHadithsTab(hadithBookDetail, settings),
-                        loading: () => const Center(child: CircularProgressIndicator()),
-                        error: (error, stack) => Center(child: Text('Error: $error')),
-                      ),
-                      _buildChaptersTab(settings),
+                    tabs: const [
+                      Tab(text: 'Hadiths'),
+                      Tab(text: 'Chapters'),
                     ],
+                    isScrollable: true,
+                    tabAlignment: TabAlignment.start,
                   ),
-                ),
-              ],
-            ),
+
+                  // Tab Views
+                  Expanded(
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: [
+                        hadithsByBookAsync.when(
+                          data: (hadithBookDetail) =>
+                              _buildHadithsTab(hadithBookDetail, settings),
+                          loading: () =>
+                              const Center(child: CircularProgressIndicator()),
+                          error: (error, stack) =>
+                              Center(child: Text('Error: $error')),
+                        ),
+                        _buildChaptersTab(settings),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (error, stack) => _buildErrorState(error),
           );
@@ -112,7 +117,8 @@ class _BookPageState extends ConsumerState<BookPage> with SingleTickerProviderSt
         borderRadius: BorderRadius.circular(AppConstants.radiusLG),
         boxShadow: [
           BoxShadow(
-            color: quranHadithTheme.hadithGradient.colors.first.withValues(alpha: 0.3),
+            color: quranHadithTheme.hadithGradient.colors.first
+                .withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -142,7 +148,7 @@ class _BookPageState extends ConsumerState<BookPage> with SingleTickerProviderSt
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Book ${book.number}: ${book.title}',
+                      'Book ${book.number}: ${book.name}',
                       style: theme.textTheme.headlineSmall?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w700,
@@ -150,7 +156,7 @@ class _BookPageState extends ConsumerState<BookPage> with SingleTickerProviderSt
                     ),
                     const SizedBox(height: AppConstants.spacingXS),
                     Text(
-                      '${book.hadithCount} Hadiths • ${book.chapterCount} Chapters',
+                      '${book.totalHadiths} Hadiths • ${book.chapters.length} Chapters',
                       style: theme.textTheme.titleMedium?.copyWith(
                         color: Colors.white.withValues(alpha: 0.9),
                       ),
@@ -160,10 +166,11 @@ class _BookPageState extends ConsumerState<BookPage> with SingleTickerProviderSt
               ),
             ],
           ),
-          if (book.description != null && book.description!.isNotEmpty) ...[
+          if (book.bookDescription != null &&
+              book.bookDescription!.isNotEmpty) ...[
             const SizedBox(height: AppConstants.spacingMD),
             Text(
-              book.description!,
+              book.bookDescription!,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: Colors.white.withValues(alpha: 0.8),
               ),
@@ -174,38 +181,31 @@ class _BookPageState extends ConsumerState<BookPage> with SingleTickerProviderSt
     );
   }
 
-  Widget _buildHadithsTab(HadithBookDetail hadithBookDetail, AsyncValue<AppSettings> settingsAsync) {
+  Widget _buildHadithsTab(HadithBookDetail hadithBookDetail,
+      AsyncValue<AppSettings> settingsAsync) {
     return settingsAsync.when(
       data: (settings) => RefreshIndicator(
-        onRefresh: () async => ref.refresh(hadithsByBookProvider(
+        onRefresh: () async => ref.refresh(hadithsByBookProvider((
           collectionId: widget.collectionId,
           bookNumber: widget.bookNumber,
-        )),
-        child: AnimationLimiter(
-          child: ListView.separated(
-            controller: _scrollController,
-            padding: const EdgeInsets.all(AppConstants.spacingMD),
-            itemCount: hadithBookDetail.hadiths.length,
-            separatorBuilder: (_, __) => const SizedBox(height: AppConstants.spacingSM),
-            itemBuilder: (context, index) {
-              final hadith = hadithBookDetail.hadiths[index];
-              return AnimationConfiguration.staggeredList(
-                position: index,
-                duration: AppConstants.fastAnimation,
-                child: SlideAnimation(
-                  verticalOffset: 30.0,
-                  child: FadeInAnimation(
-                    child: HadithListItem(
-                      hadith: hadith,
-                      settings: settings,
-                      onTap: () => context.go('/hadith/collection/${widget.collectionId}/book/${widget.bookNumber}/hadith/${hadith.hadithNumber}'),
-                      onLongPress: () => _showHadithActions(context, hadith),
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
+          page: 1,
+        ))),
+        child: ListView.separated(
+          controller: _scrollController,
+          padding: const EdgeInsets.all(AppConstants.spacingMD),
+          itemCount: hadithBookDetail.hadiths.length,
+          separatorBuilder: (_, __) =>
+              const SizedBox(height: AppConstants.spacingSM),
+          itemBuilder: (context, index) {
+            final hadith = hadithBookDetail.hadiths[index];
+            return HadithListItem(
+              hadith: hadith,
+              settings: settings.hadithDisplay,
+              onTap: () => context.go(
+                  '/hadith/collection/${widget.collectionId}/book/${widget.bookNumber}/hadith/${hadith.hadithNumber}'),
+              onLongPress: () => _showHadithActions(context, hadith),
+            );
+          },
         ),
       ),
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -221,31 +221,23 @@ class _BookPageState extends ConsumerState<BookPage> with SingleTickerProviderSt
           final chaptersAsync = ref.watch(hadithChaptersProvider(bookId));
           return chaptersAsync.when(
             data: (chapters) => RefreshIndicator(
-              onRefresh: () async => ref.refresh(hadithChaptersProvider(bookId)),
-              child: AnimationLimiter(
-                child: ListView.separated(
-                  padding: const EdgeInsets.all(AppConstants.spacingMD),
-                  itemCount: chapters.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: AppConstants.spacingMD),
-                  itemBuilder: (context, index) {
-                    final chapter = chapters[index];
-                    return AnimationConfiguration.staggeredList(
-                      position: index,
-                      duration: AppConstants.mediumAnimation,
-                      child: SlideAnimation(
-                        verticalOffset: 50.0,
-                        child: FadeInAnimation(
-                          child: _ChapterCard(
-                            chapter: chapter,
-                            onTap: () {
-                              context.go('/hadith/collection/${widget.collectionId}/book/${widget.bookNumber}/hadith/${chapter.startHadithNumber}');
-                            },
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
+              onRefresh: () async =>
+                  ref.refresh(hadithChaptersProvider(bookId)),
+              child: ListView.separated(
+                padding: const EdgeInsets.all(AppConstants.spacingMD),
+                itemCount: chapters.length,
+                separatorBuilder: (_, __) =>
+                    const SizedBox(height: AppConstants.spacingMD),
+                itemBuilder: (context, index) {
+                  final chapter = chapters[index];
+                  return _ChapterCard(
+                    chapter: chapter,
+                    onTap: () {
+                      context.go(
+                          '/hadith/collection/${widget.collectionId}/book/${widget.bookNumber}/hadith/${chapter.startHadithNumber}');
+                    },
+                  );
+                },
               ),
             ),
             loading: () => const Center(child: CircularProgressIndicator()),
@@ -268,7 +260,8 @@ class _BookPageState extends ConsumerState<BookPage> with SingleTickerProviderSt
           Text('Error: $error'),
           const SizedBox(height: 16),
           ElevatedButton(
-            onPressed: () => ref.refresh(bookProvider(widget.collectionId, widget.bookNumber)),
+            onPressed: () => ref
+                .refresh(hadithCollectionDetailProvider(widget.collectionId)),
             child: const Text('Retry'),
           ),
         ],
@@ -279,7 +272,10 @@ class _BookPageState extends ConsumerState<BookPage> with SingleTickerProviderSt
   void _showHadithActions(BuildContext context, Hadith hadith) {
     showModalBottomSheet(
       context: context,
-      builder: (context) => _HadithActionsSheet(hadith: hadith, collectionId: widget.collectionId, bookNumber: widget.bookNumber),
+      builder: (context) => _HadithActionsSheet(
+          hadith: hadith,
+          collectionId: widget.collectionId,
+          bookNumber: widget.bookNumber),
     );
   }
 }
@@ -325,14 +321,14 @@ class _ChapterCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    chapter.title,
+                    chapter.name,
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(height: AppConstants.spacingXS),
                   Text(
-                    'Hadiths ${chapter.startHadithNumber} - ${chapter.endHadithNumber} (${chapter.hadithCount} hadiths)',
+                    'Hadiths ${chapter.startHadithNumber} - ${chapter.endHadithNumber} (${chapter.totalHadiths} hadiths)',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
@@ -356,7 +352,10 @@ class _HadithActionsSheet extends ConsumerWidget {
   final String collectionId;
   final int bookNumber;
 
-  const _HadithActionsSheet({required this.hadith, required this.collectionId, required this.bookNumber});
+  const _HadithActionsSheet(
+      {required this.hadith,
+      required this.collectionId,
+      required this.bookNumber});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -402,10 +401,13 @@ class _HadithActionsSheet extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppConstants.spacingMD),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: _getGradeColor(hadith.grade).withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(AppConstants.radiusFull),
+                      color:
+                          _getGradeColor(hadith.grade).withValues(alpha: 0.15),
+                      borderRadius:
+                          BorderRadius.circular(AppConstants.radiusFull),
                     ),
                     child: Text(
                       hadith.grade.arabicName,
@@ -433,18 +435,16 @@ class _HadithActionsSheet extends ConsumerWidget {
                     onTap: () {
                       Navigator.pop(context);
                       ref.read(hadithBookmarksProvider.notifier).addBookmark(
-                        HadithBookmark(
-                          id: 'hadith_${collectionId}_${hadith.hadithNumber}_${DateTime.now().millisecondsSinceEpoch}',
-                          collectionId: collectionId,
-                          bookNumber: bookNumber,
-                          hadithNumber: hadith.hadithNumber,
-                          collectionName: '',
-                          bookTitle: '',
-                          hadithText: hadith.getTranslation(settings.language.code),
-                          grade: hadith.grade,
-                          createdAt: DateTime.now(),
-                        ),
-                      );
+                            HadithBookmark(
+                              id: 'hadith_${collectionId}_${hadith.hadithNumber}_${DateTime.now().millisecondsSinceEpoch}',
+                              hadithId:
+                                  'hadith_${collectionId}_${hadith.hadithNumber}',
+                              collectionId: collectionId,
+                              bookNumber: bookNumber,
+                              hadithNumber: hadith.hadithNumber,
+                              createdAt: DateTime.now(),
+                            ),
+                          );
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Bookmark added')),
                       );
@@ -476,7 +476,8 @@ class _HadithActionsSheet extends ConsumerWidget {
                     onTap: () {
                       Navigator.pop(context);
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Share feature coming soon')),
+                        const SnackBar(
+                            content: Text('Share feature coming soon')),
                       );
                     },
                   ),
@@ -511,12 +512,12 @@ class _HadithActionsSheet extends ConsumerWidget {
         return Colors.orange;
       case HadithGrade.mawdu:
         return Colors.red;
-      case HadithGrade.mursal:
+      case HadithGrade.munkar:
         return Colors.purple;
-      case HadithGrade.muttasil:
-        return Colors.blue;
-      case HadithGrade.munqati:
+      case HadithGrade.mudtarib:
         return Colors.teal;
+      case HadithGrade.muallal:
+        return Colors.brown;
       case HadithGrade.unknown:
         return Colors.grey;
     }
@@ -524,7 +525,9 @@ class _HadithActionsSheet extends ConsumerWidget {
 
   TextDirection _getTextDirection(String languageCode) {
     const rtlLanguages = ['ar', 'ur', 'fa', 'ps', 'sd'];
-    return rtlLanguages.contains(languageCode) ? TextDirection.rtl : TextDirection.ltr;
+    return rtlLanguages.contains(languageCode)
+        ? TextDirection.rtl
+        : TextDirection.ltr;
   }
 }
 
@@ -533,7 +536,8 @@ class _ActionTile extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  const _ActionTile({required this.icon, required this.label, required this.onTap});
+  const _ActionTile(
+      {required this.icon, required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {

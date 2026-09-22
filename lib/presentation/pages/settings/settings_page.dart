@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../presentation/providers/app_providers.dart';
+import '../../../shared/models/hadith_models.dart';
 import '../../../shared/models/settings_models.dart';
 import '../../widgets/common/app_scaffold.dart';
 import '../../widgets/common/section_header.dart';
@@ -17,7 +18,8 @@ class SettingsPage extends ConsumerStatefulWidget {
   ConsumerState<SettingsPage> createState() => _SettingsPageState();
 }
 
-class _SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerProviderStateMixin {
+class _SettingsPageState extends ConsumerState<SettingsPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -54,7 +56,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPr
                   tabs: const [
                     Tab(icon: Icon(Icons.palette_outlined), text: 'Appearance'),
                     Tab(icon: Icon(Icons.menu_book_outlined), text: 'Quran'),
-                    Tab(icon: Icon(Icons.library_books_outlined), text: 'Hadith'),
+                    Tab(
+                        icon: Icon(Icons.library_books_outlined),
+                        text: 'Hadith'),
                     Tab(icon: Icon(Icons.graphic_eq_outlined), text: 'Audio'),
                     Tab(icon: Icon(Icons.more_horiz_outlined), text: 'More'),
                   ],
@@ -116,7 +120,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPr
             title: const Text('Enable Animations'),
             subtitle: const Text('Toggle UI animations'),
             value: settings.animationsEnabled,
-            onChanged: (value) => ref.read(settingsProvider.notifier).updateAnimationsEnabled(value),
+            onChanged: (value) => ref
+                .read(settingsProvider.notifier)
+                .updateAnimationsEnabled(value),
           ),
         ],
       ),
@@ -146,7 +152,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPr
             ],
           ),
           selected: isSelected,
-          onSelected: (_) => ref.read(settingsProvider.notifier).updateThemeMode(mode.$1),
+          onSelected: (_) =>
+              ref.read(settingsProvider.notifier).updateThemeMode(mode.$1),
           selectedColor: theme.colorScheme.primaryContainer,
           checkmarkColor: theme.colorScheme.onPrimaryContainer,
         );
@@ -165,7 +172,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPr
         return FilterChip(
           label: Text(lang.name),
           selected: isSelected,
-          onSelected: (_) => ref.read(settingsProvider.notifier).updateLanguage(lang),
+          onSelected: (_) =>
+              ref.read(settingsProvider.notifier).updateLanguage(lang),
           selectedColor: theme.colorScheme.primaryContainer,
           checkmarkColor: theme.colorScheme.onPrimaryContainer,
         );
@@ -191,7 +199,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPr
           max: 1.5,
           divisions: 7,
           label: '${settings.fontScale.toStringAsFixed(1)}x',
-          onChanged: (value) => ref.read(settingsProvider.notifier).updateFontScale(value),
+          onChanged: (value) =>
+              ref.read(settingsProvider.notifier).updateFontScale(value),
         ),
       ],
     );
@@ -215,8 +224,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPr
             12,
             36,
             (value) => ref.read(settingsProvider.notifier).updateQuranDisplay(
-              quranSettings.copyWith(fontSize: value),
-            ),
+                  quranSettings.copyWith(fontSize: value),
+                ),
           ),
           const SizedBox(height: AppConstants.spacingLG),
 
@@ -229,8 +238,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPr
             10,
             24,
             (value) => ref.read(settingsProvider.notifier).updateQuranDisplay(
-              quranSettings.copyWith(translationFontSize: value),
-            ),
+                  quranSettings.copyWith(translationFontSize: value),
+                ),
           ),
           const SizedBox(height: AppConstants.spacingLG),
 
@@ -240,50 +249,42 @@ class _SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPr
           _buildDisplayOption(
             'Show Verse Numbers',
             'Display ayah numbers in the text',
-            quranSettings.showVerseNumbers,
+            quranSettings.showAyahNumbers,
             (value) => ref.read(settingsProvider.notifier).updateQuranDisplay(
-              quranSettings.copyWith(showVerseNumbers: value),
-            ),
+                  quranSettings.copyWith(showAyahNumbers: value),
+                ),
           ),
           _buildDisplayOption(
             'Show Sajdah Markers',
             'Highlight verses requiring prostration',
             quranSettings.showSajdahMarkers,
             (value) => ref.read(settingsProvider.notifier).updateQuranDisplay(
-              quranSettings.copyWith(showSajdahMarkers: value),
-            ),
+                  quranSettings.copyWith(showSajdahMarkers: value),
+                ),
           ),
           _buildDisplayOption(
             'Show Bismillah',
             'Display Bismillah at start of each surah',
             quranSettings.showBismillah,
             (value) => ref.read(settingsProvider.notifier).updateQuranDisplay(
-              quranSettings.copyWith(showBismillah: value),
-            ),
+                  quranSettings.copyWith(showBismillah: value),
+                ),
           ),
           _buildDisplayOption(
             'Show Page Numbers',
             'Display Quran page numbers',
             quranSettings.showPageNumbers,
             (value) => ref.read(settingsProvider.notifier).updateQuranDisplay(
-              quranSettings.copyWith(showPageNumbers: value),
-            ),
+                  quranSettings.copyWith(showPageNumbers: value),
+                ),
           ),
           _buildDisplayOption(
             'Show Juz Markers',
             'Display Juz boundaries',
             quranSettings.showJuzMarkers,
             (value) => ref.read(settingsProvider.notifier).updateQuranDisplay(
-              quranSettings.copyWith(showJuzMarkers: value),
-            ),
-          ),
-          _buildDisplayOption(
-            'Highlight Tajweed',
-            'Color-code tajweed rules',
-            quranSettings.highlightTajweed,
-            (value) => ref.read(settingsProvider.notifier).updateQuranDisplay(
-              quranSettings.copyWith(highlightTajweed: value),
-            ),
+                  quranSettings.copyWith(showJuzMarkers: value),
+                ),
           ),
           const SizedBox(height: AppConstants.spacingLG),
 
@@ -302,7 +303,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPr
                     return FilterChip(
                       label: Text(t.name),
                       selected: isSelected,
-                      onSelected: (_) => ref.read(settingsProvider.notifier).updateTranslation(t.id),
+                      onSelected: (_) => ref
+                          .read(settingsProvider.notifier)
+                          .updateTranslation(t.id),
                       selectedColor: theme.colorScheme.primaryContainer,
                       checkmarkColor: theme.colorScheme.onPrimaryContainer,
                     );
@@ -336,8 +339,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPr
             10,
             24,
             (value) => ref.read(settingsProvider.notifier).updateHadithDisplay(
-              hadithSettings.copyWith(fontSize: value),
-            ),
+                  hadithSettings.copyWith(fontSize: value),
+                ),
           ),
           const SizedBox(height: AppConstants.spacingLG),
 
@@ -347,14 +350,19 @@ class _SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPr
           Wrap(
             spacing: AppConstants.spacingSM,
             runSpacing: AppConstants.spacingSM,
-            children: HadithGrade.values.where((g) => g != HadithGrade.unknown).map((grade) {
-              final isSelected = hadithSettings.minGrade.index <= grade.index;
+            children: HadithGrade.values
+                .where((g) => g != HadithGrade.unknown)
+                .map((grade) {
+              final currentMinGrade =
+                  hadithSettings.minGrade ?? HadithGrade.unknown;
+              final isSelected = currentMinGrade.index <= grade.index;
               return FilterChip(
                 label: Text(grade.arabicName),
                 selected: isSelected,
-                onSelected: (_) => ref.read(settingsProvider.notifier).updateHadithDisplay(
-                  hadithSettings.copyWith(minGrade: grade),
-                ),
+                onSelected: (_) =>
+                    ref.read(settingsProvider.notifier).updateHadithDisplay(
+                          hadithSettings.copyWith(minGrade: grade),
+                        ),
                 selectedColor: theme.colorScheme.primaryContainer,
                 checkmarkColor: theme.colorScheme.onPrimaryContainer,
               );
@@ -370,32 +378,32 @@ class _SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPr
             'Display original Arabic alongside translation',
             hadithSettings.showArabic,
             (value) => ref.read(settingsProvider.notifier).updateHadithDisplay(
-              hadithSettings.copyWith(showArabic: value),
-            ),
+                  hadithSettings.copyWith(showArabic: value),
+                ),
           ),
           _buildDisplayOption(
             'Show Grade Badges',
             'Display authenticity grade for each hadith',
             hadithSettings.showGrade,
             (value) => ref.read(settingsProvider.notifier).updateHadithDisplay(
-              hadithSettings.copyWith(showGrade: value),
-            ),
+                  hadithSettings.copyWith(showGrade: value),
+                ),
           ),
           _buildDisplayOption(
             'Show Narrator Chain',
             'Display isnad (chain of narrators)',
             hadithSettings.showNarratorChain,
             (value) => ref.read(settingsProvider.notifier).updateHadithDisplay(
-              hadithSettings.copyWith(showNarratorChain: value),
-            ),
+                  hadithSettings.copyWith(showNarratorChain: value),
+                ),
           ),
           _buildDisplayOption(
             'Show Reference',
             'Display book/chapter/hadith numbers',
             hadithSettings.showReference,
             (value) => ref.read(settingsProvider.notifier).updateHadithDisplay(
-              hadithSettings.copyWith(showReference: value),
-            ),
+                  hadithSettings.copyWith(showReference: value),
+                ),
           ),
         ],
       ),
@@ -426,9 +434,11 @@ class _SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPr
                     return FilterChip(
                       label: Text(r.name),
                       selected: isSelected,
-                      onSelected: (_) => ref.read(settingsProvider.notifier).updateAudioSettings(
-                        audioSettings.copyWith(selectedReciterId: r.id),
-                      ),
+                      onSelected: (_) => ref
+                          .read(settingsProvider.notifier)
+                          .updateAudioSettings(
+                            audioSettings.copyWith(selectedReciterId: r.id),
+                          ),
                       selectedColor: theme.colorScheme.primaryContainer,
                       checkmarkColor: theme.colorScheme.onPrimaryContainer,
                     );
@@ -449,47 +459,64 @@ class _SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPr
             'Automatically play next ayah/hadith',
             audioSettings.autoPlayNext,
             (value) => ref.read(settingsProvider.notifier).updateAudioSettings(
-              audioSettings.copyWith(autoPlayNext: value),
-            ),
+                  audioSettings.copyWith(autoPlayNext: value),
+                ),
           ),
           _buildDisplayOption(
             'Repeat Mode',
             'Repeat current ayah/surah',
-            audioSettings.repeatMode != RepeatMode.off,
+            audioSettings.repeatMode != AudioRepeatMode.none,
             (value) => ref.read(settingsProvider.notifier).updateAudioSettings(
-              audioSettings.copyWith(repeatMode: value ? RepeatMode.one : RepeatMode.off),
-            ),
+                  audioSettings.copyWith(
+                      repeatMode:
+                          value ? AudioRepeatMode.ayah : AudioRepeatMode.none),
+                ),
           ),
           _buildDisplayOption(
             'Background Playback',
             'Continue playback when app is backgrounded',
             audioSettings.backgroundPlayback,
             (value) => ref.read(settingsProvider.notifier).updateAudioSettings(
-              audioSettings.copyWith(backgroundPlayback: value),
-            ),
+                  audioSettings.copyWith(backgroundPlayback: value),
+                ),
           ),
           _buildDisplayOption(
             'Show Notification',
             'Show media controls in notification shade',
             audioSettings.showNotification,
             (value) => ref.read(settingsProvider.notifier).updateAudioSettings(
-              audioSettings.copyWith(showNotification: value),
-            ),
+                  audioSettings.copyWith(showNotification: value),
+                ),
           ),
           const SizedBox(height: AppConstants.spacingLG),
 
           // Playback Speed
           SectionHeader(title: 'Default Playback Speed'),
           const SizedBox(height: AppConstants.spacingMD),
-          _buildFontSizeSlider(
-            'Speed',
-            audioSettings.playbackSpeed,
-            0.5,
-            2.0,
-            (value) => ref.read(settingsProvider.notifier).updateAudioSettings(
-              audioSettings.copyWith(playbackSpeed: value),
-            ),
-            isDouble: true,
+          Consumer(
+            builder: (context, ref, _) {
+              final speeds = PlaybackSpeed.values;
+              final currentIndex = speeds.indexOf(audioSettings.playbackSpeed);
+              return Wrap(
+                spacing: AppConstants.spacingSM,
+                runSpacing: AppConstants.spacingSM,
+                children: speeds.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final speed = entry.value;
+                  final isSelected = index == currentIndex;
+                  return FilterChip(
+                    label: Text(speed.label),
+                    selected: isSelected,
+                    onSelected: (_) =>
+                        ref.read(settingsProvider.notifier).updateAudioSettings(
+                              audioSettings.copyWith(playbackSpeed: speed),
+                            ),
+                    selectedColor: theme.colorScheme.primaryContainer,
+                    checkmarkColor: theme.colorScheme.onPrimaryContainer,
+                  );
+                }).toList(),
+              );
+            },
           ),
           const SizedBox(height: AppConstants.spacingLG),
 
@@ -501,8 +528,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPr
             'Seamless transitions between tracks',
             audioSettings.gaplessPlayback,
             (value) => ref.read(settingsProvider.notifier).updateAudioSettings(
-              audioSettings.copyWith(gaplessPlayback: value),
-            ),
+                  audioSettings.copyWith(gaplessPlayback: value),
+                ),
           ),
         ],
       ),
@@ -523,26 +550,31 @@ class _SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPr
           _buildDisplayOption(
             'Daily Hadith',
             'Receive a random hadith each day',
-            settings.notifications.dailyHadith,
-            (value) => ref.read(settingsProvider.notifier).updateNotificationSettings(
-              settings.notifications.copyWith(dailyHadith: value),
-            ),
+            settings.notifications.dailyHadithEnabled,
+            (value) => ref
+                .read(settingsProvider.notifier)
+                .updateNotificationSettings(
+                  settings.notifications.copyWith(dailyHadithEnabled: value),
+                ),
           ),
           _buildDisplayOption(
             'Prayer Times',
             'Get notified for prayer times',
-            settings.notifications.prayerTimes,
-            (value) => ref.read(settingsProvider.notifier).updateNotificationSettings(
-              settings.notifications.copyWith(prayerTimes: value),
-            ),
+            settings.notifications.prayerTimesEnabled,
+            (value) => ref
+                .read(settingsProvider.notifier)
+                .updateNotificationSettings(
+                  settings.notifications.copyWith(prayerTimesEnabled: value),
+                ),
           ),
           _buildDisplayOption(
             'Quran Reminder',
             'Daily reminder to read Quran',
             settings.notifications.quranReminder,
-            (value) => ref.read(settingsProvider.notifier).updateNotificationSettings(
-              settings.notifications.copyWith(quranReminder: value),
-            ),
+            (value) =>
+                ref.read(settingsProvider.notifier).updateNotificationSettings(
+                      settings.notifications.copyWith(quranReminder: value),
+                    ),
           ),
           _buildDisplayOption(
             'Reminder Time',
@@ -566,42 +598,47 @@ class _SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPr
           _buildDisplayOption(
             'Analytics',
             'Help improve the app with anonymous usage data',
-            settings.privacy.analytics,
-            (value) => ref.read(settingsProvider.notifier).updatePrivacySettings(
-              settings.privacy.copyWith(analytics: value),
-            ),
+            settings.privacy.analyticsEnabled,
+            (value) =>
+                ref.read(settingsProvider.notifier).updatePrivacySettings(
+                      settings.privacy.copyWith(analyticsEnabled: value),
+                    ),
           ),
           _buildDisplayOption(
             'Crash Reporting',
             'Automatically send crash reports',
-            settings.privacy.crashReporting,
-            (value) => ref.read(settingsProvider.notifier).updatePrivacySettings(
-              settings.privacy.copyWith(crashReporting: value),
-            ),
+            settings.privacy.crashReportingEnabled,
+            (value) =>
+                ref.read(settingsProvider.notifier).updatePrivacySettings(
+                      settings.privacy.copyWith(crashReportingEnabled: value),
+                    ),
           ),
           _buildDisplayOption(
             'Auto Download',
             'Download content for offline use on WiFi',
             settings.privacy.autoDownloadOnWifi,
-            (value) => ref.read(settingsProvider.notifier).updatePrivacySettings(
-              settings.privacy.copyWith(autoDownloadOnWifi: value),
-            ),
+            (value) =>
+                ref.read(settingsProvider.notifier).updatePrivacySettings(
+                      settings.privacy.copyWith(autoDownloadOnWifi: value),
+                    ),
           ),
           _buildDisplayOption(
             'Sync Bookmarks',
             'Sync bookmarks across devices',
             settings.privacy.syncBookmarks,
-            (value) => ref.read(settingsProvider.notifier).updatePrivacySettings(
-              settings.privacy.copyWith(syncBookmarks: value),
-            ),
+            (value) =>
+                ref.read(settingsProvider.notifier).updatePrivacySettings(
+                      settings.privacy.copyWith(syncBookmarks: value),
+                    ),
           ),
           _buildDisplayOption(
             'Share Progress',
             'Share reading progress with community',
             settings.privacy.shareProgress,
-            (value) => ref.read(settingsProvider.notifier).updatePrivacySettings(
-              settings.privacy.copyWith(shareProgress: value),
-            ),
+            (value) =>
+                ref.read(settingsProvider.notifier).updatePrivacySettings(
+                      settings.privacy.copyWith(shareProgress: value),
+                    ),
           ),
           const SizedBox(height: AppConstants.spacingLG),
 
@@ -613,7 +650,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPr
               return FutureBuilder<int>(
                 future: _getStorageSize(),
                 builder: (context, snapshot) => ListTile(
-                  leading: Icon(Icons.storage_outlined, color: theme.colorScheme.primary),
+                  leading: Icon(Icons.storage_outlined,
+                      color: theme.colorScheme.primary),
                   title: const Text('Storage Used'),
                   subtitle: Text('${_formatBytes(snapshot.data ?? 0)}'),
                   trailing: TextButton(
@@ -635,17 +673,20 @@ class _SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPr
             subtitle: Text(AppConstants.appVersion),
           ),
           ListTile(
-            leading: Icon(Icons.description_outlined, color: theme.colorScheme.primary),
+            leading: Icon(Icons.description_outlined,
+                color: theme.colorScheme.primary),
             title: const Text('Licenses'),
             onTap: () => showLicensePage(context: context),
           ),
           ListTile(
-            leading: Icon(Icons.privacy_tip_outlined, color: theme.colorScheme.primary),
+            leading: Icon(Icons.privacy_tip_outlined,
+                color: theme.colorScheme.primary),
             title: const Text('Privacy Policy'),
             onTap: () {},
           ),
           ListTile(
-            leading: Icon(Icons.article_outlined, color: theme.colorScheme.primary),
+            leading:
+                Icon(Icons.article_outlined, color: theme.colorScheme.primary),
             title: const Text('Terms of Service'),
             onTap: () {},
           ),
@@ -713,28 +754,25 @@ class _SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPr
       subtitle: Text(subtitle),
       value: value,
       onChanged: onChanged,
-      trailing: trailing != null
-          ? InkWell(
-              onTap: onTapTrailing,
-              child: trailing,
-            )
-          : null,
     );
   }
 
   void _showTimePicker(AppSettings settings) {
+    final reminderTime = settings.notifications.reminderTime;
+    final parts = reminderTime.split(':');
+    final hour = int.tryParse(parts[0]) ?? 8;
+    final minute = int.tryParse(parts[1]) ?? 0;
+
     showTimePicker(
       context: context,
-      initialTime: TimeOfDay(
-        hour: int.parse(settings.notifications.reminderTime.split(':')[0]),
-        minute: int.parse(settings.notifications.reminderTime.split(':')[1]),
-      ),
+      initialTime: TimeOfDay(hour: hour, minute: minute),
     ).then((time) {
       if (time != null) {
-        final formatted = '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+        final formatted =
+            '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
         ref.read(settingsProvider.notifier).updateNotificationSettings(
-          settings.notifications.copyWith(reminderTime: formatted),
-        );
+              settings.notifications.copyWith(reminderTime: formatted),
+            );
       }
     });
   }
@@ -744,7 +782,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPr
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Reset All Settings?'),
-        content: const Text('This will restore all settings to their default values. This action cannot be undone.'),
+        content: const Text(
+            'This will restore all settings to their default values. This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -773,7 +812,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> with SingleTickerPr
   String _formatBytes(int bytes) {
     if (bytes < 1024) return '$bytes B';
     if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    if (bytes < 1024 * 1024 * 1024) return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    if (bytes < 1024 * 1024 * 1024)
+      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
     return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
   }
 

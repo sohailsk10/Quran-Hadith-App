@@ -49,10 +49,12 @@ class AyahListItem extends StatelessWidget {
               children: [
                 // Ayah Number
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(AppConstants.radiusFull),
+                    borderRadius:
+                        BorderRadius.circular(AppConstants.radiusFull),
                   ),
                   child: Text(
                     '${ayah.numberInSurah}',
@@ -67,10 +69,13 @@ class AyahListItem extends StatelessWidget {
                 if (settings.showSajdahMarkers && ayah.isSajdah) ...[
                   const SizedBox(width: AppConstants.spacingSM),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: quranHadithTheme.sajdahColor.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(AppConstants.radiusFull),
+                      color:
+                          quranHadithTheme.sajdahColor.withValues(alpha: 0.15),
+                      borderRadius:
+                          BorderRadius.circular(AppConstants.radiusFull),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -98,10 +103,12 @@ class AyahListItem extends StatelessWidget {
                 // Page Number
                 if (settings.showPageNumbers && ayah.pageNumber != null) ...[
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(AppConstants.radiusFull),
+                      borderRadius:
+                          BorderRadius.circular(AppConstants.radiusFull),
                     ),
                     child: Text(
                       'Page ${ayah.pageNumber}',
@@ -134,13 +141,18 @@ class AyahListItem extends StatelessWidget {
             ],
 
             // Bismillah
-            if (settings.showBismillah && ayah.numberInSurah == 1 && ayah.surahNumber != 1 && ayah.surahNumber != 9) ...[
+            if (settings.showBismillah &&
+                ayah.numberInSurah == 1 &&
+                ayah.surahNumber != 1 &&
+                ayah.surahNumber != 9) ...[
               _buildBismillah(context),
               const SizedBox(height: AppConstants.spacingMD),
             ],
 
             // Translation
-            if (showTranslation && translationText != null && translationText!.isNotEmpty) ...[
+            if (showTranslation &&
+                translationText != null &&
+                translationText!.isNotEmpty) ...[
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(AppConstants.spacingMD),
@@ -174,7 +186,8 @@ class AyahListItem extends StatelessWidget {
       decoration: BoxDecoration(
         color: quranHadithTheme.bismillahColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppConstants.radiusSM),
-        border: Border.all(color: quranHadithTheme.bismillahColor.withValues(alpha: 0.3)),
+        border: Border.all(
+            color: quranHadithTheme.bismillahColor.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
@@ -238,10 +251,12 @@ class CompactAyahListItem extends StatelessWidget {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(AppConstants.radiusFull),
+                    borderRadius:
+                        BorderRadius.circular(AppConstants.radiusFull),
                   ),
                   child: Text(
                     '${ayah.surahNumber}:${ayah.numberInSurah}',
@@ -254,10 +269,13 @@ class CompactAyahListItem extends StatelessWidget {
                 const Spacer(),
                 if (ayah.isSajdah)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: theme.quranHadith.sajdahColor.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(AppConstants.radiusFull),
+                      color:
+                          theme.quranHadith.sajdahColor.withValues(alpha: 0.15),
+                      borderRadius:
+                          BorderRadius.circular(AppConstants.radiusFull),
                     ),
                     child: Text(
                       'Sajdah',

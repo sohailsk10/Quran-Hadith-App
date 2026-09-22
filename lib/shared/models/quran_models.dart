@@ -48,6 +48,13 @@ class Surah {
   bool get isMedinan => revelationType == RevelationType.medinan;
   int get pageCount => pageEnd - pageStart + 1;
 
+  // Aliases for compatibility
+  String get nameEnglish => nameTranslation;
+  int get totalAyahs => ayahCount;
+  String get revelationPlace =>
+      revelationType == RevelationType.meccan ? 'Makkah' : 'Madinah';
+  String get meaning => description;
+
   Surah copyWith({
     int? number,
     String? nameArabic,
@@ -91,7 +98,9 @@ class Surah {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is Surah && runtimeType == other.runtimeType && number == other.number;
+      other is Surah &&
+          runtimeType == other.runtimeType &&
+          number == other.number;
 
   @override
   int get hashCode => number.hashCode;
@@ -114,7 +123,8 @@ class Ayah {
   final String textArabic;
   final String textUthmani; // Uthmani script
   final String textSimple; // Simple Arabic without diacritics
-  final Map<String, String> translations; // Key: translation_id, Value: translated text
+  final Map<String, String>
+      translations; // Key: translation_id, Value: translated text
   final int juzNumber;
   final int hizbNumber;
   final int rubNumber;
@@ -148,6 +158,10 @@ class Ayah {
     required this.manzilNumber,
   });
 
+  // Compatibility aliases
+  int get numberInSurah => ayahInSurah;
+  String get text => textUthmani;
+
   String getTranslation(String translationId) {
     return translations[translationId] ?? translations.values.firstOrNull ?? '';
   }
@@ -162,7 +176,9 @@ class Ayah {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is Ayah && runtimeType == other.runtimeType && number == other.number;
+      other is Ayah &&
+          runtimeType == other.runtimeType &&
+          number == other.number;
 
   @override
   int get hashCode => number.hashCode;
@@ -199,13 +215,22 @@ class Juz {
     required this.ayahCount,
   });
 
+  // Compatibility aliases
+  int get startSurah => surahStart;
+  int get endSurah => surahEnd;
+  int get startAyah => ayahStart;
+  int get endAyah => ayahEnd;
+  int get totalAyahs => ayahCount;
+
   String get displayName => 'Juz $number';
   String get range => '$surahStart:$ayahStart - $surahEnd:$ayahEnd';
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is Juz && runtimeType == other.runtimeType && number == other.number;
+      other is Juz &&
+          runtimeType == other.runtimeType &&
+          number == other.number;
 
   @override
   int get hashCode => number.hashCode;
@@ -284,7 +309,9 @@ class TranslationInfo {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is TranslationInfo && runtimeType == other.runtimeType && id == other.id;
+      other is TranslationInfo &&
+          runtimeType == other.runtimeType &&
+          id == other.id;
 
   @override
   int get hashCode => id.hashCode;
@@ -312,10 +339,16 @@ class ReciterInfo {
     this.totalSize = 0,
   });
 
+  // Compatibility aliases
+  String get language => country; // Fallback to country
+  String get styleName => style.name; // String representation of style
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is ReciterInfo && runtimeType == other.runtimeType && id == other.id;
+      other is ReciterInfo &&
+          runtimeType == other.runtimeType &&
+          id == other.id;
 
   @override
   int get hashCode => id.hashCode;
@@ -351,7 +384,9 @@ class QuranBookmark {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is QuranBookmark && runtimeType == other.runtimeType && id == other.id;
+      other is QuranBookmark &&
+          runtimeType == other.runtimeType &&
+          id == other.id;
 
   @override
   int get hashCode => id.hashCode;

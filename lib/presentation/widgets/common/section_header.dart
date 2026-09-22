@@ -90,7 +90,8 @@ class SectionHeaderWithAction extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Padding(
-      padding: padding ?? const EdgeInsets.symmetric(horizontal: AppConstants.spacingMD),
+      padding: padding ??
+          const EdgeInsets.symmetric(horizontal: AppConstants.spacingMD),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

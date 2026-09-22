@@ -1,6 +1,7 @@
 /// Quran search bar widget
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
 
@@ -78,7 +79,8 @@ class SearchBarWithHistory extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<SearchBarWithHistory> createState() => _SearchBarWithHistoryState();
+  ConsumerState<SearchBarWithHistory> createState() =>
+      _SearchBarWithHistoryState();
 }
 
 class _SearchBarWithHistoryState extends ConsumerState<SearchBarWithHistory> {

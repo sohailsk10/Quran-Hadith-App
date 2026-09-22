@@ -3,12 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../presentation/providers/app_providers.dart';
 import '../../../shared/models/hadith_models.dart';
+import '../../../shared/models/settings_models.dart';
 import '../../widgets/common/app_scaffold.dart';
-import '../../widgets/hadith/hadith_detail_card.dart';
+import '../../widgets/hadith/hadith_detail_card.dart' hide NarratorChainCard;
 import '../../widgets/hadith/narrator_chain_card.dart';
 import '../../widgets/hadith/related_hadiths_card.dart';
 
@@ -16,13 +16,15 @@ class HadithDetailPage extends ConsumerStatefulWidget {
   final String collectionId;
   final int hadithNumber;
 
-  const HadithDetailPage({super.key, required this.collectionId, required this.hadithNumber});
+  const HadithDetailPage(
+      {super.key, required this.collectionId, required this.hadithNumber});
 
   @override
   ConsumerState<HadithDetailPage> createState() => _HadithDetailPageState();
 }
 
-class _HadithDetailPageState extends ConsumerState<HadithDetailPage> with SingleTickerProviderStateMixin {
+class _HadithDetailPageState extends ConsumerState<HadithDetailPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -39,8 +41,6 @@ class _HadithDetailPageState extends ConsumerState<HadithDetailPage> with Single
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return AppScaffold(
       title: 'Hadith Detail',
       actions: [
@@ -55,48 +55,56 @@ class _HadithDetailPageState extends ConsumerState<HadithDetailPage> with Single
       ],
       child: Consumer(
         builder: (context, ref, _) {
-          final hadithAsync = ref.watch(hadithDetailProvider(widget.collectionId, widget.hadithNumber));
-          final narratorsAsync = ref.watch(hadithNarratorsProvider(hadithAsync.value?.narrators ?? []));
-          final relatedHadithsAsync = ref.watch(relatedHadithsProvider(
+          final hadithAsync = ref.watch(
+              hadithDetailProvider((widget.collectionId, widget.hadithNumber)));
+          final narratorsAsync = ref.watch(
+              hadithNarratorsProvider(hadithAsync.value?.narrators ?? []));
+          final relatedHadithsAsync = ref.watch(relatedHadithsProvider((
             collectionId: widget.collectionId,
             hadithNumber: widget.hadithNumber,
-          ));
+            limit: 10,
+          )));
           final settings = ref.watch(settingsProvider);
 
           return settings.when(
             data: (settings) => hadithAsync.when(
-              data: (hadith) => narratorsAsync.when(
-                data: (narrators) => relatedHadithsAsync.when(
-                  data: (relatedHadiths) => _buildDetailContent(
-                    context,
-                    hadith,
-                    narrators,
-                    relatedHadiths,
-                    settings,
+              data: (hadith) {
+                if (hadith == null) return _buildErrorState('Hadith not found');
+                return narratorsAsync.when(
+                  data: (narrators) => relatedHadithsAsync.when(
+                    data: (relatedHadiths) => _buildDetailContent(
+                      context,
+                      hadith,
+                      narrators,
+                      relatedHadiths,
+                      settings,
+                    ),
+                    loading: () => _buildDetailContent(
+                      context,
+                      hadith,
+                      narrators,
+                      [],
+                      settings,
+                    ),
+                    error: (_, __) => _buildDetailContent(
+                      context,
+                      hadith,
+                      narrators,
+                      [],
+                      settings,
+                    ),
                   ),
-                  loading: () => _buildDetailContent(
-                    context,
-                    hadith,
-                    narrators,
-                    [],
-                    settings,
-                  ),
-                  error: (_, __) => _buildDetailContent(
-                    context,
-                    hadith,
-                    narrators,
-                    [],
-                    settings,
-                  ),
-                ),
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (_, __) => _buildErrorState('Failed to load narrators'),
-              ),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (_, __) =>
+                      _buildErrorState('Failed to load narrators'),
+                );
+              },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stack) => _buildErrorState(error),
+              error: (error, stack) => _buildErrorState(error.toString()),
             ),
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, stack) => _buildErrorState(error),
+            error: (error, stack) => _buildErrorState(error.toString()),
           );
         },
       ),
@@ -110,15 +118,13 @@ class _HadithDetailPageState extends ConsumerState<HadithDetailPage> with Single
     List<Hadith> relatedHadiths,
     AppSettings settings,
   ) {
-    final theme = Theme.of(context);
-
     return Column(
       children: [
         // Hadith Detail Card
         HadithDetailCard(
           hadith: hadith,
-          settings: settings,
-          onBookmark: _bookmarkHadith,
+          settings: settings.hadithDisplay,
+          onBookmarkToggle: _bookmarkHadith,
           onShare: _shareHadith,
         ),
 
@@ -153,7 +159,9 @@ class _HadithDetailPageState extends ConsumerState<HadithDetailPage> with Single
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.account_tree_outlined, size: 64, color: Theme.of(context).colorScheme.onSurfaceVariant),
+            Icon(Icons.account_tree_outlined,
+                size: 64,
+                color: Theme.of(context).colorScheme.onSurfaceVariant),
             const SizedBox(height: 16),
             Text('No narrator chain available'),
           ],
@@ -178,7 +186,9 @@ class _HadithDetailPageState extends ConsumerState<HadithDetailPage> with Single
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.link_outlined, size: 64, color: Theme.of(context).colorScheme.onSurfaceVariant),
+            Icon(Icons.link_outlined,
+                size: 64,
+                color: Theme.of(context).colorScheme.onSurfaceVariant),
             const SizedBox(height: 16),
             Text('No related hadiths found'),
           ],
@@ -189,7 +199,8 @@ class _HadithDetailPageState extends ConsumerState<HadithDetailPage> with Single
     return RelatedHadithsCard(
       hadiths: relatedHadiths,
       onHadithTap: (hadith) {
-        context.go('/hadith/collection/${hadith.collectionId}/hadith/${hadith.hadithNumber}');
+        context.go(
+            '/hadith/collection/${hadith.collectionId}/hadith/${hadith.hadithNumber}');
       },
     );
   }
@@ -205,7 +216,8 @@ class _HadithDetailPageState extends ConsumerState<HadithDetailPage> with Single
           _DetailSection(
             title: 'Classification',
             children: [
-              _DetailRow('Grade', hadith.grade.arabicName, color: _getGradeColor(hadith.grade)),
+              _DetailRow('Grade', hadith.grade.arabicName,
+                  color: _getGradeColor(hadith.grade)),
               _DetailRow('Authenticity', hadith.authenticity.arabicName),
               _DetailRow('Reliability', hadith.reliability.arabicName),
             ],
@@ -217,16 +229,20 @@ class _HadithDetailPageState extends ConsumerState<HadithDetailPage> with Single
               _DetailRow('Collection', hadith.collectionId),
               _DetailRow('Book Number', hadith.bookNumber.toString()),
               _DetailRow('Hadith Number', hadith.hadithNumber.toString()),
-              if (hadith.chapterId != null) _DetailRow('Chapter', hadith.chapterId!),
-              if (hadith.volumeNumber != null) _DetailRow('Volume', hadith.volumeNumber.toString()),
-              if (hadith.pageNumber != null) _DetailRow('Page', hadith.pageNumber.toString()),
+              if (hadith.chapterId != null)
+                _DetailRow('Chapter', hadith.chapterId!),
+              if (hadith.volumeNumber != null)
+                _DetailRow('Volume', hadith.volumeNumber.toString()),
+              if (hadith.pageNumber != null)
+                _DetailRow('Page', hadith.pageNumber.toString()),
             ],
           ),
           const SizedBox(height: AppConstants.spacingLG),
           if (hadith.topics.isNotEmpty) ...[
             _DetailSection(
               title: 'Topics',
-              children: hadith.topics.map((topic) => _DetailRow('', topic)).toList(),
+              children:
+                  hadith.topics.map((topic) => _DetailRow('', topic)).toList(),
             ),
             const SizedBox(height: AppConstants.spacingLG),
           ],
@@ -265,7 +281,8 @@ class _HadithDetailPageState extends ConsumerState<HadithDetailPage> with Single
           Text('Error: $error'),
           const SizedBox(height: 16),
           ElevatedButton(
-            onPressed: () => ref.refresh(hadithProvider(widget.collectionId, widget.hadithNumber)),
+            onPressed: () => ref.refresh(hadithDetailProvider(
+                (widget.collectionId, widget.hadithNumber))),
             child: const Text('Retry'),
           ),
         ],
@@ -275,20 +292,19 @@ class _HadithDetailPageState extends ConsumerState<HadithDetailPage> with Single
 
   void _bookmarkHadith() {
     ref.read(hadithBookmarksProvider.notifier).addBookmark(
-      HadithBookmark(
-        id: 'hadith_${widget.collectionId}_${widget.hadithNumber}_${DateTime.now().millisecondsSinceEpoch}',
-        collectionId: widget.collectionId,
-        bookNumber: 0,
-        hadithNumber: widget.hadithNumber,
-        collectionName: '',
-        bookTitle: '',
-        hadithText: '',
-        grade: HadithGrade.unknown,
-        createdAt: DateTime.now(),
-      ),
-    );
+          HadithBookmark(
+            id: 'hadith_${widget.collectionId}_${widget.hadithNumber}_${DateTime.now().millisecondsSinceEpoch}',
+            hadithId: 'hadith_${widget.collectionId}_${widget.hadithNumber}',
+            collectionId: widget.collectionId,
+            bookNumber: 0,
+            hadithNumber: widget.hadithNumber,
+            createdAt: DateTime.now(),
+          ),
+        );
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Hadith ${widget.collectionId}:${widget.hadithNumber} bookmarked')),
+      SnackBar(
+          content: Text(
+              'Hadith ${widget.collectionId}:${widget.hadithNumber} bookmarked')),
     );
   }
 
@@ -308,12 +324,12 @@ class _HadithDetailPageState extends ConsumerState<HadithDetailPage> with Single
         return Colors.orange;
       case HadithGrade.mawdu:
         return Colors.red;
-      case HadithGrade.mursal:
+      case HadithGrade.munkar:
         return Colors.purple;
-      case HadithGrade.muttasil:
-        return Colors.blue;
-      case HadithGrade.munqati:
+      case HadithGrade.mudtarib:
         return Colors.teal;
+      case HadithGrade.muallal:
+        return Colors.brown;
       case HadithGrade.unknown:
         return Colors.grey;
     }
@@ -359,7 +375,7 @@ class _NarratorDetailCard extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      if (narrator.kunya != null) ...[
+                      if (narrator.kunya.isNotEmpty) ...[
                         const SizedBox(height: AppConstants.spacingXS),
                         Text(
                           'Kunya: ${narrator.kunya}',
@@ -372,10 +388,13 @@ class _NarratorDetailCard extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: _getReliabilityColor(narrator.reliability).withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(AppConstants.radiusFull),
+                    color: _getReliabilityColor(narrator.reliability)
+                        .withValues(alpha: 0.15),
+                    borderRadius:
+                        BorderRadius.circular(AppConstants.radiusFull),
                   ),
                   child: Text(
                     narrator.reliability.arabicName,
@@ -392,7 +411,8 @@ class _NarratorDetailCard extends StatelessWidget {
               Row(
                 children: [
                   if (narrator.birthYear != null) ...[
-                    Icon(Icons.calendar_today, size: 14, color: theme.colorScheme.onSurfaceVariant),
+                    Icon(Icons.calendar_today,
+                        size: 14, color: theme.colorScheme.onSurfaceVariant),
                     const SizedBox(width: 4),
                     Text(
                       'Born: ${narrator.birthYear}',
@@ -404,7 +424,8 @@ class _NarratorDetailCard extends StatelessWidget {
                   if (narrator.birthYear != null && narrator.deathYear != null)
                     const SizedBox(width: AppConstants.spacingMD),
                   if (narrator.deathYear != null) ...[
-                    Icon(Icons.event_busy, size: 14, color: theme.colorScheme.onSurfaceVariant),
+                    Icon(Icons.event_busy,
+                        size: 14, color: theme.colorScheme.onSurfaceVariant),
                     const SizedBox(width: 4),
                     Text(
                       'Died: ${narrator.deathYear}',
@@ -416,10 +437,10 @@ class _NarratorDetailCard extends StatelessWidget {
                 ],
               ),
             ],
-            if (narrator.biography != null && narrator.biography!.isNotEmpty) ...[
+            if (narrator.biography.isNotEmpty) ...[
               const SizedBox(height: AppConstants.spacingMD),
               Text(
-                narrator.biography!,
+                narrator.biography,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),

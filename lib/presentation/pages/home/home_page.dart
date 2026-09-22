@@ -2,17 +2,15 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../presentation/providers/app_providers.dart';
 import '../../../shared/models/quran_models.dart';
 import '../../../shared/models/hadith_models.dart';
+import '../../../shared/models/settings_models.dart';
 import '../../widgets/common/app_scaffold.dart';
 import '../../widgets/common/section_header.dart';
-import '../../widgets/quran/surah_card.dart';
-import '../../widgets/hadith/hadith_card.dart';
 import '../../widgets/common/continue_reading_card.dart';
 
 class HomePage extends ConsumerStatefulWidget {
@@ -33,8 +31,6 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final quranHadithTheme = theme.quranHadith;
     final settings = ref.watch(settingsProvider);
 
     return AppScaffold(
@@ -75,7 +71,8 @@ class _HomePageState extends ConsumerState<HomePage> {
               _buildRandomHadithSection(),
 
               // Bottom padding
-              const SliverToBoxAdapter(child: SizedBox(height: AppConstants.spacingXXL)),
+              const SliverToBoxAdapter(
+                  child: SizedBox(height: AppConstants.spacingXXL)),
             ],
           ),
         ),
@@ -101,11 +98,15 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   Widget _buildGreetingSection(BuildContext context, AppSettings settings) {
     final theme = Theme.of(context);
+    final quranHadithTheme = theme.quranHadith;
     final hour = DateTime.now().hour;
     String greeting;
-    if (hour < 12) greeting = 'Good Morning';
-    else if (hour < 17) greeting = 'Good Afternoon';
-    else greeting = 'Good Evening';
+    if (hour < 12)
+      greeting = 'Good Morning';
+    else if (hour < 17)
+      greeting = 'Good Afternoon';
+    else
+      greeting = 'Good Evening';
 
     return Container(
       margin: const EdgeInsets.all(AppConstants.spacingMD),
@@ -115,7 +116,8 @@ class _HomePageState extends ConsumerState<HomePage> {
         borderRadius: BorderRadius.circular(AppConstants.radiusLG),
         boxShadow: [
           BoxShadow(
-            color: quranHadithTheme.quranGradient.colors.first.withValues(alpha: 0.3),
+            color: quranHadithTheme.quranGradient.colors.first
+                .withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -216,25 +218,15 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
           const SizedBox(height: AppConstants.spacingMD),
           SizedBox(
-            height: 120,
-            child: AnimationLimiter(
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: actions.length,
-                separatorBuilder: (_, __) => const SizedBox(width: AppConstants.spacingMD),
-                itemBuilder: (context, index) {
-                  return AnimationConfiguration.staggeredList(
-                    position: index,
-                    duration: AppConstants.mediumAnimation,
-                    child: SlideAnimation(
-                      horizontalOffset: 50.0,
-                      child: FadeInAnimation(
-                        child: _QuickActionCard(action: actions[index]),
-                      ),
-                    ),
-                  );
-                },
-              ),
+            height: 148,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: actions.length,
+              separatorBuilder: (_, __) =>
+                  const SizedBox(width: AppConstants.spacingMD),
+              itemBuilder: (context, index) {
+                return _QuickActionCard(action: actions[index]);
+              },
             ),
           ),
         ],
@@ -254,12 +246,15 @@ class _HomePageState extends ConsumerState<HomePage> {
 
               final latest = progressList.first;
               return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppConstants.spacingMD, vertical: AppConstants.spacingMD),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: AppConstants.spacingMD,
+                    vertical: AppConstants.spacingMD),
                 child: ContinueReadingCard(
                   surahNumber: latest.surahNumber,
                   ayahNumber: latest.ayahNumber,
                   lastRead: latest.lastRead,
-                  onTap: () => context.go('/quran/surah/${latest.surahNumber}/ayah/${latest.ayahNumber}'),
+                  onTap: () => context.go(
+                      '/quran/surah/${latest.surahNumber}/ayah/${latest.ayahNumber}'),
                 ),
               );
             },
@@ -284,7 +279,8 @@ class _HomePageState extends ConsumerState<HomePage> {
               final recentBookmarks = bookmarks.take(5).toList();
 
               return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppConstants.spacingMD),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: AppConstants.spacingMD),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -295,16 +291,18 @@ class _HomePageState extends ConsumerState<HomePage> {
                     ),
                     const SizedBox(height: AppConstants.spacingMD),
                     SizedBox(
-                      height: 100,
+                      height: 125,
                       child: ListView.separated(
                         scrollDirection: Axis.horizontal,
                         itemCount: recentBookmarks.length,
-                        separatorBuilder: (_, __) => const SizedBox(width: AppConstants.spacingMD),
+                        separatorBuilder: (_, __) =>
+                            const SizedBox(width: AppConstants.spacingMD),
                         itemBuilder: (context, index) {
                           final bookmark = recentBookmarks[index];
                           return _BookmarkCard(
                             bookmark: bookmark,
-                            onTap: () => context.go('/quran/surah/${bookmark.surahNumber}/ayah/${bookmark.ayahNumber}'),
+                            onTap: () => context.go(
+                                '/quran/surah/${bookmark.surahNumber}/ayah/${bookmark.ayahNumber}'),
                           );
                         },
                       ),
@@ -330,7 +328,8 @@ class _HomePageState extends ConsumerState<HomePage> {
           return collectionsAsync.when(
             data: (collections) {
               return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppConstants.spacingMD),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: AppConstants.spacingMD),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -341,28 +340,19 @@ class _HomePageState extends ConsumerState<HomePage> {
                     ),
                     const SizedBox(height: AppConstants.spacingMD),
                     SizedBox(
-                      height: 160,
-                      child: AnimationLimiter(
-                        child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: collections.length,
-                          separatorBuilder: (_, __) => const SizedBox(width: AppConstants.spacingMD),
-                          itemBuilder: (context, index) {
-                            return AnimationConfiguration.staggeredList(
-                              position: index,
-                              duration: AppConstants.mediumAnimation,
-                              child: SlideAnimation(
-                                horizontalOffset: 50.0,
-                                child: FadeInAnimation(
-                                  child: _CollectionCard(
-                                    collection: collections[index],
-                                    onTap: () => context.go('/hadith/collection/${collections[index].id}'),
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
+                      height: 175,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: collections.length,
+                        separatorBuilder: (_, __) =>
+                            const SizedBox(width: AppConstants.spacingMD),
+                        itemBuilder: (context, index) {
+                          return _CollectionCard(
+                            collection: collections[index],
+                            onTap: () => context.go(
+                                '/hadith/collection/${collections[index].id}'),
+                          );
+                        },
                       ),
                     ),
                   ],
@@ -388,10 +378,13 @@ class _HomePageState extends ConsumerState<HomePage> {
               if (hadith == null) return const SizedBox.shrink();
 
               return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppConstants.spacingMD, vertical: AppConstants.spacingMD),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: AppConstants.spacingMD,
+                    vertical: AppConstants.spacingMD),
                 child: _RandomHadithCard(
                   hadith: hadith,
-                  onTap: () => context.go('/hadith/collection/${hadith.collectionId}/hadith/${hadith.hadithNumber}'),
+                  onTap: () => context.go(
+                      '/hadith/collection/${hadith.collectionId}/hadith/${hadith.hadithNumber}'),
                   onRefresh: () => ref.refresh(randomHadithProvider),
                 ),
               );
@@ -419,8 +412,11 @@ class _QuickActionCard extends StatelessWidget {
       onTap: action.onTap,
       borderRadius: BorderRadius.circular(AppConstants.radiusLG),
       child: Container(
-        width: 100,
-        padding: const EdgeInsets.all(AppConstants.spacingMD),
+        width: 110,
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppConstants.spacingSM,
+          vertical: AppConstants.spacingMD,
+        ),
         decoration: BoxDecoration(
           color: theme.colorScheme.surfaceContainerHigh,
           borderRadius: BorderRadius.circular(AppConstants.radiusLG),
@@ -428,10 +424,11 @@ class _QuickActionCard extends StatelessWidget {
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 48,
-              height: 48,
+              width: 46,
+              height: 46,
               decoration: BoxDecoration(
                 color: action.color.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(AppConstants.radiusMD),
@@ -445,14 +442,19 @@ class _QuickActionCard extends StatelessWidget {
                 fontWeight: FontWeight.w600,
               ),
               textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: AppConstants.spacingXS),
             Text(
               action.subtitle,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
+                fontSize: 11,
               ),
               textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -501,6 +503,7 @@ class _BookmarkCard extends StatelessWidget {
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -516,32 +519,36 @@ class _BookmarkCard extends StatelessWidget {
                 ),
               ),
             ),
-            const Spacer(),
-            Text(
-              'Surah $bookmark.surahNumber',
-              style: theme.textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: AppConstants.spacingXS),
-            Text(
-              'Ayah $bookmark.ayahNumber',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-            if (bookmark.note != null) ...[
-              const SizedBox(height: AppConstants.spacingXS),
-              Text(
-                bookmark.note!,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                  fontStyle: FontStyle.italic,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Surah ${bookmark.surahNumber}',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+                const SizedBox(height: AppConstants.spacingXS),
+                Text(
+                  'Ayah ${bookmark.ayahNumber}',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                if (bookmark.note != null) ...[
+                  const SizedBox(height: AppConstants.spacingXS),
+                  Text(
+                    bookmark.note!,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                      fontStyle: FontStyle.italic,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ],
+            ),
           ],
         ),
       ),
@@ -590,10 +597,11 @@ class _CollectionCard extends StatelessWidget {
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(
-              width: 48,
-              height: 48,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
                 color: theme.colorScheme.primaryContainer,
                 borderRadius: BorderRadius.circular(AppConstants.radiusMD),
@@ -604,38 +612,43 @@ class _CollectionCard extends StatelessWidget {
                 size: 24,
               ),
             ),
-            const Spacer(),
-            Text(
-              collection.name,
-              style: theme.textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: AppConstants.spacingXS),
-            Text(
-              collection.author,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: AppConstants.spacingXS),
-            Row(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
-                  Icons.article_outlined,
-                  size: 14,
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-                const SizedBox(width: 4),
                 Text(
-                  '${collection.totalHadiths} hadiths',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+                  collection.name,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: AppConstants.spacingXS),
+                Text(
+                  collection.author,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    fontSize: 11,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: AppConstants.spacingXS),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.article_outlined,
+                      size: 14,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${collection.totalHadiths} hadiths',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -673,7 +686,8 @@ class _RandomHadithCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppConstants.radiusLG),
           boxShadow: [
             BoxShadow(
-              color: quranHadithTheme.hadithGradient.colors.first.withValues(alpha: 0.3),
+              color: quranHadithTheme.hadithGradient.colors.first
+                  .withValues(alpha: 0.3),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -687,7 +701,8 @@ class _RandomHadithCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.casino_rounded, color: Colors.white.withValues(alpha: 0.9), size: 20),
+                    Icon(Icons.casino_rounded,
+                        color: Colors.white.withValues(alpha: 0.9), size: 20),
                     const SizedBox(width: AppConstants.spacingXS),
                     Text(
                       'Hadith of the Day',
@@ -728,10 +743,12 @@ class _RandomHadithCard extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(AppConstants.radiusFull),
+                    borderRadius:
+                        BorderRadius.circular(AppConstants.radiusFull),
                   ),
                   child: Text(
                     hadith.grade.arabicName,

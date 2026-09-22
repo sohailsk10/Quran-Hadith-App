@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
+import 'audio_progress_bar.dart';
 
 /// Main audio controls (play/pause, next, previous, speed, sleep timer)
 class AudioControls extends StatelessWidget {
@@ -100,7 +101,9 @@ class AudioControls extends StatelessWidget {
 
               // Play/Pause
               _ControlButton(
-                icon: isPlaying ? Icons.pause_circle_filled_rounded : Icons.play_circle_filled_rounded,
+                icon: isPlaying
+                    ? Icons.pause_circle_filled_rounded
+                    : Icons.play_circle_filled_rounded,
                 onPressed: onPlayPause,
                 isPrimary: true,
                 tooltip: isPlaying ? 'Pause' : 'Play',
@@ -346,16 +349,17 @@ class _SleepTimerButton extends StatelessWidget {
         ),
         const PopupMenuDivider(),
         ..._durations.map((d) => PopupMenuItem<Duration?>(
-          value: d,
-          child: Row(
-            children: [
-              if (d == duration)
-                Icon(Icons.check, size: 18, color: theme.colorScheme.primary),
-              if (d == duration) const SizedBox(width: 8),
-              Text(_formatSleepDuration(d)),
-            ],
-          ),
-        )),
+              value: d,
+              child: Row(
+                children: [
+                  if (d == duration)
+                    Icon(Icons.check,
+                        size: 18, color: theme.colorScheme.primary),
+                  if (d == duration) const SizedBox(width: 8),
+                  Text(_formatSleepDuration(d)),
+                ],
+              ),
+            )),
       ],
     );
   }
@@ -459,7 +463,9 @@ class CompactAudioControls extends StatelessWidget {
         ),
         const SizedBox(width: AppConstants.spacingSM),
         _ControlButton(
-          icon: isPlaying ? Icons.pause_circle_filled_rounded : Icons.play_circle_filled_rounded,
+          icon: isPlaying
+              ? Icons.pause_circle_filled_rounded
+              : Icons.play_circle_filled_rounded,
           onPressed: onPlayPause,
           isPrimary: true,
           tooltip: isPlaying ? 'Pause' : 'Play',

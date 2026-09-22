@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../shared/models/hadith_models.dart';
+import '../../../shared/models/settings_models.dart';
 
 class HadithListItem extends StatelessWidget {
   final Hadith hadith;
@@ -29,6 +30,11 @@ class HadithListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final quranHadithTheme = theme.quranHadith;
+    final effectiveTranslation =
+        (translation != null && translation!.isNotEmpty)
+            ? translation!
+            : hadith.getTranslation('en');
+    final urduTranslation = hadith.translations['ur'] ?? '';
 
     return InkWell(
       onTap: onTap,
@@ -98,22 +104,45 @@ class HadithListItem extends StatelessWidget {
                 textAlign: TextAlign.right,
                 textDirection: TextDirection.rtl,
                 maxLines: settings.showFullText ? null : 3,
-                overflow: settings.showFullText ? TextOverflow.visible : TextOverflow.ellipsis,
+                overflow: settings.showFullText
+                    ? TextOverflow.visible
+                    : TextOverflow.ellipsis,
               ),
               const SizedBox(height: AppConstants.spacingSM),
             ],
 
             // Translation
-            if (translation != null && translation!.isNotEmpty) ...[
+            if (settings.showTranslation && effectiveTranslation.isNotEmpty) ...[
               Text(
-                translation!,
+                effectiveTranslation,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontSize: settings.translationFontSize,
                   height: 1.5,
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
-                maxLines: settings.showFullText ? null : 2,
-                overflow: settings.showFullText ? TextOverflow.visible : TextOverflow.ellipsis,
+                maxLines: settings.showFullText ? null : 3,
+                overflow: settings.showFullText
+                    ? TextOverflow.visible
+                    : TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: AppConstants.spacingSM),
+            ],
+
+            if (settings.showTranslation && urduTranslation.isNotEmpty) ...[
+              Text(
+                urduTranslation,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontFamily: 'Amiri',
+                  fontSize: settings.translationFontSize + 1,
+                  height: 1.7,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                textAlign: TextAlign.right,
+                textDirection: TextDirection.rtl,
+                maxLines: settings.showFullText ? null : 3,
+                overflow: settings.showFullText
+                    ? TextOverflow.visible
+                    : TextOverflow.ellipsis,
               ),
               const SizedBox(height: AppConstants.spacingSM),
             ],
@@ -141,15 +170,19 @@ class HadithListItem extends StatelessWidget {
                     spacing: 4,
                     children: hadith.topics.take(3).map((topic) {
                       return Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: quranHadithTheme.hadithGradient.colors!.first.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(AppConstants.radiusFull),
+                          color: quranHadithTheme.hadithGradient.colors!.first
+                              .withValues(alpha: 0.1),
+                          borderRadius:
+                              BorderRadius.circular(AppConstants.radiusFull),
                         ),
                         child: Text(
                           topic,
                           style: theme.textTheme.labelSmall?.copyWith(
-                            color: quranHadithTheme.hadithGradient.colors!.first,
+                            color:
+                                quranHadithTheme.hadithGradient.colors!.first,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -179,7 +212,10 @@ class _AuthenticityBadge extends StatelessWidget {
       HadithAuthenticity.hasan => ('Hasan', Colors.blue),
       HadithAuthenticity.daif => ('Da\'if', Colors.orange),
       HadithAuthenticity.mawdu => ('Mawdu\'', Colors.red),
-      HadithAuthenticity.unknown => ('Unknown', theme.colorScheme.onSurfaceVariant),
+      HadithAuthenticity.unknown => (
+          'Unknown',
+          theme.colorScheme.onSurfaceVariant
+        ),
     };
 
     return Container(
@@ -216,7 +252,10 @@ class CompactHadithListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final quranHadithTheme = theme.quranHadith;
+    final effectiveCompactTranslation =
+        (translation != null && translation!.isNotEmpty)
+            ? translation!
+            : hadith.getTranslation('en');
 
     return InkWell(
       onTap: onTap,
@@ -259,10 +298,10 @@ class CompactHadithListItem extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
-            if (translation != null && translation!.isNotEmpty) ...[
+            if (effectiveCompactTranslation.isNotEmpty) ...[
               const SizedBox(height: AppConstants.spacingSM),
               Text(
-                translation!,
+                effectiveCompactTranslation,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                   height: 1.5,

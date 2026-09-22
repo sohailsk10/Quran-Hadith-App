@@ -2,12 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../presentation/providers/app_providers.dart';
 import '../../../shared/models/hadith_models.dart';
+import '../../../shared/models/settings_models.dart';
 import '../../widgets/common/app_scaffold.dart';
 import '../../widgets/common/section_header.dart';
 import '../../widgets/hadith/hadith_list_item.dart';
@@ -21,7 +21,8 @@ class HadithTopicPage extends ConsumerStatefulWidget {
   ConsumerState<HadithTopicPage> createState() => _HadithTopicPageState();
 }
 
-class _HadithTopicPageState extends ConsumerState<HadithTopicPage> with SingleTickerProviderStateMixin {
+class _HadithTopicPageState extends ConsumerState<HadithTopicPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final ScrollController _scrollController = ScrollController();
 
@@ -47,7 +48,8 @@ class _HadithTopicPageState extends ConsumerState<HadithTopicPage> with SingleTi
       child: Consumer(
         builder: (context, ref, _) {
           final topicAsync = ref.watch(hadithTopicProvider(widget.topicId));
-          final hadithsAsync = ref.watch(hadithsByTopicProvider(widget.topicId));
+          final hadithsAsync =
+              ref.watch(hadithsByTopicProvider(widget.topicId));
           final settings = ref.watch(settingsProvider);
 
           return topicAsync.when(
@@ -99,7 +101,8 @@ class _HadithTopicPageState extends ConsumerState<HadithTopicPage> with SingleTi
         borderRadius: BorderRadius.circular(AppConstants.radiusLG),
         boxShadow: [
           BoxShadow(
-            color: quranHadithTheme.hadithGradient.colors.first.withValues(alpha: 0.3),
+            color: quranHadithTheme.hadithGradient.colors.first
+                .withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -137,10 +140,13 @@ class _HadithTopicPageState extends ConsumerState<HadithTopicPage> with SingleTi
                     ),
                     const SizedBox(height: AppConstants.spacingXS),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: _getGradeColor(topic.grade).withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(AppConstants.radiusFull),
+                        color:
+                            _getGradeColor(topic.grade).withValues(alpha: 0.2),
+                        borderRadius:
+                            BorderRadius.circular(AppConstants.radiusFull),
                       ),
                       child: Text(
                         topic.grade.arabicName,
@@ -184,7 +190,8 @@ class _HadithTopicPageState extends ConsumerState<HadithTopicPage> with SingleTi
     );
   }
 
-  Widget _buildHadithsTab(AsyncValue<List<Hadith>> hadithsAsync, AsyncValue<AppSettings> settingsAsync) {
+  Widget _buildHadithsTab(AsyncValue<List<Hadith>> hadithsAsync,
+      AsyncValue<AppSettings> settingsAsync) {
     return settingsAsync.when(
       data: (settings) => hadithsAsync.when(
         data: (hadiths) {
@@ -193,32 +200,24 @@ class _HadithTopicPageState extends ConsumerState<HadithTopicPage> with SingleTi
           }
 
           return RefreshIndicator(
-            onRefresh: () async => ref.refresh(hadithsByTopicProvider(widget.topicId)),
-            child: AnimationLimiter(
-              child: ListView.separated(
-                controller: _scrollController,
-                padding: const EdgeInsets.all(AppConstants.spacingMD),
-                itemCount: hadiths.length,
-                separatorBuilder: (_, __) => const SizedBox(height: AppConstants.spacingSM),
-                itemBuilder: (context, index) {
-                  final hadith = hadiths[index];
-                  return AnimationConfiguration.staggeredList(
-                    position: index,
-                    duration: AppConstants.fastAnimation,
-                    child: SlideAnimation(
-                      verticalOffset: 30.0,
-                      child: FadeInAnimation(
-                        child: HadithListItem(
-                          hadith: hadith,
-                          settings: settings,
-                          onTap: () => context.go('/hadith/collection/${hadith.collectionId}/hadith/${hadith.hadithNumber}'),
-                          onLongPress: () => _showHadithActions(context, hadith),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
+            onRefresh: () async =>
+                ref.refresh(hadithsByTopicProvider(widget.topicId)),
+            child: ListView.separated(
+              controller: _scrollController,
+              padding: const EdgeInsets.all(AppConstants.spacingMD),
+              itemCount: hadiths.length,
+              separatorBuilder: (_, __) =>
+                  const SizedBox(height: AppConstants.spacingSM),
+              itemBuilder: (context, index) {
+                final hadith = hadiths[index];
+                return HadithListItem(
+                  hadith: hadith,
+                  settings: settings.hadithDisplay,
+                  onTap: () => context.go(
+                      '/hadith/collection/${hadith.collectionId}/hadith/${hadith.hadithNumber}'),
+                  onLongPress: () => _showHadithActions(context, hadith),
+                );
+              },
             ),
           );
         },
@@ -234,7 +233,8 @@ class _HadithTopicPageState extends ConsumerState<HadithTopicPage> with SingleTi
     return settingsAsync.when(
       data: (settings) => Consumer(
         builder: (context, ref, _) {
-          final relatedTopicsAsync = ref.watch(relatedTopicsProvider(widget.topicId));
+          final relatedTopicsAsync =
+              ref.watch(childHadithTopicsProvider(widget.topicId));
           return relatedTopicsAsync.when(
             data: (topics) {
               if (topics.isEmpty) {
@@ -246,29 +246,20 @@ class _HadithTopicPageState extends ConsumerState<HadithTopicPage> with SingleTi
               }
 
               return RefreshIndicator(
-                onRefresh: () async => ref.refresh(relatedTopicsProvider(widget.topicId)),
-                child: AnimationLimiter(
-                  child: ListView.separated(
-                    padding: const EdgeInsets.all(AppConstants.spacingMD),
-                    itemCount: topics.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: AppConstants.spacingMD),
-                    itemBuilder: (context, index) {
-                      final topic = topics[index];
-                      return AnimationConfiguration.staggeredList(
-                        position: index,
-                        duration: AppConstants.mediumAnimation,
-                        child: SlideAnimation(
-                          verticalOffset: 50.0,
-                          child: FadeInAnimation(
-                            child: _RelatedTopicCard(
-                              topic: topic,
-                              onTap: () => context.go('/hadith/topic/${topic.id}'),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+                onRefresh: () async =>
+                    ref.refresh(childHadithTopicsProvider(widget.topicId)),
+                child: ListView.separated(
+                  padding: const EdgeInsets.all(AppConstants.spacingMD),
+                  itemCount: topics.length,
+                  separatorBuilder: (_, __) =>
+                      const SizedBox(height: AppConstants.spacingMD),
+                  itemBuilder: (context, index) {
+                    final topic = topics[index];
+                    return _RelatedTopicCard(
+                      topic: topic,
+                      onTap: () => context.go('/hadith/topic/${topic.id}'),
+                    );
+                  },
                 ),
               );
             },
@@ -299,7 +290,8 @@ class _HadithTopicPageState extends ConsumerState<HadithTopicPage> with SingleTi
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
+                color:
+                    theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -360,16 +352,23 @@ class _HadithTopicPageState extends ConsumerState<HadithTopicPage> with SingleTi
 
   IconData _getTopicIcon(String topicName) {
     final name = topicName.toLowerCase();
-    if (name.contains('prayer') || name.contains('salah')) return Icons.accessibility;
-    if (name.contains('fast') || name.contains('sawm')) return Icons.wb_sunny_outlined;
-    if (name.contains('charity') || name.contains('zakat')) return Icons.volunteer_activism;
+    if (name.contains('prayer') || name.contains('salah'))
+      return Icons.accessibility;
+    if (name.contains('fast') || name.contains('sawm'))
+      return Icons.wb_sunny_outlined;
+    if (name.contains('charity') || name.contains('zakat'))
+      return Icons.volunteer_activism;
     if (name.contains('hajj') || name.contains('pilgrim')) return Icons.flight;
     if (name.contains('faith') || name.contains('iman')) return Icons.favorite;
     if (name.contains('knowledge') || name.contains('ilm')) return Icons.school;
-    if (name.contains('manners') || name.contains('akhlaq')) return Icons.psychology;
-    if (name.contains('family') || name.contains('marriage')) return Icons.family_restroom;
-    if (name.contains('business') || name.contains('trade')) return Icons.business;
-    if (name.contains('death') || name.contains('funeral')) return Icons.bedtime;
+    if (name.contains('manners') || name.contains('akhlaq'))
+      return Icons.psychology;
+    if (name.contains('family') || name.contains('marriage'))
+      return Icons.family_restroom;
+    if (name.contains('business') || name.contains('trade'))
+      return Icons.business;
+    if (name.contains('death') || name.contains('funeral'))
+      return Icons.bedtime;
     return Icons.topic;
   }
 
@@ -383,12 +382,12 @@ class _HadithTopicPageState extends ConsumerState<HadithTopicPage> with SingleTi
         return Colors.orange;
       case HadithGrade.mawdu:
         return Colors.red;
-      case HadithGrade.mursal:
+      case HadithGrade.munkar:
         return Colors.purple;
-      case HadithGrade.muttasil:
-        return Colors.blue;
-      case HadithGrade.munqati:
+      case HadithGrade.mudtarib:
         return Colors.teal;
+      case HadithGrade.muallal:
+        return Colors.brown;
       case HadithGrade.unknown:
         return Colors.grey;
     }
@@ -457,10 +456,12 @@ class _RelatedTopicCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: _getGradeColor(topic.grade).withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(AppConstants.radiusFull),
+                    borderRadius:
+                        BorderRadius.circular(AppConstants.radiusFull),
                   ),
                   child: Text(
                     topic.grade.arabicName,
@@ -495,12 +496,12 @@ class _RelatedTopicCard extends StatelessWidget {
         return Colors.orange;
       case HadithGrade.mawdu:
         return Colors.red;
-      case HadithGrade.mursal:
+      case HadithGrade.munkar:
         return Colors.purple;
-      case HadithGrade.muttasil:
-        return Colors.blue;
-      case HadithGrade.munqati:
+      case HadithGrade.mudtarib:
         return Colors.teal;
+      case HadithGrade.muallal:
+        return Colors.brown;
       case HadithGrade.unknown:
         return Colors.grey;
     }
@@ -587,10 +588,13 @@ class _HadithActionsSheet extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppConstants.spacingMD),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: _getGradeColor(hadith.grade).withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(AppConstants.radiusFull),
+                      color:
+                          _getGradeColor(hadith.grade).withValues(alpha: 0.15),
+                      borderRadius:
+                          BorderRadius.circular(AppConstants.radiusFull),
                     ),
                     child: Text(
                       hadith.grade.arabicName,
@@ -614,18 +618,15 @@ class _HadithActionsSheet extends ConsumerWidget {
                     onTap: () {
                       Navigator.pop(context);
                       ref.read(hadithBookmarksProvider.notifier).addBookmark(
-                        HadithBookmark(
-                          id: 'hadith_${hadith.collectionId}_${hadith.hadithNumber}_${DateTime.now().millisecondsSinceEpoch}',
-                          collectionId: hadith.collectionId,
-                          bookNumber: hadith.bookNumber,
-                          hadithNumber: hadith.hadithNumber,
-                          collectionName: '',
-                          bookTitle: '',
-                          hadithText: hadith.getTranslation(settings.language.code),
-                          grade: hadith.grade,
-                          createdAt: DateTime.now(),
-                        ),
-                      );
+                            HadithBookmark(
+                              id: 'hadith_${hadith.collectionId}_${hadith.hadithNumber}_${DateTime.now().millisecondsSinceEpoch}',
+                              hadithId: hadith.id,
+                              collectionId: hadith.collectionId,
+                              bookNumber: hadith.bookNumber,
+                              hadithNumber: hadith.hadithNumber,
+                              createdAt: DateTime.now(),
+                            ),
+                          );
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Bookmark added')),
                       );
@@ -657,7 +658,8 @@ class _HadithActionsSheet extends ConsumerWidget {
                     onTap: () {
                       Navigator.pop(context);
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Share feature coming soon')),
+                        const SnackBar(
+                            content: Text('Share feature coming soon')),
                       );
                     },
                   ),
@@ -683,12 +685,12 @@ class _HadithActionsSheet extends ConsumerWidget {
         return Colors.orange;
       case HadithGrade.mawdu:
         return Colors.red;
-      case HadithGrade.mursal:
+      case HadithGrade.munkar:
         return Colors.purple;
-      case HadithGrade.muttasil:
-        return Colors.blue;
-      case HadithGrade.munqati:
+      case HadithGrade.mudtarib:
         return Colors.teal;
+      case HadithGrade.muallal:
+        return Colors.brown;
       case HadithGrade.unknown:
         return Colors.grey;
     }
@@ -696,7 +698,9 @@ class _HadithActionsSheet extends ConsumerWidget {
 
   TextDirection _getTextDirection(String languageCode) {
     const rtlLanguages = ['ar', 'ur', 'fa', 'ps', 'sd'];
-    return rtlLanguages.contains(languageCode) ? TextDirection.rtl : TextDirection.ltr;
+    return rtlLanguages.contains(languageCode)
+        ? TextDirection.rtl
+        : TextDirection.ltr;
   }
 }
 
@@ -705,7 +709,8 @@ class _ActionTile extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  const _ActionTile({required this.icon, required this.label, required this.onTap});
+  const _ActionTile(
+      {required this.icon, required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {

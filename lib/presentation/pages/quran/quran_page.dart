@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
@@ -23,7 +22,8 @@ class QuranPage extends ConsumerStatefulWidget {
   ConsumerState<QuranPage> createState() => _QuranPageState();
 }
 
-class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProviderStateMixin {
+class _QuranPageState extends ConsumerState<QuranPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final ScrollController _scrollController = ScrollController();
 
@@ -103,29 +103,19 @@ class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProvider
     return surahsAsync.when(
       data: (surahs) => RefreshIndicator(
         onRefresh: () async => ref.refresh(surahsProvider),
-        child: AnimationLimiter(
-          child: ListView.separated(
-            controller: _scrollController,
-            padding: const EdgeInsets.all(AppConstants.spacingMD),
-            itemCount: surahs.length,
-            separatorBuilder: (_, __) => const SizedBox(height: AppConstants.spacingXS),
-            itemBuilder: (context, index) {
-              final surah = surahs[index];
-              return AnimationConfiguration.staggeredList(
-                position: index,
-                duration: AppConstants.mediumAnimation,
-                child: SlideAnimation(
-                  verticalOffset: 50.0,
-                  child: FadeInAnimation(
-                    child: SurahListItem(
-                      surah: surah,
-                      onTap: () => context.go('/quran/surah/${surah.number}'),
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
+        child: ListView.separated(
+          controller: _scrollController,
+          padding: const EdgeInsets.all(AppConstants.spacingMD),
+          itemCount: surahs.length,
+          separatorBuilder: (_, __) =>
+              const SizedBox(height: AppConstants.spacingXS),
+          itemBuilder: (context, index) {
+            final surah = surahs[index];
+            return SurahListItem(
+              surah: surah,
+              onTap: () => context.go('/quran/surah/${surah.number}'),
+            );
+          },
         ),
       ),
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -153,28 +143,18 @@ class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProvider
     return juzAsync.when(
       data: (juzList) => RefreshIndicator(
         onRefresh: () async => ref.refresh(juzsProvider),
-        child: AnimationLimiter(
-          child: ListView.separated(
-            padding: const EdgeInsets.all(AppConstants.spacingMD),
-            itemCount: juzList.length,
-            separatorBuilder: (_, __) => const SizedBox(height: AppConstants.spacingXS),
-            itemBuilder: (context, index) {
-              final juz = juzList[index];
-              return AnimationConfiguration.staggeredList(
-                position: index,
-                duration: AppConstants.mediumAnimation,
-                child: SlideAnimation(
-                  verticalOffset: 50.0,
-                  child: FadeInAnimation(
-                    child: JuzListItem(
-                      juz: juz,
-                      onTap: () => context.go('/quran/juz/${juz.number}'),
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
+        child: ListView.separated(
+          padding: const EdgeInsets.all(AppConstants.spacingMD),
+          itemCount: juzList.length,
+          separatorBuilder: (_, __) =>
+              const SizedBox(height: AppConstants.spacingXS),
+          itemBuilder: (context, index) {
+            final juz = juzList[index];
+            return JuzListItem(
+              juz: juz,
+              onTap: () => context.go('/quran/juz/${juz.number}'),
+            );
+          },
         ),
       ),
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -185,28 +165,18 @@ class _QuranPageState extends ConsumerState<QuranPage> with SingleTickerProvider
   Widget _buildPagesTab() {
     return RefreshIndicator(
       onRefresh: () async {},
-      child: AnimationLimiter(
-        child: ListView.separated(
-          padding: const EdgeInsets.all(AppConstants.spacingMD),
-          itemCount: 604, // Total pages in Quran
-          separatorBuilder: (_, __) => const SizedBox(height: AppConstants.spacingXS),
-          itemBuilder: (context, index) {
-            final pageNumber = index + 1;
-            return AnimationConfiguration.staggeredList(
-              position: index,
-              duration: AppConstants.mediumAnimation,
-              child: SlideAnimation(
-                verticalOffset: 50.0,
-                child: FadeInAnimation(
-                  child: _PageListItem(
-                    pageNumber: pageNumber,
-                    onTap: () => context.go('/quran/page/$pageNumber'),
-                  ),
-                ),
-              );
-            },
-          },
-        ),
+      child: ListView.separated(
+        padding: const EdgeInsets.all(AppConstants.spacingMD),
+        itemCount: 604, // Total pages in Quran
+        separatorBuilder: (_, __) =>
+            const SizedBox(height: AppConstants.spacingXS),
+        itemBuilder: (context, index) {
+          final pageNumber = index + 1;
+          return _PageListItem(
+            pageNumber: pageNumber,
+            onTap: () => context.go('/quran/page/$pageNumber'),
+          );
+        },
       ),
     );
   }
@@ -360,21 +330,26 @@ class _FilterBottomSheet extends ConsumerWidget {
                           spacing: AppConstants.spacingSM,
                           runSpacing: AppConstants.spacingSM,
                           children: translations.map((t) {
-                            final isSelected = t.id == settings.selectedTranslationId;
+                            final isSelected =
+                                t.id == settings.selectedTranslationId;
                             return FilterChip(
                               label: Text(t.name),
                               selected: isSelected,
                               onSelected: (_) {
-                                ref.read(settingsProvider.notifier).updateTranslation(t.id);
+                                ref
+                                    .read(settingsProvider.notifier)
+                                    .updateTranslation(t.id);
                                 Navigator.pop(context);
                               },
                               selectedColor: theme.colorScheme.primaryContainer,
-                              checkmarkColor: theme.colorScheme.onPrimaryContainer,
+                              checkmarkColor:
+                                  theme.colorScheme.onPrimaryContainer,
                             );
                           }).toList(),
                         ),
                         loading: () => const CircularProgressIndicator(),
-                        error: (_, __) => const Text('Error loading translations'),
+                        error: (_, __) =>
+                            const Text('Error loading translations'),
                       );
                     },
                   ),
@@ -397,18 +372,23 @@ class _FilterBottomSheet extends ConsumerWidget {
                           spacing: AppConstants.spacingSM,
                           runSpacing: AppConstants.spacingSM,
                           children: reciters.map((r) {
-                            final isSelected = r.id == settings.audio.selectedReciterId;
+                            final isSelected =
+                                r.id == settings.audio.selectedReciterId;
                             return FilterChip(
                               label: Text(r.name),
                               selected: isSelected,
                               onSelected: (_) {
-                                ref.read(settingsProvider.notifier).updateAudioSettings(
-                                  settings.audio.copyWith(selectedReciterId: r.id),
-                                );
+                                ref
+                                    .read(settingsProvider.notifier)
+                                    .updateAudioSettings(
+                                      settings.audio
+                                          .copyWith(selectedReciterId: r.id),
+                                    );
                                 Navigator.pop(context);
                               },
                               selectedColor: theme.colorScheme.primaryContainer,
-                              checkmarkColor: theme.colorScheme.onPrimaryContainer,
+                              checkmarkColor:
+                                  theme.colorScheme.onPrimaryContainer,
                             );
                           }).toList(),
                         ),
@@ -436,8 +416,8 @@ class _FilterBottomSheet extends ConsumerWidget {
                     label: '${settings.quranDisplay.fontSize.toInt()}',
                     onChanged: (value) {
                       ref.read(settingsProvider.notifier).updateQuranDisplay(
-                        settings.quranDisplay.copyWith(fontSize: value),
-                      );
+                            settings.quranDisplay.copyWith(fontSize: value),
+                          );
                     },
                   ),
 

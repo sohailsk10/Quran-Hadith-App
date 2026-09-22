@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
@@ -11,8 +10,6 @@ import '../../../shared/models/quran_models.dart';
 import '../../../shared/models/hadith_models.dart';
 import '../../widgets/common/app_scaffold.dart';
 import '../../widgets/common/section_header.dart';
-import '../../widgets/quran/surah_list_item.dart';
-import '../../widgets/hadith/hadith_list_item.dart';
 
 class SearchPage extends ConsumerStatefulWidget {
   final String? initialQuery;
@@ -24,13 +21,13 @@ class SearchPage extends ConsumerStatefulWidget {
   ConsumerState<SearchPage> createState() => _SearchPageState();
 }
 
-class _SearchPageState extends ConsumerState<SearchPage> with SingleTickerProviderStateMixin {
+class _SearchPageState extends ConsumerState<SearchPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late TextEditingController _searchController;
   final ScrollController _scrollController = ScrollController();
 
   String _currentQuery = '';
-  String _searchType = 'all'; // all, quran, hadith
 
   @override
   void initState() {
@@ -38,7 +35,6 @@ class _SearchPageState extends ConsumerState<SearchPage> with SingleTickerProvid
     _tabController = TabController(length: 3, vsync: this);
     _searchController = TextEditingController(text: widget.initialQuery ?? '');
     _currentQuery = widget.initialQuery ?? '';
-    _searchType = widget.initialType ?? 'all';
 
     if (widget.initialQuery != null && widget.initialQuery!.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -55,15 +51,14 @@ class _SearchPageState extends ConsumerState<SearchPage> with SingleTickerProvid
     super.dispose();
   }
 
-  void _performSearch() {
+  Future<void> _performSearch() async {
     if (_currentQuery.trim().isEmpty) return;
-    ref.read(searchProvider(_currentQuery, _searchType).notifier).search(_currentQuery, _searchType);
+    ref.read(quranSearchProvider(_currentQuery));
+    ref.read(hadithSearchProvider(_currentQuery));
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return AppScaffold(
       title: 'Search',
       showBackButton: false,
@@ -81,10 +76,7 @@ class _SearchPageState extends ConsumerState<SearchPage> with SingleTickerProvid
               Tab(text: 'Hadith'),
             ],
             onTap: (index) {
-              setState(() {
-                _searchType = ['all', 'quran', 'hadith'][index];
-                _performSearch();
-              });
+              _performSearch();
             },
           ),
 
@@ -120,7 +112,8 @@ class _SearchPageState extends ConsumerState<SearchPage> with SingleTickerProvid
                   onPressed: () {
                     _searchController.clear();
                     setState(() => _currentQuery = '');
-                    ref.invalidate(searchProvider('', _searchType));
+                    ref.invalidate(quranSearchProvider(''));
+                    ref.invalidate(hadithSearchProvider(''));
                   },
                 )
               : null,
@@ -139,92 +132,132 @@ class _SearchPageState extends ConsumerState<SearchPage> with SingleTickerProvid
   }
 
   Widget _buildAllResults() {
-    final searchAsync = ref.watch(searchProvider(_currentQuery, 'all'));
+    return Consumer(
+      builder: (context, ref, _) {
+        final quranResults = ref.watch(quranSearchProvider(_currentQuery));
+        final hadithResults = ref.watch(hadithSearchProvider(_currentQuery));
 
-    return searchAsync.when(
-      data: (results) => _buildResultsList(results),
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => _buildErrorState(error),
+        return _buildResultsList(quranResults, hadithResults);
+      },
     );
   }
 
   Widget _buildQuranResults() {
-    final searchAsync = ref.watch(searchProvider(_currentQuery, 'quran'));
+    final searchAsync = ref.watch(quranSearchProvider(_currentQuery));
 
     return searchAsync.when(
-      data: (results) => _buildResultsList(results),
+      data: (results) => _buildQuranResultsList(results),
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, stack) => _buildErrorState(error),
     );
   }
 
   Widget _buildHadithResults() {
-    final searchAsync = ref.watch(searchProvider(_currentQuery, 'hadith'));
+    final searchAsync = ref.watch(hadithSearchProvider(_currentQuery));
 
     return searchAsync.when(
-      data: (results) => _buildResultsList(results),
+      data: (results) => _buildHadithResultsList(results),
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, stack) => _buildErrorState(error),
     );
   }
 
-  Widget _buildResultsList(SearchResults results) {
+  Widget _buildResultsList(AsyncValue<List<QuranSearchResult>> quranAsync,
+      AsyncValue<List<Hadith>> hadithAsync) {
     if (_currentQuery.isEmpty) {
       return _buildEmptyState();
     }
 
-    if (results.quranResults.isEmpty && results.hadithResults.isEmpty) {
-      return _buildNoResultsState();
-    }
+    return quranAsync.when(
+      data: (quranResults) => hadithAsync.when(
+        data: (hadithResults) {
+          if (quranResults.isEmpty && hadithResults.isEmpty) {
+            return _buildNoResultsState();
+          }
+
+          return RefreshIndicator(
+            onRefresh: _performSearch,
+            child: ListView(
+              controller: _scrollController,
+              padding: const EdgeInsets.all(AppConstants.spacingMD),
+              children: [
+                if (quranResults.isNotEmpty) ...[
+                  SectionHeader(
+                    title: 'Quran Results',
+                    subtitle: '${quranResults.length} verses found',
+                  ),
+                  const SizedBox(height: AppConstants.spacingMD),
+                  ...quranResults.map((result) => _QuranSearchResultItem(
+                        ayah: result,
+                        query: _currentQuery,
+                        onTap: () => context.go(
+                            '/quran/surah/${result.ayah.surahNumber}/ayah/${result.ayah.ayahInSurah}'),
+                      )),
+                  const SizedBox(height: AppConstants.spacingLG),
+                ],
+                if (hadithResults.isNotEmpty) ...[
+                  SectionHeader(
+                    title: 'Hadith Results',
+                    subtitle: '${hadithResults.length} hadiths found',
+                  ),
+                  const SizedBox(height: AppConstants.spacingMD),
+                  ...hadithResults.map((hadith) => _HadithSearchResultItem(
+                        hadith: hadith,
+                        query: _currentQuery,
+                        onTap: () => context.go(
+                            '/hadith/collection/${hadith.collectionId}/hadith/${hadith.hadithNumber}'),
+                      )),
+                ],
+              ],
+            ),
+          );
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stack) => _buildErrorState(error),
+      ),
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => _buildErrorState(error),
+    );
+  }
+
+  Widget _buildQuranResultsList(List<QuranSearchResult> results) {
+    if (_currentQuery.isEmpty) return _buildEmptyState();
+    if (results.isEmpty) return _buildNoResultsState();
 
     return RefreshIndicator(
       onRefresh: _performSearch,
-      child: AnimationLimiter(
-        child: ListView(
-          controller: _scrollController,
-          padding: const EdgeInsets.all(AppConstants.spacingMD),
-          children: [
-            if (results.quranResults.isNotEmpty) ...[
-              SectionHeader(
-                title: 'Quran Results',
-                subtitle: '${results.quranResults.length} verses found',
-              ),
-              const SizedBox(height: AppConstants.spacingMD),
-              ...AnimationConfiguration.toStaggeredList(
-                duration: AppConstants.mediumAnimation,
-                childAnimationBuilder: (widget) => SlideAnimation(
-                  verticalOffset: 50.0,
-                  child: FadeInAnimation(child: widget),
-                ),
-                children: results.quranResults.map((ayah) => _QuranSearchResultItem(
-                  ayah: ayah,
+      child: ListView(
+        controller: _scrollController,
+        padding: const EdgeInsets.all(AppConstants.spacingMD),
+        children: results
+            .map((result) => _QuranSearchResultItem(
+                  ayah: result,
                   query: _currentQuery,
-                  onTap: () => context.go('/quran/surah/${ayah.surahNumber}/ayah/${ayah.numberInSurah}'),
-                )).toList(),
-              ),
-              const SizedBox(height: AppConstants.spacingLG),
-            ],
-            if (results.hadithResults.isNotEmpty) ...[
-              SectionHeader(
-                title: 'Hadith Results',
-                subtitle: '${results.hadithResults.length} hadiths found',
-              ),
-              const SizedBox(height: AppConstants.spacingMD),
-              ...AnimationConfiguration.toStaggeredList(
-                duration: AppConstants.mediumAnimation,
-                childAnimationBuilder: (widget) => SlideAnimation(
-                  verticalOffset: 50.0,
-                  child: FadeInAnimation(child: widget),
-                ),
-                children: results.hadithResults.map((hadith) => _HadithSearchResultItem(
+                  onTap: () => context.go(
+                      '/quran/surah/${result.ayah.surahNumber}/ayah/${result.ayah.ayahInSurah}'),
+                ))
+            .toList(),
+      ),
+    );
+  }
+
+  Widget _buildHadithResultsList(List<Hadith> results) {
+    if (_currentQuery.isEmpty) return _buildEmptyState();
+    if (results.isEmpty) return _buildNoResultsState();
+
+    return RefreshIndicator(
+      onRefresh: _performSearch,
+      child: ListView(
+        controller: _scrollController,
+        padding: const EdgeInsets.all(AppConstants.spacingMD),
+        children: results
+            .map((hadith) => _HadithSearchResultItem(
                   hadith: hadith,
                   query: _currentQuery,
-                  onTap: () => context.go('/hadith/collection/${hadith.collectionId}/hadith/${hadith.hadithNumber}'),
-                )).toList(),
-              ),
-            ],
-          ],
-        ),
+                  onTap: () => context.go(
+                      '/hadith/collection/${hadith.collectionId}/hadith/${hadith.hadithNumber}'),
+                ))
+            .toList(),
       ),
     );
   }
@@ -311,14 +344,16 @@ class _SearchPageState extends ConsumerState<SearchPage> with SingleTickerProvid
       spacing: AppConstants.spacingSM,
       runSpacing: AppConstants.spacingSM,
       alignment: WrapAlignment.center,
-      children: suggestions.map((suggestion) => ActionChip(
-        label: Text(suggestion),
-        onPressed: () {
-          _searchController.text = suggestion;
-          setState(() => _currentQuery = suggestion);
-          _performSearch();
-        },
-      )).toList(),
+      children: suggestions
+          .map((suggestion) => ActionChip(
+                label: Text(suggestion),
+                onPressed: () {
+                  _searchController.text = suggestion;
+                  setState(() => _currentQuery = suggestion);
+                  _performSearch();
+                },
+              ))
+          .toList(),
     );
   }
 
@@ -343,7 +378,7 @@ class _SearchPageState extends ConsumerState<SearchPage> with SingleTickerProvid
 
 /// Quran Search Result Item
 class _QuranSearchResultItem extends StatelessWidget {
-  final Ayah ayah;
+  final QuranSearchResult ayah;
   final String query;
   final VoidCallback onTap;
 
@@ -373,13 +408,15 @@ class _QuranSearchResultItem extends StatelessWidget {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(AppConstants.radiusFull),
+                    borderRadius:
+                        BorderRadius.circular(AppConstants.radiusFull),
                   ),
                   child: Text(
-                    '${ayah.surahNumber}:${ayah.numberInSurah}',
+                    '${ayah.ayah.surahNumber}:${ayah.ayah.ayahInSurah}',
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: theme.colorScheme.onPrimaryContainer,
                       fontWeight: FontWeight.w600,
@@ -388,18 +425,21 @@ class _QuranSearchResultItem extends StatelessWidget {
                 ),
                 const SizedBox(width: AppConstants.spacingSM),
                 Text(
-                  'Surah ${ayah.surahNumber}',
+                  'Surah ${ayah.surah.nameTransliteration}',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
                 const Spacer(),
-                if (ayah.isSajdah)
+                if (ayah.ayah.isSajdah)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: theme.quranHadith.sajdahColor.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(AppConstants.radiusFull),
+                      color:
+                          theme.quranHadith.sajdahColor.withValues(alpha: 0.15),
+                      borderRadius:
+                          BorderRadius.circular(AppConstants.radiusFull),
                     ),
                     child: Text(
                       'Sajdah',
@@ -413,7 +453,7 @@ class _QuranSearchResultItem extends StatelessWidget {
             ),
             const SizedBox(height: AppConstants.spacingMD),
             Text(
-              ayah.text,
+              ayah.ayah.textUthmani,
               style: theme.textTheme.bodyLarge?.copyWith(
                 fontFamily: 'Uthmani',
                 fontSize: 20,
@@ -461,10 +501,12 @@ class _HadithSearchResultItem extends StatelessWidget {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: _getGradeColor(hadith.grade).withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(AppConstants.radiusFull),
+                    borderRadius:
+                        BorderRadius.circular(AppConstants.radiusFull),
                   ),
                   child: Text(
                     hadith.grade.arabicName,
@@ -510,12 +552,12 @@ class _HadithSearchResultItem extends StatelessWidget {
         return Colors.orange;
       case HadithGrade.mawdu:
         return Colors.red;
-      case HadithGrade.mursal:
+      case HadithGrade.munkar:
         return Colors.purple;
-      case HadithGrade.muttasil:
-        return Colors.blue;
-      case HadithGrade.munqati:
+      case HadithGrade.mudtarib:
         return Colors.teal;
+      case HadithGrade.muallal:
+        return Colors.brown;
       case HadithGrade.unknown:
         return Colors.grey;
     }

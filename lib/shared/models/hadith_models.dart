@@ -1,59 +1,26 @@
 /// Hadith data models for collections, books, and individual hadiths
 
 import 'package:flutter/foundation.dart';
-import 'package:hive/hive.dart';
-
-part 'hadith_models.g.dart';
+import 'quran_models.dart' show BookmarkColor;
 
 /// Represents a Hadith collection (e.g., Sahih Bukhari, Sahih Muslim)
-@HiveType(typeId: 20)
-class HadithCollection extends HiveObject {
-  @HiveField(0)
+class HadithCollection {
   final String id; // e.g., 'bukhari', 'muslim'
-
-  @HiveField(1)
   final String name; // English name
-
-  @HiveField(2)
   final String nameArabic; // Arabic name
-
-  @HiveField(3)
   final String author; // Compiler name
-
-  @HiveField(4)
   final String authorArabic; // Compiler name in Arabic
-
-  @HiveField(5)
   final int authorBirthYear;
-
-  @HiveField(6)
   final int authorDeathYear;
-
-  @HiveField(7)
   final String description;
-
-  @HiveField(8)
   final String descriptionArabic;
-
-  @HiveField(9)
   final int totalHadiths;
-
-  @HiveField(10)
   final int totalBooks;
-
-  @HiveField(11)
+  final int totalChapters;
   final CollectionAuthenticity authenticity;
-
-  @HiveField(12)
   final bool isDownloaded;
-
-  @HiveField(13)
   final String? localPath;
-
-  @HiveField(14)
   final List<String> availableLanguages;
-
-  @HiveField(15)
   final String coverImageUrl;
 
   const HadithCollection({
@@ -68,6 +35,7 @@ class HadithCollection extends HiveObject {
     required this.descriptionArabic,
     required this.totalHadiths,
     required this.totalBooks,
+    required this.totalChapters,
     required this.authenticity,
     this.isDownloaded = false,
     this.localPath,
@@ -75,16 +43,15 @@ class HadithCollection extends HiveObject {
     required this.coverImageUrl,
   });
 
-  /// Get display name with hadith count
   String get displayName => '$name ($totalHadiths hadiths)';
-
-  /// Get author lifespan
   String get authorLifespan => '$authorBirthYear–$authorDeathYear CE';
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is HadithCollection && runtimeType == other.runtimeType && id == other.id;
+      other is HadithCollection &&
+          runtimeType == other.runtimeType &&
+          id == other.id;
 
   @override
   int get hashCode => id.hashCode;
@@ -94,30 +61,19 @@ class HadithCollection extends HiveObject {
 }
 
 /// Authenticity level of a hadith collection
-@HiveType(typeId: 21)
 enum CollectionAuthenticity {
-  @HiveField(0)
   sahih, // Most authentic
-  @HiveField(1)
   hasan, // Good
-  @HiveField(2)
   mixed, // Contains various grades
-  @HiveField(3)
   weak, // Contains weak hadiths
 }
 
 /// Authenticity level of an individual hadith
-@HiveType(typeId: 21)
 enum HadithAuthenticity {
-  @HiveField(0)
   sahih, // Authentic
-  @HiveField(1)
   hasan, // Good
-  @HiveField(2)
   daif, // Weak
-  @HiveField(3)
   mawdu, // Fabricated
-  @HiveField(4)
   unknown, // Unknown
 }
 
@@ -169,39 +125,17 @@ extension HadithAuthenticityExtension on HadithAuthenticity {
 }
 
 /// Represents a Book within a Hadith collection (e.g., "Book of Prayer")
-@HiveType(typeId: 22)
-class HadithBook extends HiveObject {
-  @HiveField(0)
+class HadithBook {
   final String id;
-
-  @HiveField(1)
   final String collectionId;
-
-  @HiveField(2)
   final int bookNumber;
-
-  @HiveField(3)
   final String name;
-
-  @HiveField(4)
   final String nameArabic;
-
-  @HiveField(5)
-  final String? description;
-
-  @HiveField(6)
+  final String? bookDescription;
   final String? descriptionArabic;
-
-  @HiveField(7)
   final int hadithStartNumber;
-
-  @HiveField(8)
   final int hadithEndNumber;
-
-  @HiveField(9)
   final int totalHadiths;
-
-  @HiveField(10)
   final List<String> chapters; // Chapter names within this book
 
   const HadithBook({
@@ -210,13 +144,13 @@ class HadithBook extends HiveObject {
     required this.bookNumber,
     required this.name,
     required this.nameArabic,
-    this.description,
+    String? description,
     this.descriptionArabic,
     required this.hadithStartNumber,
     required this.hadithEndNumber,
     required this.totalHadiths,
     required this.chapters,
-  });
+  }) : bookDescription = description;
 
   String get displayName => 'Book $bookNumber: $name';
   String get range => '$hadithStartNumber–$hadithEndNumber';
@@ -226,7 +160,7 @@ class HadithBook extends HiveObject {
   String get title => name;
   int get hadithCount => totalHadiths;
   int get chapterCount => chapters.length;
-  String? get description => this.description;
+  String? get description => bookDescription;
 
   @override
   bool operator ==(Object other) =>
@@ -241,30 +175,14 @@ class HadithBook extends HiveObject {
 }
 
 /// Represents a Chapter within a Book
-@HiveType(typeId: 23)
-class HadithChapter extends HiveObject {
-  @HiveField(0)
+class HadithChapter {
   final String id;
-
-  @HiveField(1)
   final String bookId;
-
-  @HiveField(2)
   final int chapterNumber;
-
-  @HiveField(3)
   final String name;
-
-  @HiveField(4)
   final String nameArabic;
-
-  @HiveField(5)
   final int hadithStartNumber;
-
-  @HiveField(6)
   final int hadithEndNumber;
-
-  @HiveField(7)
   final int totalHadiths;
 
   const HadithChapter({
@@ -283,6 +201,7 @@ class HadithChapter extends HiveObject {
 
   // Aliases for compatibility
   int get startHadithNumber => hadithStartNumber;
+  int get endHadithNumber => hadithEndNumber;
   int get number => chapterNumber;
   String get nameEnglish => name;
   int get hadithCount => totalHadiths;
@@ -292,76 +211,37 @@ class HadithChapter extends HiveObject {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is HadithChapter && runtimeType == other.runtimeType && id == other.id;
+      other is HadithChapter &&
+          runtimeType == other.runtimeType &&
+          id == other.id;
 
   @override
   int get hashCode => id.hashCode;
 }
 
 /// Represents a single Hadith
-@HiveType(typeId: 24)
-class Hadith extends HiveObject {
-  @HiveField(0)
+class Hadith {
   final String id; // Unique identifier
-
-  @HiveField(1)
   final String collectionId;
-
-  @HiveField(2)
   final int bookNumber;
-
-  @HiveField(3)
   final int hadithNumber; // Number within the collection
-
-  @HiveField(4)
   final int? bookHadithNumber; // Number within the book
-
-  @HiveField(5)
   final String? chapterId;
-
-  @HiveField(6)
   final String textArabic;
-
-  @HiveField(7)
-  final Map<String, String> translations; // Key: language_code, Value: translated text
-
-  @HiveField(8)
+  final Map<String, String>
+      translations; // Key: language_code, Value: translated text
   final List<String> narrators; // Chain of narrators (isnad)
-
-  @HiveField(9)
   final String narratorChainArabic; // Full isnad in Arabic
-
-  @HiveField(10)
   final HadithGrade grade;
-
-  @HiveField(11)
   final String gradeDetails; // Explanation of grading
-
-  @HiveField(12)
   final List<String> topics; // Tags/categories
-
-  @HiveField(13)
   final List<String> keywords; // Search keywords
-
-  @HiveField(14)
   final String? reference; // e.g., "Bukhari 1234"
-
-  @HiveField(15)
   final String? referenceUrl; // Link to online source
-
-  @HiveField(16)
   final Map<String, String> audioUrls; // Key: reciter_id, Value: audio URL
-
-  @HiveField(17)
   final Duration? audioDuration;
-
-  @HiveField(18)
   final bool isFavorite;
-
-  @HiveField(19)
   final DateTime? addedToFavorites;
-
-  @HiveField(20)
   final Map<String, dynamic> metadata; // Additional flexible metadata
 
   const Hadith({
@@ -388,26 +268,24 @@ class Hadith extends HiveObject {
     required this.metadata,
   });
 
-  /// Get translation for a specific language
   String getTranslation(String languageCode) {
-    return translations[languageCode] ?? translations['en'] ?? translations.values.firstOrNull ?? '';
+    return translations[languageCode] ??
+        translations['en'] ??
+        translations.values.firstOrNull ??
+        '';
   }
 
-  /// Get audio URL for a specific reciter
   String? getAudioUrl(String reciterId) {
     return audioUrls[reciterId];
   }
 
-  /// Get formatted reference string
   String get formattedReference {
     if (reference != null) return reference!;
     return '$collectionId $hadithNumber';
   }
 
-  /// Get short reference for display
   String get shortReference => '$collectionId $hadithNumber';
 
-  /// Get display title (first few words of translation)
   String get displayTitle {
     final translation = getTranslation('en');
     if (translation.isEmpty) return formattedReference;
@@ -415,19 +293,15 @@ class Hadith extends HiveObject {
     return words.take(8).join(' ') + (words.length > 8 ? '...' : '');
   }
 
-  /// Arabic text getter (alias for textArabic)
   String get arabicText => textArabic;
-
-  /// Number in book getter (alias for bookHadithNumber or hadithNumber)
   int get numberInBook => bookHadithNumber ?? hadithNumber;
-
-  /// Collection name getter
   String get collectionName => collectionId.toUpperCase();
-
-  /// Is bookmarked getter (alias for isFavorite)
   bool get isBookmarked => isFavorite;
 
-  /// Authenticity getter based on grade
+  // Compatibility aliases
+  String get bookName => metadata['bookName'] as String? ?? '';
+  String get chapterName => metadata['chapterName'] as String? ?? '';
+
   HadithAuthenticity get authenticity {
     switch (grade) {
       case HadithGrade.sahih:
@@ -443,7 +317,6 @@ class Hadith extends HiveObject {
     }
   }
 
-  /// Reliability getter based on grade
   NarratorReliability get reliability {
     switch (grade) {
       case HadithGrade.sahih:
@@ -459,7 +332,6 @@ class Hadith extends HiveObject {
     }
   }
 
-  /// Volume number (from metadata if available)
   int? get volumeNumber {
     if (metadata.containsKey('volume')) {
       return metadata['volume'] as int?;
@@ -467,7 +339,6 @@ class Hadith extends HiveObject {
     return null;
   }
 
-  /// Page number (from metadata if available)
   int? get pageNumber {
     if (metadata.containsKey('page')) {
       return metadata['page'] as int?;
@@ -475,7 +346,6 @@ class Hadith extends HiveObject {
     return null;
   }
 
-  /// Notes (from metadata if available)
   String? get notes {
     if (metadata.containsKey('notes')) {
       return metadata['notes'] as String?;
@@ -483,16 +353,10 @@ class Hadith extends HiveObject {
     return null;
   }
 
-  /// Check if hadith is graded Sahih
   bool get isSahih => grade == HadithGrade.sahih;
-
-  /// Check if hadith is graded Hasan
   bool get isHasan => grade == HadithGrade.hasan;
-
-  /// Check if hadith is graded Da'if
   bool get isDaif => grade == HadithGrade.daif;
 
-  /// Create copy with updated fields
   Hadith copyWith({
     String? id,
     String? collectionId,
@@ -554,27 +418,17 @@ class Hadith extends HiveObject {
 }
 
 /// Hadith grading/strength
-@HiveType(typeId: 25)
 enum HadithGrade {
-  @HiveField(0)
   sahih, // Authentic
-  @HiveField(1)
   hasan, // Good
-  @HiveField(2)
   daif, // Weak
-  @HiveField(3)
   mawdu, // Fabricated
-  @HiveField(4)
   munkar, // Rejected
-  @HiveField(5)
   mudtarib, // Shaky
-  @HiveField(6)
   muallal, // Defective
-  @HiveField(7)
   unknown, // Not graded/unknown
 }
 
-/// Grade display info
 extension HadithGradeExtension on HadithGrade {
   String get displayName {
     switch (this) {
@@ -662,33 +516,15 @@ extension HadithGradeExtension on HadithGrade {
 }
 
 /// Bookmark for Hadith
-@HiveType(typeId: 26)
-class HadithBookmark extends HiveObject {
-  @HiveField(0)
+class HadithBookmark {
   final String id;
-
-  @HiveField(1)
   final String hadithId;
-
-  @HiveField(2)
   final String collectionId;
-
-  @HiveField(3)
   final int bookNumber;
-
-  @HiveField(4)
   final int hadithNumber;
-
-  @HiveField(5)
   final DateTime createdAt;
-
-  @HiveField(6)
   final String? note;
-
-  @HiveField(7)
   final BookmarkColor color;
-
-  @HiveField(8)
   final List<String> tags;
 
   const HadithBookmark({
@@ -708,27 +544,12 @@ class HadithBookmark extends HiveObject {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is HadithBookmark && runtimeType == other.runtimeType && id == other.id;
+      other is HadithBookmark &&
+          runtimeType == other.runtimeType &&
+          id == other.id;
 
   @override
   int get hashCode => id.hashCode;
-}
-
-/// Reuse BookmarkColor from Quran models
-@HiveType(typeId: 27)
-enum BookmarkColor {
-  @HiveField(0)
-  gold,
-  @HiveField(1)
-  green,
-  @HiveField(2)
-  blue,
-  @HiveField(3)
-  red,
-  @HiveField(4)
-  purple,
-  @HiveField(5)
-  orange,
 }
 
 /// Search result for Hadith
@@ -757,43 +578,20 @@ class HadithSearchResult {
 }
 
 /// Narrator (Rawi) information
-@HiveType(typeId: 28)
-class Narrator extends HiveObject {
-  @HiveField(0)
+class Narrator {
   final String id;
-
-  @HiveField(1)
   final String name;
-
-  @HiveField(2)
   final String nameArabic;
-
-  @HiveField(3)
   final String kunya; // e.g., "Abu Hurairah"
-
-  @HiveField(4)
   final int? birthYear;
-
-  @HiveField(5)
   final int? deathYear;
-
-  @HiveField(6)
   final String biography;
-
-  @HiveField(7)
   final String biographyArabic;
-
-  @HiveField(8)
   final NarratorReliability reliability;
-
-  @HiveField(9)
   final List<String> teachers; // Who they narrated from
-
-  @HiveField(10)
   final List<String> students; // Who narrated from them
-
-  @HiveField(11)
   final List<String> collections; // Which collections they appear in
+  final int? order; // Position in isnad chain
 
   const Narrator({
     required this.id,
@@ -808,6 +606,7 @@ class Narrator extends HiveObject {
     required this.teachers,
     required this.students,
     required this.collections,
+    this.order,
   });
 
   String get lifespan {
@@ -819,6 +618,10 @@ class Narrator extends HiveObject {
     return 'Unknown';
   }
 
+  // Compatibility aliases
+  String get birthDeath => lifespan;
+  int get narratorOrder => order ?? 1;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -829,23 +632,14 @@ class Narrator extends HiveObject {
 }
 
 /// Narrator reliability grading
-@HiveType(typeId: 29)
 enum NarratorReliability {
-  @HiveField(0)
   thiqa, // Trustworthy
-  @HiveField(1)
   saduq, // Truthful
-  @HiveField(2)
   hasan, // Good
-  @HiveField(3)
   daif, // Weak
-  @HiveField(4)
   matruk, // Abandoned
-  @HiveField(5)
   majhul, // Unknown
-  @HiveField(6)
   kadhdhab, // Liar
-  @HiveField(7)
   unknown, // Not graded/unknown
 }
 
@@ -859,7 +653,7 @@ extension NarratorReliabilityExtension on NarratorReliability {
       case NarratorReliability.hasan:
         return 'Hasan (Good)';
       case NarratorReliability.daif:
-        return 'Da\'if (Weak)';
+        return "Da'if (Weak)";
       case NarratorReliability.matruk:
         return 'Matruk (Abandoned)';
       case NarratorReliability.majhul:
@@ -880,7 +674,7 @@ extension NarratorReliabilityExtension on NarratorReliability {
       case NarratorReliability.hasan:
         return 'Hasan';
       case NarratorReliability.daif:
-        return 'Da\'if';
+        return "Da'if";
       case NarratorReliability.matruk:
         return 'Matruk';
       case NarratorReliability.majhul:
@@ -918,7 +712,7 @@ extension NarratorReliabilityExtension on NarratorReliability {
 @immutable
 class HadithFilter {
   final Set<String> collections;
-  final Set<CollectionAuthenticity> authenticities;
+  final Set<HadithAuthenticity> authenticities;
   final Set<HadithGrade> grades;
   final Set<String> topics;
   final bool bookmarkedOnly;
@@ -933,7 +727,7 @@ class HadithFilter {
 
   HadithFilter copyWith({
     Set<String>? collections,
-    Set<CollectionAuthenticity>? authenticities,
+    Set<HadithAuthenticity>? authenticities,
     Set<HadithGrade>? grades,
     Set<String>? topics,
     bool? bookmarkedOnly,
@@ -975,33 +769,17 @@ class HadithFilter {
 }
 
 /// Topic/Category for hadith classification
-@HiveType(typeId: 30)
-class HadithTopic extends HiveObject {
-  @HiveField(0)
+class HadithTopic {
   final String id;
-
-  @HiveField(1)
   final String name;
-
-  @HiveField(2)
   final String nameArabic;
-
-  @HiveField(3)
   final String? parentId; // For hierarchical topics
-
-  @HiveField(4)
   final int level; // 0 = top level
-
-  @HiveField(5)
   final String description;
-
-  @HiveField(6)
   final String descriptionArabic;
-
-  @HiveField(7)
   final int hadithCount;
-
-  @HiveField(8)
+  final int collectionCount;
+  final HadithGrade grade;
   final String iconName; // Material icon name
 
   const HadithTopic({
@@ -1013,13 +791,17 @@ class HadithTopic extends HiveObject {
     required this.description,
     required this.descriptionArabic,
     required this.hadithCount,
+    this.collectionCount = 0,
+    this.grade = HadithGrade.unknown,
     required this.iconName,
   });
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is HadithTopic && runtimeType == other.runtimeType && id == other.id;
+      other is HadithTopic &&
+          runtimeType == other.runtimeType &&
+          id == other.id;
 
   @override
   int get hashCode => id.hashCode;

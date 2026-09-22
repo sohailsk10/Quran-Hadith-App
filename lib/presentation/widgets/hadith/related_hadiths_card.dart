@@ -5,7 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../shared/models/hadith_models.dart';
+import '../../../shared/models/settings_models.dart';
 import '../../widgets/hadith/hadith_list_item.dart';
+import '../../../presentation/providers/app_providers.dart';
 
 class RelatedHadithsCard extends StatelessWidget {
   final List<Hadith> hadiths;
@@ -27,7 +29,8 @@ class RelatedHadithsCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppConstants.spacingMD),
+          padding:
+              const EdgeInsets.symmetric(horizontal: AppConstants.spacingMD),
           child: Row(
             children: [
               Icon(
@@ -150,8 +153,15 @@ class _RelatedHadithItem extends ConsumerWidget {
                     Text(
                       hadith.textArabic,
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        fontFamily: settings.valueOrNull?.quranDisplay.fontFamilyArabic ?? 'Uthmani',
-                        fontSize: (settings.valueOrNull?.quranDisplay.fontSizeArabic ?? 18) * 0.9,
+                        fontFamily: settings.valueOrNull?.hadithDisplay
+                                    .arabicFontSize !=
+                                null
+                            ? 'Amiri'
+                            : 'Amiri',
+                        fontSize: (settings.valueOrNull?.hadithDisplay
+                                    .arabicFontSize ??
+                                18) *
+                            0.9,
                         height: 1.8,
                       ),
                       textDirection: TextDirection.rtl,
@@ -165,7 +175,10 @@ class _RelatedHadithItem extends ConsumerWidget {
                   Text(
                     hadith.displayTitle,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      fontSize: (settings.valueOrNull?.quranDisplay.fontSizeTranslation ?? 14) * 0.9,
+                      fontSize: (settings.valueOrNull?.hadithDisplay
+                                  .translationFontSize ??
+                              14) *
+                          0.9,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -249,11 +262,16 @@ class RelatedHadithsList extends ConsumerWidget {
     return ListView.separated(
       padding: const EdgeInsets.all(AppConstants.spacingMD),
       itemCount: hadiths.length,
-      separatorBuilder: (context, index) => const SizedBox(height: AppConstants.spacingSM),
+      separatorBuilder: (context, index) =>
+          const SizedBox(height: AppConstants.spacingSM),
       itemBuilder: (context, index) {
         final hadith = hadiths[index];
+        final settings =
+            ref.watch(settingsProvider).valueOrNull?.hadithDisplay ??
+                const HadithDisplaySettings();
         return HadithListItem(
           hadith: hadith,
+          settings: settings,
           onTap: () => onHadithTap?.call(hadith),
         );
       },

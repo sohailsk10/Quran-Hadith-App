@@ -81,7 +81,8 @@ class AudioProgressBar extends StatelessWidget {
                 child: Container(
                   height: height,
                   decoration: BoxDecoration(
-                    color: bufferColor ?? theme.colorScheme.primary.withValues(alpha: 0.3),
+                    color: bufferColor ??
+                        theme.colorScheme.primary.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(height / 2),
                   ),
                 ),
@@ -95,7 +96,10 @@ class AudioProgressBar extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: progressColor != null
-                        ? [progressColor!, progressColor!.withValues(alpha: 0.7)]
+                        ? [
+                            progressColor!,
+                            progressColor!.withValues(alpha: 0.7)
+                          ]
                         : [
                             theme.colorScheme.primary,
                             theme.colorScheme.primary.withValues(alpha: 0.7),
@@ -185,7 +189,8 @@ class CircularAudioProgress extends StatelessWidget {
           CircularProgressIndicator(
             value: progress,
             strokeWidth: strokeWidth,
-            backgroundColor: backgroundColor ?? theme.colorScheme.surfaceContainerHighest,
+            backgroundColor:
+                backgroundColor ?? theme.colorScheme.surfaceContainerHighest,
             valueColor: AlwaysStoppedAnimation<Color>(
               progressColor ?? theme.colorScheme.primary,
             ),

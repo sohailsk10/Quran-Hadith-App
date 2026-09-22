@@ -1,61 +1,28 @@
 /// Settings and user preference models
 
-import 'package:flutter/foundation.dart';
-import 'package:hive/hive.dart';
-
-part 'settings_models.g.dart';
-
-/// App theme mode
-@HiveType(typeId: 40)
-enum ThemeMode {
-  @HiveField(0)
-  system,
-  @HiveField(1)
-  light,
-  @HiveField(2)
-  dark,
-}
+import 'package:flutter/material.dart';
+import '../../shared/models/hadith_models.dart';
 
 /// App language
-@HiveType(typeId: 41)
 enum AppLanguage {
-  @HiveField(0)
   english,
-  @HiveField(1)
   arabic,
-  @HiveField(2)
   urdu,
-  @HiveField(3)
   turkish,
-  @HiveField(4)
   indonesian,
-  @HiveField(5)
   malay,
-  @HiveField(6)
   bengali,
-  @HiveField(7)
   persian,
-  @HiveField(8)
   french,
-  @HiveField(9)
   german,
-  @HiveField(10)
   russian,
-  @HiveField(11)
   chinese,
-  @HiveField(12)
   spanish,
-  @HiveField(13)
   italian,
-  @HiveField(14)
   dutch,
-  @HiveField(15)
   portuguese,
-  @HiveField(16)
   swahili,
-  @HiveField(17)
   tamil,
-  @HiveField(18)
   malayalam,
 }
 
@@ -189,57 +156,39 @@ extension AppLanguageExtension on AppLanguage {
     }
   }
 
-  bool get isRTL => this == AppLanguage.arabic || this == AppLanguage.urdu || this == AppLanguage.persian;
+  bool get isRTL =>
+      this == AppLanguage.arabic ||
+      this == AppLanguage.urdu ||
+      this == AppLanguage.persian;
 }
 
 /// Quran font family options
-@HiveType(typeId: 42)
 enum QuranFontFamily {
-  @HiveField(0)
-  uthmani, // Classic Uthmani script
-  @HiveField(1)
-  indopak, // Indo-Pak script
-  @HiveField(2)
-  simple, // Simple Arabic
-  @HiveField(3)
-  amiri, // Amiri font
-  @HiveField(4)
-  notoNastaliq, // Noto Nastaliq Urdu
-  @HiveField(5)
-  scheherazade, // Scheherazade
-  @HiveField(6)
-  latex, // LaTeX-style
+  uthmani,
+  indopak,
+  simple,
+  amiri,
+  notoNastaliq,
+  scheherazade,
+  latex,
 }
 
 /// Audio repeat mode
-@HiveType(typeId: 43)
 enum AudioRepeatMode {
-  @HiveField(0)
   none,
-  @HiveField(1)
   ayah,
-  @HiveField(2)
   surah,
-  @HiveField(3)
   all,
 }
 
 /// Audio playback speed
-@HiveType(typeId: 44)
 enum PlaybackSpeed {
-  @HiveField(0)
   x0_5,
-  @HiveField(1)
   x0_75,
-  @HiveField(2)
   x1_0,
-  @HiveField(3)
   x1_25,
-  @HiveField(4)
   x1_5,
-  @HiveField(5)
   x1_75,
-  @HiveField(6)
   x2_0,
 }
 
@@ -284,64 +233,30 @@ extension PlaybackSpeedExtension on PlaybackSpeed {
 }
 
 /// Quran display options
-@HiveType(typeId: 45)
-class QuranDisplaySettings extends HiveObject {
-  @HiveField(0)
+class QuranDisplaySettings {
   final double fontSize;
-
-  @HiveField(1)
   final double translationFontSize;
-
-  @HiveField(2)
   final QuranFontFamily fontFamily;
-
-  @HiveField(3)
   final bool showArabic;
-
-  @HiveField(4)
   final bool showTranslation;
-
-  @HiveField(5)
   final bool showTransliteration;
-
-  @HiveField(6)
   final bool showAyahNumbers;
-
-  @HiveField(7)
   final bool showJuzMarkers;
-
-  @HiveField(8)
   final bool showHizbMarkers;
-
-  @HiveField(9)
   final bool showSajdahMarkers;
-
-  @HiveField(10)
   final bool showRukuMarkers;
-
-  @HiveField(11)
   final bool showPageNumbers;
-
-  @HiveField(12)
   final bool highlightCurrentAyah;
-
-  @HiveField(13)
   final bool autoScrollToAyah;
-
-  @HiveField(14)
   final double lineSpacing;
-
-  @HiveField(15)
   final double wordSpacing;
-
-  @HiveField(16)
   final bool nightMode;
-
-  @HiveField(17)
   final bool showBismillah;
-
-  @HiveField(18)
   final bool verseByVerse;
+  final bool highlightTajweed;
+  final String fontFamilyArabic;
+  final double fontSizeArabic;
+  final double fontSizeTranslation;
 
   const QuranDisplaySettings({
     this.fontSize = 18.0,
@@ -363,7 +278,17 @@ class QuranDisplaySettings extends HiveObject {
     this.nightMode = false,
     this.showBismillah = true,
     this.verseByVerse = false,
+    this.highlightTajweed = false,
+    this.fontFamilyArabic = 'Uthmani',
+    this.fontSizeArabic = 18.0,
+    this.fontSizeTranslation = 14.0,
   });
+
+  // Compatibility aliases
+  bool get showVerseNumbers => showAyahNumbers;
+  String get fontFamilyArabicCompat => fontFamilyArabic;
+  double get fontSizeArabicCompat => fontSizeArabic;
+  double get fontSizeTranslationCompat => fontSizeTranslation;
 
   QuranDisplaySettings copyWith({
     double? fontSize,
@@ -373,6 +298,7 @@ class QuranDisplaySettings extends HiveObject {
     bool? showTranslation,
     bool? showTransliteration,
     bool? showAyahNumbers,
+    bool? showVerseNumbers,
     bool? showJuzMarkers,
     bool? showHizbMarkers,
     bool? showSajdahMarkers,
@@ -385,6 +311,10 @@ class QuranDisplaySettings extends HiveObject {
     bool? nightMode,
     bool? showBismillah,
     bool? verseByVerse,
+    bool? highlightTajweed,
+    String? fontFamilyArabic,
+    double? fontSizeArabic,
+    double? fontSizeTranslation,
   }) {
     return QuranDisplaySettings(
       fontSize: fontSize ?? this.fontSize,
@@ -393,7 +323,8 @@ class QuranDisplaySettings extends HiveObject {
       showArabic: showArabic ?? this.showArabic,
       showTranslation: showTranslation ?? this.showTranslation,
       showTransliteration: showTransliteration ?? this.showTransliteration,
-      showAyahNumbers: showAyahNumbers ?? this.showAyahNumbers,
+      showAyahNumbers:
+          showAyahNumbers ?? showVerseNumbers ?? this.showAyahNumbers,
       showJuzMarkers: showJuzMarkers ?? this.showJuzMarkers,
       showHizbMarkers: showHizbMarkers ?? this.showHizbMarkers,
       showSajdahMarkers: showSajdahMarkers ?? this.showSajdahMarkers,
@@ -406,47 +337,27 @@ class QuranDisplaySettings extends HiveObject {
       nightMode: nightMode ?? this.nightMode,
       showBismillah: showBismillah ?? this.showBismillah,
       verseByVerse: verseByVerse ?? this.verseByVerse,
+      highlightTajweed: highlightTajweed ?? this.highlightTajweed,
+      fontFamilyArabic: fontFamilyArabic ?? this.fontFamilyArabic,
+      fontSizeArabic: fontSizeArabic ?? this.fontSizeArabic,
+      fontSizeTranslation: fontSizeTranslation ?? this.translationFontSize,
     );
   }
 }
 
 /// Audio settings
-@HiveType(typeId: 46)
-class AudioSettings extends HiveObject {
-  @HiveField(0)
+class AudioSettings {
   final String selectedReciterId;
-
-  @HiveField(1)
   final AudioRepeatMode repeatMode;
-
-  @HiveField(2)
   final PlaybackSpeed playbackSpeed;
-
-  @HiveField(3)
   final bool autoPlayNext;
-
-  @HiveField(4)
   final bool backgroundPlayback;
-
-  @HiveField(5)
   final bool downloadOnWifiOnly;
-
-  @HiveField(6)
   final bool showNotification;
-
-  @HiveField(7)
   final bool lockScreenControls;
-
-  @HiveField(8)
   final double volume;
-
-  @HiveField(9)
   final int skipSilenceThreshold; // milliseconds
-
-  @HiveField(10)
   final bool gaplessPlayback;
-
-  @HiveField(11)
   final bool rememberPosition;
 
   const AudioSettings({
@@ -496,47 +407,27 @@ class AudioSettings extends HiveObject {
 }
 
 /// Hadith display settings
-@HiveType(typeId: 47)
-class HadithDisplaySettings extends HiveObject {
-  @HiveField(0)
+class HadithDisplaySettings {
   final double fontSize;
-
-  @HiveField(1)
   final double arabicFontSize;
-
-  @HiveField(2)
+  final double translationFontSize;
   final bool showArabic;
-
-  @HiveField(3)
   final bool showTranslation;
-
-  @HiveField(4)
   final bool showNarratorChain;
-
-  @HiveField(5)
   final bool showGrade;
-
-  @HiveField(6)
   final bool showReference;
-
-  @HiveField(7)
   final bool showTopics;
-
-  @HiveField(8)
   final bool groupByBook;
-
-  @HiveField(9)
   final bool groupByChapter;
-
-  @HiveField(10)
   final bool compactMode;
-
-  @HiveField(11)
   final bool showDiacritics;
+  final bool showFullText;
+  final HadithGrade? minGrade;
 
   const HadithDisplaySettings({
     this.fontSize = 16.0,
     this.arabicFontSize = 18.0,
+    this.translationFontSize = 14.0,
     this.showArabic = true,
     this.showTranslation = true,
     this.showNarratorChain = true,
@@ -547,11 +438,14 @@ class HadithDisplaySettings extends HiveObject {
     this.groupByChapter = false,
     this.compactMode = false,
     this.showDiacritics = true,
+    this.showFullText = false,
+    this.minGrade = HadithGrade.unknown,
   });
 
   HadithDisplaySettings copyWith({
     double? fontSize,
     double? arabicFontSize,
+    double? translationFontSize,
     bool? showArabic,
     bool? showTranslation,
     bool? showNarratorChain,
@@ -562,10 +456,13 @@ class HadithDisplaySettings extends HiveObject {
     bool? groupByChapter,
     bool? compactMode,
     bool? showDiacritics,
+    bool? showFullText,
+    HadithGrade? minGrade,
   }) {
     return HadithDisplaySettings(
       fontSize: fontSize ?? this.fontSize,
       arabicFontSize: arabicFontSize ?? this.arabicFontSize,
+      translationFontSize: translationFontSize ?? this.translationFontSize,
       showArabic: showArabic ?? this.showArabic,
       showTranslation: showTranslation ?? this.showTranslation,
       showNarratorChain: showNarratorChain ?? this.showNarratorChain,
@@ -576,45 +473,27 @@ class HadithDisplaySettings extends HiveObject {
       groupByChapter: groupByChapter ?? this.groupByChapter,
       compactMode: compactMode ?? this.compactMode,
       showDiacritics: showDiacritics ?? this.showDiacritics,
+      showFullText: showFullText ?? this.showFullText,
+      minGrade: minGrade ?? this.minGrade,
     );
   }
 }
 
 /// Notification settings
-@HiveType(typeId: 48)
-class NotificationSettings extends HiveObject {
-  @HiveField(0)
+class NotificationSettings {
   final bool dailyVerseEnabled;
-
-  @HiveField(1)
   final TimeOfDay dailyVerseTime;
-
-  @HiveField(2)
   final bool dailyHadithEnabled;
-
-  @HiveField(3)
   final TimeOfDay dailyHadithTime;
-
-  @HiveField(4)
   final bool prayerTimesEnabled;
-
-  @HiveField(5)
   final bool prayerNotificationsEnabled;
-
-  @HiveField(6)
   final int prayerNotificationOffset; // minutes before prayer
-
-  @HiveField(7)
   final bool fridayReminderEnabled;
-
-  @HiveField(8)
   final bool ramadanRemindersEnabled;
-
-  @HiveField(9)
   final bool eidRemindersEnabled;
-
-  @HiveField(10)
   final bool downloadCompleteEnabled;
+  final bool quranReminder;
+  final String reminderTime;
 
   const NotificationSettings({
     this.dailyVerseEnabled = true,
@@ -628,72 +507,68 @@ class NotificationSettings extends HiveObject {
     this.ramadanRemindersEnabled = true,
     this.eidRemindersEnabled = true,
     this.downloadCompleteEnabled = true,
+    this.quranReminder = false,
+    this.reminderTime = '08:00',
   });
+
+  // Compatibility aliases
+  bool get dailyHadith => dailyHadithEnabled;
+  bool get prayerTimes => prayerTimesEnabled;
+  bool get quranReminderEnabled => quranReminder;
+  String get reminderTimeCompat => reminderTime;
 
   NotificationSettings copyWith({
     bool? dailyVerseEnabled,
     TimeOfDay? dailyVerseTime,
     bool? dailyHadithEnabled,
+    bool? dailyHadith,
     TimeOfDay? dailyHadithTime,
     bool? prayerTimesEnabled,
+    bool? prayerTimes,
     bool? prayerNotificationsEnabled,
     int? prayerNotificationOffset,
     bool? fridayReminderEnabled,
     bool? ramadanRemindersEnabled,
     bool? eidRemindersEnabled,
     bool? downloadCompleteEnabled,
+    bool? quranReminder,
+    String? reminderTime,
   }) {
     return NotificationSettings(
       dailyVerseEnabled: dailyVerseEnabled ?? this.dailyVerseEnabled,
       dailyVerseTime: dailyVerseTime ?? this.dailyVerseTime,
-      dailyHadithEnabled: dailyHadithEnabled ?? this.dailyHadithEnabled,
+      dailyHadithEnabled:
+          dailyHadithEnabled ?? dailyHadith ?? this.dailyHadithEnabled,
       dailyHadithTime: dailyHadithTime ?? this.dailyHadithTime,
-      prayerTimesEnabled: prayerTimesEnabled ?? this.prayerTimesEnabled,
-      prayerNotificationsEnabled: prayerNotificationsEnabled ?? this.prayerNotificationsEnabled,
-      prayerNotificationOffset: prayerNotificationOffset ?? this.prayerNotificationOffset,
-      fridayReminderEnabled: fridayReminderEnabled ?? this.fridayReminderEnabled,
-      ramadanRemindersEnabled: ramadanRemindersEnabled ?? this.ramadanRemindersEnabled,
+      prayerTimesEnabled:
+          prayerTimesEnabled ?? prayerTimes ?? this.prayerTimesEnabled,
+      prayerNotificationsEnabled:
+          prayerNotificationsEnabled ?? this.prayerNotificationsEnabled,
+      prayerNotificationOffset:
+          prayerNotificationOffset ?? this.prayerNotificationOffset,
+      fridayReminderEnabled:
+          fridayReminderEnabled ?? this.fridayReminderEnabled,
+      ramadanRemindersEnabled:
+          ramadanRemindersEnabled ?? this.ramadanRemindersEnabled,
       eidRemindersEnabled: eidRemindersEnabled ?? this.eidRemindersEnabled,
-      downloadCompleteEnabled: downloadCompleteEnabled ?? this.downloadCompleteEnabled,
+      downloadCompleteEnabled:
+          downloadCompleteEnabled ?? this.downloadCompleteEnabled,
+      quranReminder: quranReminder ?? this.quranReminder,
+      reminderTime: reminderTime ?? this.reminderTime,
     );
   }
 }
 
-/// TimeOfDay adapter for Hive
-@HiveType(typeId: 49)
-class TimeOfDayAdapter extends TypeAdapter<TimeOfDay> {
-  @override
-  final int typeId = 49;
-
-  @override
-  TimeOfDay read(BinaryReader reader) {
-    return TimeOfDay(hour: reader.readByte(), minute: reader.readByte());
-  }
-
-  @override
-  void write(BinaryWriter writer, TimeOfDay obj) {
-    writer.writeByte(obj.hour);
-    writer.writeByte(obj.minute);
-  }
-}
-
 /// Privacy settings
-@HiveType(typeId: 50)
-class PrivacySettings extends HiveObject {
-  @HiveField(0)
+class PrivacySettings {
   final bool analyticsEnabled;
-
-  @HiveField(1)
   final bool crashReportingEnabled;
-
-  @HiveField(2)
   final bool shareUsageData;
-
-  @HiveField(3)
   final bool personalizedContent;
-
-  @HiveField(4)
   final bool cloudSync;
+  final bool autoDownloadOnWifi;
+  final bool syncBookmarks;
+  final bool shareProgress;
 
   const PrivacySettings({
     this.analyticsEnabled = false,
@@ -701,59 +576,58 @@ class PrivacySettings extends HiveObject {
     this.shareUsageData = false,
     this.personalizedContent = false,
     this.cloudSync = false,
+    this.autoDownloadOnWifi = true,
+    this.syncBookmarks = false,
+    this.shareProgress = false,
   });
+
+  // Compatibility aliases
+  bool get analytics => analyticsEnabled;
+  bool get crashReporting => crashReportingEnabled;
+  bool get autoDownloadOnWifiEnabled => autoDownloadOnWifi;
+  bool get syncBookmarksEnabled => syncBookmarks;
+  bool get shareProgressEnabled => shareProgress;
 
   PrivacySettings copyWith({
     bool? analyticsEnabled,
+    bool? analytics,
     bool? crashReportingEnabled,
+    bool? crashReporting,
     bool? shareUsageData,
     bool? personalizedContent,
     bool? cloudSync,
+    bool? autoDownloadOnWifi,
+    bool? syncBookmarks,
+    bool? shareProgress,
   }) {
     return PrivacySettings(
-      analyticsEnabled: analyticsEnabled ?? this.analyticsEnabled,
-      crashReportingEnabled: crashReportingEnabled ?? this.crashReportingEnabled,
+      analyticsEnabled: analyticsEnabled ?? analytics ?? this.analyticsEnabled,
+      crashReportingEnabled:
+          crashReportingEnabled ?? crashReporting ?? this.crashReportingEnabled,
       shareUsageData: shareUsageData ?? this.shareUsageData,
       personalizedContent: personalizedContent ?? this.personalizedContent,
       cloudSync: cloudSync ?? this.cloudSync,
+      autoDownloadOnWifi: autoDownloadOnWifi ?? this.autoDownloadOnWifi,
+      syncBookmarks: syncBookmarks ?? this.syncBookmarks,
+      shareProgress: shareProgress ?? this.shareProgress,
     );
   }
 }
 
 /// Complete app settings
-@HiveType(typeId: 51)
-class AppSettings extends HiveObject {
-  @HiveField(0)
+class AppSettings {
   final ThemeMode themeMode;
-
-  @HiveField(1)
   final AppLanguage language;
-
-  @HiveField(2)
   final String selectedTranslationId;
-
-  @HiveField(3)
   final QuranDisplaySettings quranDisplay;
-
-  @HiveField(4)
   final AudioSettings audio;
-
-  @HiveField(5)
   final HadithDisplaySettings hadithDisplay;
-
-  @HiveField(6)
   final NotificationSettings notifications;
-
-  @HiveField(7)
   final PrivacySettings privacy;
-
-  @HiveField(8)
   final bool firstLaunch;
-
-  @HiveField(9)
+  final bool animationsEnabled;
+  final double fontScale;
   final DateTime? lastUpdated;
-
-  @HiveField(10)
   final int schemaVersion;
 
   const AppSettings({
@@ -766,6 +640,8 @@ class AppSettings extends HiveObject {
     NotificationSettings? notifications,
     PrivacySettings? privacy,
     this.firstLaunch = true,
+    this.animationsEnabled = true,
+    this.fontScale = 1.0,
     this.lastUpdated,
     this.schemaVersion = 1,
   })  : quranDisplay = quranDisplay ?? const QuranDisplaySettings(),
@@ -784,19 +660,24 @@ class AppSettings extends HiveObject {
     NotificationSettings? notifications,
     PrivacySettings? privacy,
     bool? firstLaunch,
+    bool? animationsEnabled,
+    double? fontScale,
     DateTime? lastUpdated,
     int? schemaVersion,
   }) {
     return AppSettings(
       themeMode: themeMode ?? this.themeMode,
       language: language ?? this.language,
-      selectedTranslationId: selectedTranslationId ?? this.selectedTranslationId,
+      selectedTranslationId:
+          selectedTranslationId ?? this.selectedTranslationId,
       quranDisplay: quranDisplay ?? this.quranDisplay,
       audio: audio ?? this.audio,
       hadithDisplay: hadithDisplay ?? this.hadithDisplay,
       notifications: notifications ?? this.notifications,
       privacy: privacy ?? this.privacy,
       firstLaunch: firstLaunch ?? this.firstLaunch,
+      animationsEnabled: animationsEnabled ?? this.animationsEnabled,
+      fontScale: fontScale ?? this.fontScale,
       lastUpdated: lastUpdated ?? DateTime.now(),
       schemaVersion: schemaVersion ?? this.schemaVersion,
     );

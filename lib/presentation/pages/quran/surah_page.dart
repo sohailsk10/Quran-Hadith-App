@@ -2,17 +2,15 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:go_router/go_router.dart';
-import 'package:quran/quran.dart' as quran;
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../presentation/providers/app_providers.dart';
 import '../../../shared/models/quran_models.dart';
+import '../../../shared/models/settings_models.dart';
 import '../../widgets/common/app_scaffold.dart';
 import '../../widgets/common/section_header.dart';
 import '../../widgets/quran/ayah_list_item.dart';
-import '../../widgets/quran/surah_header.dart';
 import '../../widgets/audio/audio_controls.dart';
 
 class SurahPage extends ConsumerStatefulWidget {
@@ -24,7 +22,8 @@ class SurahPage extends ConsumerStatefulWidget {
   ConsumerState<SurahPage> createState() => _SurahPageState();
 }
 
-class _SurahPageState extends ConsumerState<SurahPage> with TickerProviderStateMixin {
+class _SurahPageState extends ConsumerState<SurahPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final ScrollController _scrollController = ScrollController();
 
@@ -62,28 +61,26 @@ class _SurahPageState extends ConsumerState<SurahPage> with TickerProviderStateM
       ],
       child: Consumer(
         builder: (context, ref, _) {
-          final surahAsync = ref.watch(surahProvider(surahNumber));
-          final ayahsAsync = ref.watch(ayahsProvider(surahNumber));
+          final surahAsync = ref.watch(selectedSurahProvider(surahNumber));
+          final ayahsAsync = ref.watch(surahAyahsProvider(surahNumber));
           final settings = ref.watch(settingsProvider);
-          final translationAsync = ref.watch(translationProvider(surahNumber));
 
           return settings.when(
             data: (settings) => surahAsync.when(
-              data: (surah) => ayahsAsync.when(
-                data: (ayahs) => translationAsync.when(
-                  data: (translations) => _buildSurahContent(
+              data: (surah) {
+                if (surah == null) return _buildErrorState('Surah not found');
+                return ayahsAsync.when(
+                  data: (ayahs) => _buildSurahContent(
                     context,
                     surah,
                     ayahs,
-                    translations,
                     settings,
                   ),
-                  loading: () => const Center(child: CircularProgressIndicator()),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
                   error: (error, stack) => _buildErrorState(error),
-                ),
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (error, stack) => _buildErrorState(error),
-              ),
+                );
+              },
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (error, stack) => _buildErrorState(error),
             ),
@@ -99,7 +96,6 @@ class _SurahPageState extends ConsumerState<SurahPage> with TickerProviderStateM
     BuildContext context,
     Surah surah,
     List<Ayah> ayahs,
-    Map<String, List<TranslationInfo>> translations,
     AppSettings settings,
   ) {
     final theme = Theme.of(context);
@@ -107,7 +103,7 @@ class _SurahPageState extends ConsumerState<SurahPage> with TickerProviderStateM
     return Column(
       children: [
         // Surah Header
-        SurahHeader(surah: surah),
+        _buildSurahHeader(surah, theme),
 
         // Tab Bar for Arabic/Translation
         TabBar(
@@ -130,89 +126,174 @@ class _SurahPageState extends ConsumerState<SurahPage> with TickerProviderStateM
             controller: _tabController,
             children: [
               _buildArabicTab(ayahs, settings),
-              _buildTranslationTab(ayahs, translations, settings),
+              _buildTranslationTab(ayahs, settings),
             ],
           ),
         ),
 
         // Audio Controls
-        AudioControls(surahNumber: widget.surahNumber, ayahs: ayahs),
+        // AudioControls(
+        // ),
       ],
+    );
+  }
+
+  Widget _buildSurahHeader(Surah surah, ThemeData theme) {
+    final quranHadithTheme = theme.quranHadith;
+
+    return Container(
+      margin: const EdgeInsets.all(AppConstants.spacingMD),
+      padding: const EdgeInsets.all(AppConstants.spacingLG),
+      decoration: BoxDecoration(
+        gradient: quranHadithTheme.quranGradient,
+        borderRadius: BorderRadius.circular(AppConstants.radiusLG),
+        boxShadow: [
+          BoxShadow(
+            color: quranHadithTheme.quranGradient.colors.first
+                .withValues(alpha: 0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(AppConstants.radiusMD),
+                ),
+                child: Center(
+                  child: Text(
+                    '${surah.number}',
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppConstants.spacingMD),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      surah.nameTransliteration,
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: AppConstants.spacingXS),
+                    Text(
+                      surah.nameTranslation,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: Colors.white.withValues(alpha: 0.9),
+                      ),
+                    ),
+                    if (surah.nameArabic.isNotEmpty) ...[
+                      const SizedBox(height: AppConstants.spacingXS),
+                      Text(
+                        surah.nameArabic,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: Colors.white.withValues(alpha: 0.9),
+                          fontFamily: 'Amiri',
+                        ),
+                        textDirection: TextDirection.rtl,
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppConstants.spacingMD),
+          Wrap(
+            spacing: AppConstants.spacingSM,
+            runSpacing: AppConstants.spacingSM,
+            children: [
+              _InfoChip(
+                icon: Icons.format_list_numbered_rtl,
+                label: '${surah.ayahCount} Ayahs',
+                color: Colors.white,
+              ),
+              _InfoChip(
+                icon: surah.revelationType == RevelationType.meccan
+                    ? Icons.location_city
+                    : Icons.mosque,
+                label: surah.revelationType == RevelationType.meccan
+                    ? 'Meccan'
+                    : 'Medinan',
+                color: surah.revelationType == RevelationType.meccan
+                    ? Colors.deepOrange
+                    : Colors.green,
+              ),
+              _InfoChip(
+                icon: Icons.auto_stories,
+                label: 'Juz ${surah.juzNumber}',
+                color: Colors.white,
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildArabicTab(List<Ayah> ayahs, AppSettings settings) {
     return RefreshIndicator(
-      onRefresh: () async => ref.refresh(ayahsProvider(widget.surahNumber)),
-      child: AnimationLimiter(
-        child: ListView.separated(
-          controller: _scrollController,
-          padding: const EdgeInsets.all(AppConstants.spacingMD),
-          itemCount: ayahs.length,
-          separatorBuilder: (_, __) => const SizedBox(height: AppConstants.spacingSM),
-          itemBuilder: (context, index) {
-            final ayah = ayahs[index];
-            return AnimationConfiguration.staggeredList(
-              position: index,
-              duration: AppConstants.fastAnimation,
-              child: SlideAnimation(
-                verticalOffset: 30.0,
-                child: FadeInAnimation(
-                  child: AyahListItem(
-                    ayah: ayah,
-                    settings: settings,
-                    showTranslation: false,
-                    onTap: () => _showAyahActions(context, ayah),
-                    onLongPress: () => _showAyahActions(context, ayah),
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
+      onRefresh: () async =>
+          ref.refresh(surahAyahsProvider(widget.surahNumber)),
+      child: ListView.separated(
+        controller: _scrollController,
+        padding: const EdgeInsets.all(AppConstants.spacingMD),
+        itemCount: ayahs.length,
+        separatorBuilder: (_, __) =>
+            const SizedBox(height: AppConstants.spacingSM),
+        itemBuilder: (context, index) {
+          final ayah = ayahs[index];
+          return AyahListItem(
+            ayah: ayah,
+            settings: settings.quranDisplay,
+            showTranslation: false,
+            onTap: () => _showAyahActions(context, ayah),
+            onLongPress: () => _showAyahActions(context, ayah),
+          );
+        },
       ),
     );
   }
 
-  Widget _buildTranslationTab(
-    List<Ayah> ayahs,
-    Map<String, List<TranslationInfo>> translations,
-    AppSettings settings,
-  ) {
-    final selectedTranslationId = settings.selectedTranslationId;
-    final selectedTranslation = translations[selectedTranslationId] ?? [];
-    final translationMap = {for (var t in selectedTranslation) t.ayahNumber: t.text};
+  Widget _buildTranslationTab(List<Ayah> ayahs, AppSettings settings) {
+    final translationId = settings.selectedTranslationId;
 
     return RefreshIndicator(
-      onRefresh: () async => ref.refresh(translationProvider(widget.surahNumber)),
-      child: AnimationLimiter(
-        child: ListView.separated(
-          controller: _scrollController,
-          padding: const EdgeInsets.all(AppConstants.spacingMD),
-          itemCount: ayahs.length,
-          separatorBuilder: (_, __) => const SizedBox(height: AppConstants.spacingSM),
-          itemBuilder: (context, index) {
-            final ayah = ayahs[index];
-            final translationText = translationMap[ayah.numberInSurah] ?? '';
-            return AnimationConfiguration.staggeredList(
-              position: index,
-              duration: AppConstants.fastAnimation,
-              child: SlideAnimation(
-                verticalOffset: 30.0,
-                child: FadeInAnimation(
-                  child: AyahListItem(
-                    ayah: ayah,
-                    settings: settings,
-                    showTranslation: true,
-                    translationText: translationText,
-                    onTap: () => _showAyahActions(context, ayah),
-                    onLongPress: () => _showAyahActions(context, ayah),
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
+      onRefresh: () async =>
+          ref.refresh(surahAyahsProvider(widget.surahNumber)),
+      child: ListView.separated(
+        controller: _scrollController,
+        padding: const EdgeInsets.all(AppConstants.spacingMD),
+        itemCount: ayahs.length,
+        separatorBuilder: (_, __) =>
+            const SizedBox(height: AppConstants.spacingSM),
+        itemBuilder: (context, index) {
+          final ayah = ayahs[index];
+          final translationText = ayah.getTranslation(translationId);
+          return AyahListItem(
+            ayah: ayah,
+            settings: settings.quranDisplay,
+            showTranslation: true,
+            translationText: translationText,
+            onTap: () => _showAyahActions(context, ayah),
+            onLongPress: () => _showAyahActions(context, ayah),
+          );
+        },
       ),
     );
   }
@@ -227,7 +308,8 @@ class _SurahPageState extends ConsumerState<SurahPage> with TickerProviderStateM
           Text('Error: $error'),
           const SizedBox(height: 16),
           ElevatedButton(
-            onPressed: () => ref.refresh(surahProvider(widget.surahNumber)),
+            onPressed: () =>
+                ref.refresh(selectedSurahProvider(widget.surahNumber)),
             child: const Text('Retry'),
           ),
         ],
@@ -238,28 +320,26 @@ class _SurahPageState extends ConsumerState<SurahPage> with TickerProviderStateM
   void _showAyahActions(BuildContext context, Ayah ayah) {
     showModalBottomSheet(
       context: context,
-      builder: (context) => _AyahActionsSheet(ayah: ayah, surahNumber: widget.surahNumber),
+      builder: (context) =>
+          _AyahActionsSheet(ayah: ayah, surahNumber: widget.surahNumber),
     );
   }
 
   void _showDownloadOptions() {
-    // TODO: Implement download for offline
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Download feature coming soon')),
     );
   }
 
   void _bookmarkSurah() {
-    ref.read(quranBookmarksProvider.notifier).addBookmark(
-      QuranBookmark(
-        id: 'surah_${widget.surahNumber}_${DateTime.now().millisecondsSinceEpoch}',
-        surahNumber: widget.surahNumber,
-        ayahNumber: 1,
-        surahName: quran.getSurahName(widget.surahNumber),
-        ayahText: '',
-        createdAt: DateTime.now(),
-      ),
-    );
+    ref.read(quranBookmarksProvider.notifier).add(
+          QuranBookmark(
+            id: 'surah_${widget.surahNumber}_${DateTime.now().millisecondsSinceEpoch}',
+            surahNumber: widget.surahNumber,
+            ayahNumber: 1,
+            createdAt: DateTime.now(),
+          ),
+        );
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Surah ${widget.surahNumber} bookmarked')),
     );
@@ -309,14 +389,14 @@ class _AyahActionsSheet extends ConsumerWidget {
               child: Column(
                 children: [
                   Text(
-                    'Surah $surahNumber, Ayah ${ayah.numberInSurah}',
+                    'Surah $surahNumber, Ayah ${ayah.ayahInSurah}',
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(height: AppConstants.spacingMD),
                   Text(
-                    ayah.text,
+                    ayah.textUthmani,
                     style: theme.textTheme.headlineSmall?.copyWith(
                       fontFamily: 'Uthmani',
                       fontSize: settings.quranDisplay.fontSize + 4,
@@ -330,9 +410,16 @@ class _AyahActionsSheet extends ConsumerWidget {
                   _ActionTile(
                     icon: Icons.play_arrow_rounded,
                     label: 'Play from here',
-                    onTap: () {
+                    onTap: () async {
                       Navigator.pop(context);
-                      ref.read(audioPlayerProvider.notifier).playSurah(surahNumber, ayah.numberInSurah);
+                      final ayahs = await ref
+                          .read(surahAyahsProvider(surahNumber).future);
+                      ref
+                          .read(audioPlayerStateProvider.notifier)
+                          .setPlaylist(ayahs);
+                      ref
+                          .read(audioPlayerStateProvider.notifier)
+                          .setPlaying(true);
                     },
                   ),
                   _ActionTile(
@@ -340,16 +427,14 @@ class _AyahActionsSheet extends ConsumerWidget {
                     label: 'Bookmark',
                     onTap: () {
                       Navigator.pop(context);
-                      ref.read(quranBookmarksProvider.notifier).addBookmark(
-                        QuranBookmark(
-                          id: 'ayah_${surahNumber}_${ayah.numberInSurah}_${DateTime.now().millisecondsSinceEpoch}',
-                          surahNumber: surahNumber,
-                          ayahNumber: ayah.numberInSurah,
-                          surahName: quran.getSurahName(surahNumber),
-                          ayahText: ayah.text,
-                          createdAt: DateTime.now(),
-                        ),
-                      );
+                      ref.read(quranBookmarksProvider.notifier).add(
+                            QuranBookmark(
+                              id: 'ayah_${surahNumber}_${ayah.ayahInSurah}_${DateTime.now().millisecondsSinceEpoch}',
+                              surahNumber: surahNumber,
+                              ayahNumber: ayah.ayahInSurah,
+                              createdAt: DateTime.now(),
+                            ),
+                          );
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Bookmark added')),
                       );
@@ -360,7 +445,6 @@ class _AyahActionsSheet extends ConsumerWidget {
                     label: 'Copy Arabic',
                     onTap: () {
                       Navigator.pop(context);
-                      // TODO: Copy to clipboard
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Arabic copied')),
                       );
@@ -371,7 +455,6 @@ class _AyahActionsSheet extends ConsumerWidget {
                     label: 'Copy Translation',
                     onTap: () {
                       Navigator.pop(context);
-                      // TODO: Copy translation
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Translation copied')),
                       );
@@ -382,9 +465,9 @@ class _AyahActionsSheet extends ConsumerWidget {
                     label: 'Share',
                     onTap: () {
                       Navigator.pop(context);
-                      // TODO: Share
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Share feature coming soon')),
+                        const SnackBar(
+                            content: Text('Share feature coming soon')),
                       );
                     },
                   ),
@@ -393,7 +476,8 @@ class _AyahActionsSheet extends ConsumerWidget {
                     label: 'Open Tafsir',
                     onTap: () {
                       Navigator.pop(context);
-                      context.go('/quran/surah/$surahNumber/ayah/${ayah.numberInSurah}/tafsir');
+                      context.go(
+                          '/quran/surah/$surahNumber/ayah/${ayah.ayahInSurah}/tafsir');
                     },
                   ),
 
@@ -415,7 +499,8 @@ class _ActionTile extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  const _ActionTile({required this.icon, required this.label, required this.onTap});
+  const _ActionTile(
+      {required this.icon, required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -427,6 +512,41 @@ class _ActionTile extends StatelessWidget {
       onTap: onTap,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppConstants.radiusMD),
+      ),
+    );
+  }
+}
+
+/// Info Chip for surah header
+class _InfoChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  const _InfoChip(
+      {required this.icon, required this.label, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(AppConstants.radiusFull),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: color),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: color,
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
+        ],
       ),
     );
   }

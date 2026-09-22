@@ -14,7 +14,8 @@ class SplashPage extends ConsumerStatefulWidget {
   ConsumerState<SplashPage> createState() => _SplashPageState();
 }
 
-class _SplashPageState extends ConsumerState<SplashPage> with TickerProviderStateMixin {
+class _SplashPageState extends ConsumerState<SplashPage>
+    with TickerProviderStateMixin {
   late AnimationController _logoController;
   late AnimationController _textController;
   late AnimationController _progressController;
@@ -121,7 +122,8 @@ class _SplashPageState extends ConsumerState<SplashPage> with TickerProviderStat
                         height: 120,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(AppConstants.radiusLG),
+                          borderRadius:
+                              BorderRadius.circular(AppConstants.radiusLG),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withValues(alpha: 0.2),
@@ -193,10 +195,13 @@ class _SplashPageState extends ConsumerState<SplashPage> with TickerProviderStat
                         children: [
                           LinearProgressIndicator(
                             value: _progressAnimation.value,
-                            backgroundColor: Colors.white.withValues(alpha: 0.2),
-                            valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                            backgroundColor:
+                                Colors.white.withValues(alpha: 0.2),
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                                Colors.white),
                             minHeight: 4,
-                            borderRadius: BorderRadius.circular(AppConstants.radiusFull),
+                            borderRadius:
+                                BorderRadius.circular(AppConstants.radiusFull),
                           ),
                           const SizedBox(height: AppConstants.spacingMD),
                           Text(

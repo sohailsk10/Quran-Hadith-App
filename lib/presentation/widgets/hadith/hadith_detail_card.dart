@@ -1,11 +1,10 @@
 /// Hadith detail card widget
 
 import 'package:flutter/material.dart';
-import 'package:quran/quran.dart' as quran;
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../shared/models/hadith_models.dart';
-import 'related_hadiths_card.dart';
+import '../../../shared/models/settings_models.dart';
 
 class HadithDetailCard extends StatelessWidget {
   final Hadith hadith;
@@ -29,6 +28,11 @@ class HadithDetailCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final quranHadithTheme = theme.quranHadith;
+    final effectiveTranslation =
+        (translation != null && translation!.isNotEmpty)
+            ? translation!
+            : hadith.getTranslation('en');
+    final urduTranslation = hadith.translations['ur'] ?? '';
 
     return Container(
       padding: const EdgeInsets.all(AppConstants.spacingLG),
@@ -57,7 +61,8 @@ class HadithDetailCard extends StatelessWidget {
                       ? theme.colorScheme.primary
                       : theme.colorScheme.onSurfaceVariant,
                 ),
-                tooltip: hadith.isBookmarked ? 'Remove bookmark' : 'Add bookmark',
+                tooltip:
+                    hadith.isBookmarked ? 'Remove bookmark' : 'Add bookmark',
               ),
               IconButton(
                 onPressed: onShare,
@@ -80,7 +85,8 @@ class HadithDetailCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(AppConstants.spacingMD),
               decoration: BoxDecoration(
-                color: quranHadithTheme.hadithGradient.colors!.first.withValues(alpha: 0.1),
+                color: quranHadithTheme.hadithGradient.colors!.first
+                    .withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppConstants.radiusMD),
               ),
               child: Column(
@@ -145,24 +151,103 @@ class HadithDetailCard extends StatelessWidget {
           ],
 
           // Translation
-          if (translation != null && translation!.isNotEmpty) ...[
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(AppConstants.spacingMD),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(AppConstants.radiusMD),
-              ),
-              child: Text(
-                translation!,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  fontSize: settings.translationFontSize,
-                  height: 1.6,
-                  color: theme.colorScheme.onSurface,
+          if (effectiveTranslation.isNotEmpty || urduTranslation.isNotEmpty) ...[
+            if (effectiveTranslation.isNotEmpty) ...[
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(AppConstants.spacingMD),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(AppConstants.radiusMD),
+                  border: Border.all(
+                    color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.translate_rounded,
+                          size: 15,
+                          color: theme.colorScheme.primary,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          'English Translation',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppConstants.spacingSM),
+                    Text(
+                      effectiveTranslation,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontSize: settings.translationFontSize,
+                        height: 1.6,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-            const SizedBox(height: AppConstants.spacingLG),
+              const SizedBox(height: AppConstants.spacingMD),
+            ],
+
+            if (urduTranslation.isNotEmpty) ...[
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(AppConstants.spacingMD),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(AppConstants.radiusMD),
+                  border: Border.all(
+                    color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          'اردو ترجمہ (Urdu Translation)',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Icon(
+                          Icons.translate_rounded,
+                          size: 15,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppConstants.spacingSM),
+                    Text(
+                      urduTranslation,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontFamily: 'Amiri',
+                        fontSize: settings.translationFontSize + 2,
+                        height: 1.8,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                      textAlign: TextAlign.right,
+                      textDirection: TextDirection.rtl,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: AppConstants.spacingMD),
+            ],
+            const SizedBox(height: AppConstants.spacingSM),
           ],
 
           // Narrator Chain
@@ -177,7 +262,8 @@ class HadithDetailCard extends StatelessWidget {
               hadith.reference != null) ...[
             _DetailsSection(
               grade: hadith.grade,
-              arabicGrade: hadith.gradeDetails.isNotEmpty ? hadith.gradeDetails : null,
+              arabicGrade:
+                  hadith.gradeDetails.isNotEmpty ? hadith.gradeDetails : null,
               reference: hadith.reference,
               topics: hadith.topics,
             ),
@@ -202,7 +288,10 @@ class _AuthenticityBadge extends StatelessWidget {
       HadithAuthenticity.hasan => ('Hasan', Colors.blue),
       HadithAuthenticity.daif => ('Da\'if', Colors.orange),
       HadithAuthenticity.mawdu => ('Mawdu\'', Colors.red),
-      HadithAuthenticity.unknown => ('Unknown', theme.colorScheme.onSurfaceVariant),
+      HadithAuthenticity.unknown => (
+          'Unknown',
+          theme.colorScheme.onSurfaceVariant
+        ),
     };
 
     return Container(
@@ -264,7 +353,6 @@ class _DetailsSection extends StatelessWidget {
           ],
         ),
         const SizedBox(height: AppConstants.spacingMD),
-
         if (arabicGrade != null && arabicGrade!.isNotEmpty) ...[
           _DetailRow(
             label: 'Arabic Grade',
@@ -272,7 +360,6 @@ class _DetailsSection extends StatelessWidget {
           ),
           const SizedBox(height: AppConstants.spacingSM),
         ],
-
         if (reference != null && reference!.isNotEmpty) ...[
           _DetailRow(
             label: 'Reference',
@@ -280,7 +367,6 @@ class _DetailsSection extends StatelessWidget {
           ),
           const SizedBox(height: AppConstants.spacingSM),
         ],
-
         if (topics.isNotEmpty) ...[
           _DetailRow(
             label: 'Topics',
@@ -297,6 +383,9 @@ class _DetailsSection extends StatelessWidget {
       HadithGrade.hasan => Colors.blue,
       HadithGrade.daif => Colors.orange,
       HadithGrade.mawdu => Colors.red,
+      HadithGrade.munkar => Colors.deepOrange,
+      HadithGrade.mudtarib => Colors.purple,
+      HadithGrade.muallal => Colors.brown,
       HadithGrade.unknown => Colors.grey,
     };
   }
@@ -380,9 +469,9 @@ class _DetailRow extends StatelessWidget {
   }
 }
 
-/// Narrator chain card
+/// Narrator chain card - accepts both List<String> (simple names) and List<Narrator> (detailed)
 class NarratorChainCard extends StatelessWidget {
-  final List<Narrator> narrators;
+  final List<dynamic> narrators; // Can be List<String> or List<Narrator>
 
   const NarratorChainCard({
     super.key,
@@ -412,7 +501,8 @@ class NarratorChainCard extends StatelessWidget {
           physics: const NeverScrollableScrollPhysics(),
           itemCount: narrators.length,
           separatorBuilder: (context, index) => Padding(
-            padding: const EdgeInsets.symmetric(vertical: AppConstants.spacingXS),
+            padding:
+                const EdgeInsets.symmetric(vertical: AppConstants.spacingXS),
             child: Center(
               child: Icon(
                 Icons.keyboard_arrow_down_rounded,
@@ -422,11 +512,82 @@ class NarratorChainCard extends StatelessWidget {
             ),
           ),
           itemBuilder: (context, index) {
-            final narrator = narrators[index];
-            return _NarratorItem(narrator: narrator, isLast: index == narrators.length - 1);
+            final narratorData = narrators[index];
+            if (narratorData is Narrator) {
+              return _NarratorItem(
+                  narrator: narratorData,
+                  isLast: index == narrators.length - 1);
+            } else if (narratorData is String) {
+              return _SimpleNarratorItem(
+                  name: narratorData, isLast: index == narrators.length - 1);
+            }
+            return const SizedBox.shrink();
           },
         ),
       ],
+    );
+  }
+}
+
+/// Simple narrator item for string names
+class _SimpleNarratorItem extends StatelessWidget {
+  final String name;
+  final bool isLast;
+
+  const _SimpleNarratorItem({
+    required this.name,
+    required this.isLast,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: const EdgeInsets.all(AppConstants.spacingMD),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(AppConstants.radiusMD),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Number
+          Container(
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primaryContainer,
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Text(
+                '?',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onPrimaryContainer,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: AppConstants.spacingMD),
+
+          // Narrator Info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -484,15 +645,16 @@ class _NarratorItem extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                if (narrator.kunya != null && narrator.kunya!.isNotEmpty)
+                if (narrator.kunya.isNotEmpty)
                   Text(
-                    narrator.kunya!,
+                    narrator.kunya,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                       fontStyle: FontStyle.italic,
                     ),
                   ),
-                if (narrator.birthDeath != null && narrator.birthDeath!.isNotEmpty)
+                if (narrator.birthDeath != null &&
+                    narrator.birthDeath!.isNotEmpty)
                   Text(
                     narrator.birthDeath!,
                     style: theme.textTheme.labelSmall?.copyWith(
@@ -522,12 +684,17 @@ class _ReliabilityBadge extends StatelessWidget {
     final theme = Theme.of(context);
 
     final (label, color) = switch (reliability) {
-      NarratorReliability.thiqah => ('Thiqah', Colors.green),
+      NarratorReliability.thiqa => ('Thiqa', Colors.green),
       NarratorReliability.saduq => ('Saduq', Colors.blue),
-      NarratorReliability.saqr => ('Saqr', Colors.amber),
-      NarratorReliability.majhul => ('Majhul', Colors.orange),
+      NarratorReliability.hasan => ('Hasan', Colors.lightBlue),
       NarratorReliability.daif => ('Da\'if', Colors.red),
-      NarratorReliability.unknown => ('Unknown', theme.colorScheme.onSurfaceVariant),
+      NarratorReliability.matruk => ('Matruk', Colors.deepOrange),
+      NarratorReliability.majhul => ('Majhul', Colors.orange),
+      NarratorReliability.kadhdhab => ('Kadhdhab', Colors.red.shade800),
+      NarratorReliability.unknown => (
+          'Unknown',
+          theme.colorScheme.onSurfaceVariant
+        ),
     };
 
     return Container(
@@ -546,4 +713,3 @@ class _ReliabilityBadge extends StatelessWidget {
     );
   }
 }
-

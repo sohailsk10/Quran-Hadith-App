@@ -24,17 +24,15 @@ class BookCard extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(AppConstants.radiusLG),
       child: Container(
-        width: 160,
         padding: const EdgeInsets.all(AppConstants.spacingMD),
         decoration: BoxDecoration(
           color: theme.colorScheme.surfaceContainerHigh,
           borderRadius: BorderRadius.circular(AppConstants.radiusLG),
           border: Border.all(color: theme.colorScheme.outlineVariant),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
           children: [
-            // Book Icon
+            // Book Number / Icon Container
             Container(
               width: 48,
               height: 48,
@@ -42,82 +40,90 @@ class BookCard extends StatelessWidget {
                 gradient: quranHadithTheme.hadithGradient,
                 borderRadius: BorderRadius.circular(AppConstants.radiusMD),
               ),
-              child: const Icon(
-                Icons.menu_book_rounded,
-                color: Colors.white,
-                size: 24,
-              ),
-            ),
-            const Spacer(),
-
-            // Book Number
-            Text(
-              'Book ${book.number}',
-              style: theme.textTheme.labelMedium?.copyWith(
-                color: theme.colorScheme.primary,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: AppConstants.spacingXS),
-
-            // Book Name
-            Text(
-              book.name,
-              style: theme.textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-
-            // Arabic Name
-            if (book.nameArabic.isNotEmpty) ...[
-              const SizedBox(height: AppConstants.spacingXS),
-              Text(
-                book.nameArabic,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                  fontFamily: 'Amiri',
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textDirection: TextDirection.rtl,
-              ),
-            ],
-
-            const SizedBox(height: AppConstants.spacingSM),
-
-            // Stats
-            Row(
-              children: [
-                Icon(
-                  Icons.article_outlined,
-                  size: 14,
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  '${book.hadithCount} hadiths',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+              child: Center(
+                child: Text(
+                  '${book.number}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
                   ),
                 ),
-                const Spacer(),
-                if (book.chapterCount > 0) ...[
-                  Icon(
-                    Icons.list_alt_rounded,
-                    size: 14,
-                    color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(width: AppConstants.spacingMD),
+
+            // Book Details
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          book.name,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (book.nameArabic.isNotEmpty) ...[
+                        const SizedBox(width: AppConstants.spacingSM),
+                        Text(
+                          book.nameArabic,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.primary,
+                            fontFamily: 'Amiri',
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textDirection: TextDirection.rtl,
+                        ),
+                      ],
+                    ],
                   ),
-                  const SizedBox(width: 4),
-                  Text(
-                    '${book.chapterCount} chapters',
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
+                  const SizedBox(height: AppConstants.spacingXS),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.article_outlined,
+                        size: 14,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${book.hadithCount} hadiths',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      if (book.chapterCount > 0) ...[
+                        const SizedBox(width: AppConstants.spacingMD),
+                        Icon(
+                          Icons.list_alt_rounded,
+                          size: 14,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${book.chapterCount} chapters',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ],
-              ],
+              ),
+            ),
+            const SizedBox(width: AppConstants.spacingSM),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ],
         ),
