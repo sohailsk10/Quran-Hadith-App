@@ -9,6 +9,7 @@ import '../../../presentation/providers/app_providers.dart';
 import '../../../shared/models/hadith_models.dart';
 import '../../../shared/models/settings_models.dart';
 import '../../widgets/common/app_scaffold.dart';
+import '../../widgets/common/reading_settings_sheet.dart';
 import '../../widgets/hadith/hadith_list_item.dart';
 
 class BookPage extends ConsumerStatefulWidget {
@@ -44,6 +45,16 @@ class _BookPageState extends ConsumerState<BookPage>
   Widget build(BuildContext context) {
     return AppScaffold(
       title: 'Book ${widget.bookNumber}',
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.tune_rounded),
+          tooltip: 'Reading Settings',
+          onPressed: () => showReadingSettingsSheet(
+            context,
+            ReadingSettingsMode.hadith,
+          ),
+        ),
+      ],
       child: Consumer(
         builder: (context, ref, _) {
           final booksAsync =

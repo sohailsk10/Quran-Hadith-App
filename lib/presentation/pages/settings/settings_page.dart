@@ -10,6 +10,7 @@ import '../../../shared/models/hadith_models.dart';
 import '../../../shared/models/settings_models.dart';
 import '../../widgets/common/app_scaffold.dart';
 import '../../widgets/common/section_header.dart';
+import '../../widgets/quran/country_wise_translation_selector.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
@@ -247,6 +248,13 @@ class _SettingsPageState extends ConsumerState<SettingsPage>
           SectionHeader(title: 'Display Options'),
           const SizedBox(height: AppConstants.spacingMD),
           _buildDisplayOption(
+            'Show Translation',
+            'Display ayah translations alongside Arabic text',
+            quranSettings.showTranslation,
+            (value) =>
+                ref.read(settingsProvider.notifier).toggleTranslation(value),
+          ),
+          _buildDisplayOption(
             'Show Verse Numbers',
             'Display ayah numbers in the text',
             quranSettings.showAyahNumbers,
@@ -291,31 +299,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage>
           // Default Translation
           SectionHeader(title: 'Default Translation'),
           const SizedBox(height: AppConstants.spacingMD),
-          Consumer(
-            builder: (context, ref, _) {
-              final translationsAsync = ref.watch(translationsProvider);
-              return translationsAsync.when(
-                data: (translations) => Wrap(
-                  spacing: AppConstants.spacingSM,
-                  runSpacing: AppConstants.spacingSM,
-                  children: translations.map((t) {
-                    final isSelected = t.id == settings.selectedTranslationId;
-                    return FilterChip(
-                      label: Text(t.name),
-                      selected: isSelected,
-                      onSelected: (_) => ref
-                          .read(settingsProvider.notifier)
-                          .updateTranslation(t.id),
-                      selectedColor: theme.colorScheme.primaryContainer,
-                      checkmarkColor: theme.colorScheme.onPrimaryContainer,
-                    );
-                  }).toList(),
-                ),
-                loading: () => const CircularProgressIndicator(),
-                error: (_, __) => const Text('Error loading translations'),
-              );
-            },
-          ),
+          const CountryWiseTranslationSelector(),
         ],
       ),
     );
@@ -373,6 +357,13 @@ class _SettingsPageState extends ConsumerState<SettingsPage>
           // Display Options
           SectionHeader(title: 'Display Options'),
           const SizedBox(height: AppConstants.spacingMD),
+          _buildDisplayOption(
+            'Show Translation',
+            'Display hadith translations (English & Urdu)',
+            hadithSettings.showTranslation,
+            (value) =>
+                ref.read(settingsProvider.notifier).toggleTranslation(value),
+          ),
           _buildDisplayOption(
             'Show Arabic Text',
             'Display original Arabic alongside translation',

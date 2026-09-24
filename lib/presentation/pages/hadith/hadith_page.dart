@@ -272,11 +272,12 @@ class _FilterBottomSheet extends ConsumerWidget {
     final theme = Theme.of(context);
     final settings = ref.watch(settingsProvider);
 
-    return settings.when(
-      data: (settings) => Container(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
+    return DraggableScrollableSheet(
+      initialChildSize: 0.7,
+      minChildSize: 0.4,
+      maxChildSize: 0.9,
+      expand: false,
+      builder: (context, scrollController) => Container(
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
           borderRadius: const BorderRadius.vertical(
@@ -284,7 +285,6 @@ class _FilterBottomSheet extends ConsumerWidget {
           ),
         ),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
             // Drag handle
             Container(
@@ -297,94 +297,116 @@ class _FilterBottomSheet extends ConsumerWidget {
               ),
             ),
 
+            // Header
             Padding(
-              padding: const EdgeInsets.all(AppConstants.spacingLG),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppConstants.spacingLG,
+                vertical: AppConstants.spacingSM,
+              ),
+              child: Row(
                 children: [
+                  Icon(Icons.tune_rounded, color: theme.colorScheme.primary),
+                  const SizedBox(width: AppConstants.spacingSM),
                   Text(
-                    'Filters',
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
+                    'Hadith Filters',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(height: AppConstants.spacingLG),
-
-                  // Grade Filter
-                  Text(
-                    'Minimum Grade',
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded),
+                    onPressed: () => Navigator.pop(context),
                   ),
-                  const SizedBox(height: AppConstants.spacingMD),
-                  Wrap(
-                    spacing: AppConstants.spacingSM,
-                    runSpacing: AppConstants.spacingSM,
-                    children: HadithGrade.values
-                        .where((g) => g != HadithGrade.unknown)
-                        .map((grade) {
-                      final minGradeIndex =
-                          settings.hadithDisplay.minGrade?.index ??
-                              HadithGrade.unknown.index;
-                      final isSelected = minGradeIndex <= grade.index;
-                      return FilterChip(
-                        label: Text(grade.arabicName),
-                        selected: isSelected,
-                        onSelected: (_) {
-                          ref
-                              .read(settingsProvider.notifier)
-                              .updateHadithDisplay(
-                                settings.hadithDisplay
-                                    .copyWith(minGrade: grade),
-                              );
-                          Navigator.pop(context);
-                        },
-                        selectedColor: theme.colorScheme.primaryContainer,
-                        checkmarkColor: theme.colorScheme.onPrimaryContainer,
-                      );
-                    }).toList(),
-                  ),
-
-                  const SizedBox(height: AppConstants.spacingLG),
-
-                  // Language Filter
-                  Text(
-                    'Language',
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: AppConstants.spacingMD),
-                  Wrap(
-                    spacing: AppConstants.spacingSM,
-                    runSpacing: AppConstants.spacingSM,
-                    children: AppLanguage.values.map((lang) {
-                      final isSelected = lang == settings.language;
-                      return FilterChip(
-                        label: Text(lang.name),
-                        selected: isSelected,
-                        onSelected: (_) {
-                          ref
-                              .read(settingsProvider.notifier)
-                              .updateLanguage(lang);
-                          Navigator.pop(context);
-                        },
-                        selectedColor: theme.colorScheme.primaryContainer,
-                        checkmarkColor: theme.colorScheme.onPrimaryContainer,
-                      );
-                    }).toList(),
-                  ),
-
-                  const SizedBox(height: AppConstants.spacingLG),
                 ],
+              ),
+            ),
+
+            const Divider(height: 1),
+
+            // Scrollable Content
+            Expanded(
+              child: settings.when(
+                data: (settings) => ListView(
+                  controller: scrollController,
+                  padding: const EdgeInsets.all(AppConstants.spacingLG),
+                  children: [
+                    // Grade Filter
+                    Text(
+                      'Minimum Grade',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: AppConstants.spacingMD),
+                    Wrap(
+                      spacing: AppConstants.spacingSM,
+                      runSpacing: AppConstants.spacingSM,
+                      children: HadithGrade.values
+                          .where((g) => g != HadithGrade.unknown)
+                          .map((grade) {
+                        final minGradeIndex =
+                            settings.hadithDisplay.minGrade?.index ??
+                                HadithGrade.unknown.index;
+                        final isSelected = minGradeIndex <= grade.index;
+                        return FilterChip(
+                          label: Text(grade.arabicName),
+                          selected: isSelected,
+                          onSelected: (_) {
+                            ref
+                                .read(settingsProvider.notifier)
+                                .updateHadithDisplay(
+                                  settings.hadithDisplay
+                                      .copyWith(minGrade: grade),
+                                );
+                          },
+                          selectedColor: theme.colorScheme.primaryContainer,
+                          checkmarkColor: theme.colorScheme.onPrimaryContainer,
+                        );
+                      }).toList(),
+                    ),
+
+                    const SizedBox(height: AppConstants.spacingXL),
+
+                    // Language Filter
+                    Text(
+                      'Language',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: AppConstants.spacingMD),
+                    Wrap(
+                      spacing: AppConstants.spacingSM,
+                      runSpacing: AppConstants.spacingSM,
+                      children: AppLanguage.values.map((lang) {
+                        final isSelected = lang == settings.language;
+                        return FilterChip(
+                          label: Text(lang.name),
+                          selected: isSelected,
+                          onSelected: (_) {
+                            ref
+                                .read(settingsProvider.notifier)
+                                .updateLanguage(lang);
+                          },
+                          selectedColor: theme.colorScheme.primaryContainer,
+                          checkmarkColor: theme.colorScheme.onPrimaryContainer,
+                        );
+                      }).toList(),
+                    ),
+
+                    const SizedBox(height: AppConstants.spacingXXL),
+                  ],
+                ),
+                loading: () =>
+                    const Center(child: CircularProgressIndicator()),
+                error: (_, __) =>
+                    const Center(child: Text('Error loading settings')),
               ),
             ),
           ],
         ),
       ),
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (_, __) => const Center(child: Text('Error loading settings')),
     );
   }
 }

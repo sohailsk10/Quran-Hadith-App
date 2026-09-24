@@ -8,6 +8,7 @@ import '../../../presentation/providers/app_providers.dart';
 import '../../../shared/models/hadith_models.dart';
 import '../../../shared/models/settings_models.dart';
 import '../../widgets/common/app_scaffold.dart';
+import '../../widgets/common/reading_settings_sheet.dart';
 import '../../widgets/hadith/hadith_detail_card.dart' hide NarratorChainCard;
 import '../../widgets/hadith/narrator_chain_card.dart';
 import '../../widgets/hadith/related_hadiths_card.dart';
@@ -45,12 +46,12 @@ class _HadithDetailPageState extends ConsumerState<HadithDetailPage>
       title: 'Hadith Detail',
       actions: [
         IconButton(
-          icon: const Icon(Icons.share_outlined),
-          onPressed: () => _shareHadith(),
-        ),
-        IconButton(
-          icon: const Icon(Icons.bookmark_add_outlined),
-          onPressed: () => _bookmarkHadith(),
+          icon: const Icon(Icons.tune_rounded),
+          tooltip: 'Reading Settings',
+          onPressed: () => showReadingSettingsSheet(
+            context,
+            ReadingSettingsMode.hadith,
+          ),
         ),
       ],
       child: Consumer(
@@ -118,38 +119,46 @@ class _HadithDetailPageState extends ConsumerState<HadithDetailPage>
     List<Hadith> relatedHadiths,
     AppSettings settings,
   ) {
-    return Column(
-      children: [
-        // Hadith Detail Card
-        HadithDetailCard(
-          hadith: hadith,
-          settings: settings.hadithDisplay,
-          onBookmarkToggle: _bookmarkHadith,
-          onShare: _shareHadith,
-        ),
+    final theme = Theme.of(context);
 
-        // Tab Bar
-        TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(icon: Icon(Icons.account_tree), text: 'Narrators'),
-            Tab(icon: Icon(Icons.link), text: 'Related'),
-            Tab(icon: Icon(Icons.info_outline), text: 'Details'),
-          ],
-        ),
-
-        // Tab Views
-        Expanded(
-          child: TabBarView(
-            controller: _tabController,
-            children: [
-              _buildNarratorsTab(narrators, settings),
-              _buildRelatedTab(relatedHadiths, settings),
-              _buildDetailsTab(hadith, settings),
-            ],
+    return NestedScrollView(
+      headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+        return <Widget>[
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(AppConstants.spacingMD),
+              child: HadithDetailCard(
+                hadith: hadith,
+                settings: settings.hadithDisplay,
+                onBookmarkToggle: _bookmarkHadith,
+                onShare: _shareHadith,
+              ),
+            ),
           ),
-        ),
-      ],
+          SliverPersistentHeader(
+            pinned: true,
+            delegate: _SliverTabBarDelegate(
+              TabBar(
+                controller: _tabController,
+                tabs: const [
+                  Tab(icon: Icon(Icons.account_tree), text: 'Narrators'),
+                  Tab(icon: Icon(Icons.link), text: 'Related'),
+                  Tab(icon: Icon(Icons.info_outline), text: 'Details'),
+                ],
+              ),
+              color: theme.scaffoldBackgroundColor,
+            ),
+          ),
+        ];
+      },
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _buildNarratorsTab(narrators, settings),
+          _buildRelatedTab(relatedHadiths, settings),
+          _buildDetailsTab(hadith, settings),
+        ],
+      ),
     );
   }
 
@@ -196,12 +205,15 @@ class _HadithDetailPageState extends ConsumerState<HadithDetailPage>
       );
     }
 
-    return RelatedHadithsCard(
-      hadiths: relatedHadiths,
-      onHadithTap: (hadith) {
-        context.go(
-            '/hadith/collection/${hadith.collectionId}/hadith/${hadith.hadithNumber}');
-      },
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(vertical: AppConstants.spacingMD),
+      child: RelatedHadithsCard(
+        hadiths: relatedHadiths,
+        onHadithTap: (hadith) {
+          context.go(
+              '/hadith/collection/${hadith.collectionId}/hadith/${hadith.hadithNumber}');
+        },
+      ),
     );
   }
 
@@ -541,5 +553,31 @@ class _DetailRow extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class _SliverTabBarDelegate extends SliverPersistentHeaderDelegate {
+  final TabBar tabBar;
+  final Color color;
+
+  _SliverTabBarDelegate(this.tabBar, {required this.color});
+
+  @override
+  double get minExtent => tabBar.preferredSize.height;
+  @override
+  double get maxExtent => tabBar.preferredSize.height;
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(
+      color: color,
+      child: tabBar,
+    );
+  }
+
+  @override
+  bool shouldRebuild(_SliverTabBarDelegate oldDelegate) {
+    return tabBar != oldDelegate.tabBar || color != oldDelegate.color;
   }
 }

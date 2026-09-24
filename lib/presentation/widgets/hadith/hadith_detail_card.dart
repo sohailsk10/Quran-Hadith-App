@@ -151,7 +151,8 @@ class HadithDetailCard extends StatelessWidget {
           ],
 
           // Translation
-          if (effectiveTranslation.isNotEmpty || urduTranslation.isNotEmpty) ...[
+          if (settings.showTranslation &&
+              (effectiveTranslation.isNotEmpty || urduTranslation.isNotEmpty)) ...[
             if (effectiveTranslation.isNotEmpty) ...[
               Container(
                 width: double.infinity,

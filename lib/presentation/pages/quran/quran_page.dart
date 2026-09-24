@@ -11,6 +11,7 @@ import '../../widgets/common/section_header.dart';
 import '../../widgets/quran/surah_list_item.dart';
 import '../../widgets/quran/juz_list_item.dart';
 import '../../widgets/quran/quran_search_bar.dart';
+import '../../widgets/quran/country_wise_translation_selector.dart';
 
 class QuranPage extends ConsumerStatefulWidget {
   final int? initialJuz;
@@ -51,7 +52,6 @@ class _QuranPageState extends ConsumerState<QuranPage>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final settings = ref.watch(settingsProvider);
 
     return AppScaffold(
@@ -276,11 +276,12 @@ class _FilterBottomSheet extends ConsumerWidget {
     final theme = Theme.of(context);
     final settings = ref.watch(settingsProvider);
 
-    return settings.when(
-      data: (settings) => Container(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
+    return DraggableScrollableSheet(
+      initialChildSize: 0.85,
+      minChildSize: 0.5,
+      maxChildSize: 0.95,
+      expand: false,
+      builder: (context, scrollController) => Container(
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
           borderRadius: const BorderRadius.vertical(
@@ -288,7 +289,6 @@ class _FilterBottomSheet extends ConsumerWidget {
           ),
         ),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
             // Drag handle
             Container(
@@ -301,135 +301,191 @@ class _FilterBottomSheet extends ConsumerWidget {
               ),
             ),
 
+            // Sheet Title & Close button
             Padding(
-              padding: const EdgeInsets.all(AppConstants.spacingLG),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppConstants.spacingLG,
+                vertical: AppConstants.spacingSM,
+              ),
+              child: Row(
                 children: [
+                  Icon(Icons.tune_rounded, color: theme.colorScheme.primary),
+                  const SizedBox(width: AppConstants.spacingSM),
                   Text(
                     'Filters',
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(height: AppConstants.spacingLG),
-
-                  // Translation Filter
-                  Text(
-                    'Translation',
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded),
+                    onPressed: () => Navigator.pop(context),
                   ),
-                  const SizedBox(height: AppConstants.spacingMD),
-                  Consumer(
-                    builder: (context, ref, _) {
-                      final translationsAsync = ref.watch(translationsProvider);
-                      return translationsAsync.when(
-                        data: (translations) => Wrap(
-                          spacing: AppConstants.spacingSM,
-                          runSpacing: AppConstants.spacingSM,
-                          children: translations.map((t) {
-                            final isSelected =
-                                t.id == settings.selectedTranslationId;
-                            return FilterChip(
-                              label: Text(t.name),
-                              selected: isSelected,
-                              onSelected: (_) {
-                                ref
-                                    .read(settingsProvider.notifier)
-                                    .updateTranslation(t.id);
-                                Navigator.pop(context);
-                              },
-                              selectedColor: theme.colorScheme.primaryContainer,
-                              checkmarkColor:
-                                  theme.colorScheme.onPrimaryContainer,
-                            );
-                          }).toList(),
-                        ),
-                        loading: () => const CircularProgressIndicator(),
-                        error: (_, __) =>
-                            const Text('Error loading translations'),
-                      );
-                    },
-                  ),
-
-                  const SizedBox(height: AppConstants.spacingLG),
-
-                  // Reciter Filter
-                  Text(
-                    'Reciter',
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: AppConstants.spacingMD),
-                  Consumer(
-                    builder: (context, ref, _) {
-                      final recitersAsync = ref.watch(recitersProvider);
-                      return recitersAsync.when(
-                        data: (reciters) => Wrap(
-                          spacing: AppConstants.spacingSM,
-                          runSpacing: AppConstants.spacingSM,
-                          children: reciters.map((r) {
-                            final isSelected =
-                                r.id == settings.audio.selectedReciterId;
-                            return FilterChip(
-                              label: Text(r.name),
-                              selected: isSelected,
-                              onSelected: (_) {
-                                ref
-                                    .read(settingsProvider.notifier)
-                                    .updateAudioSettings(
-                                      settings.audio
-                                          .copyWith(selectedReciterId: r.id),
-                                    );
-                                Navigator.pop(context);
-                              },
-                              selectedColor: theme.colorScheme.primaryContainer,
-                              checkmarkColor:
-                                  theme.colorScheme.onPrimaryContainer,
-                            );
-                          }).toList(),
-                        ),
-                        loading: () => const CircularProgressIndicator(),
-                        error: (_, __) => const Text('Error loading reciters'),
-                      );
-                    },
-                  ),
-
-                  const SizedBox(height: AppConstants.spacingLG),
-
-                  // Font Size
-                  Text(
-                    'Arabic Font Size',
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: AppConstants.spacingMD),
-                  Slider(
-                    value: settings.quranDisplay.fontSize,
-                    min: 12,
-                    max: 36,
-                    divisions: 24,
-                    label: '${settings.quranDisplay.fontSize.toInt()}',
-                    onChanged: (value) {
-                      ref.read(settingsProvider.notifier).updateQuranDisplay(
-                            settings.quranDisplay.copyWith(fontSize: value),
-                          );
-                    },
-                  ),
-
-                  const SizedBox(height: AppConstants.spacingLG),
                 ],
+              ),
+            ),
+
+            const Divider(height: 1),
+
+            // Scrollable Content
+            Expanded(
+              child: settings.when(
+                data: (settings) => ListView(
+                  controller: scrollController,
+                  padding: const EdgeInsets.all(AppConstants.spacingLG),
+                  children: [
+                    // Translation Section
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.translate_rounded,
+                          size: 20,
+                          color: theme.colorScheme.primary,
+                        ),
+                        const SizedBox(width: AppConstants.spacingSM),
+                        Text(
+                          'Translation',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Grouped by scholar / compiler country of origin',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: AppConstants.spacingMD),
+
+                    // Country-wise Translation Selector
+                    const CountryWiseTranslationSelector(),
+
+                    const SizedBox(height: AppConstants.spacingXL),
+
+                    // Reciter Section
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.record_voice_over_rounded,
+                          size: 20,
+                          color: theme.colorScheme.primary,
+                        ),
+                        const SizedBox(width: AppConstants.spacingSM),
+                        Text(
+                          'Reciter',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppConstants.spacingMD),
+                    Consumer(
+                      builder: (context, ref, _) {
+                        final recitersAsync = ref.watch(recitersProvider);
+                        return recitersAsync.when(
+                          data: (reciters) => Wrap(
+                            spacing: AppConstants.spacingSM,
+                            runSpacing: AppConstants.spacingSM,
+                            children: reciters.map((r) {
+                              final isSelected =
+                                  r.id == settings.audio.selectedReciterId;
+                              return FilterChip(
+                                label: Text(r.name),
+                                selected: isSelected,
+                                onSelected: (_) {
+                                  ref
+                                      .read(settingsProvider.notifier)
+                                      .updateAudioSettings(
+                                        settings.audio
+                                            .copyWith(selectedReciterId: r.id),
+                                      );
+                                },
+                                selectedColor:
+                                    theme.colorScheme.primaryContainer,
+                                checkmarkColor:
+                                    theme.colorScheme.onPrimaryContainer,
+                              );
+                            }).toList(),
+                          ),
+                          loading: () => const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(AppConstants.spacingMD),
+                              child: CircularProgressIndicator(),
+                            ),
+                          ),
+                          error: (_, __) =>
+                              const Text('Error loading reciters'),
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: AppConstants.spacingXL),
+
+                    // Font Size Section
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.format_size_rounded,
+                          size: 20,
+                          color: theme.colorScheme.primary,
+                        ),
+                        const SizedBox(width: AppConstants.spacingSM),
+                        Text(
+                          'Arabic Font Size',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const Spacer(),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primaryContainer,
+                            borderRadius:
+                                BorderRadius.circular(AppConstants.radiusFull),
+                          ),
+                          child: Text(
+                            '${settings.quranDisplay.fontSizeArabic.round()}',
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              color: theme.colorScheme.onPrimaryContainer,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppConstants.spacingSM),
+                    Slider(
+                      value: settings.quranDisplay.fontSizeArabic,
+                      min: 12,
+                      max: 40,
+                      divisions: 28,
+                      label: '${settings.quranDisplay.fontSizeArabic.toInt()}',
+                      onChanged: (value) {
+                        ref.read(settingsProvider.notifier).updateQuranDisplay(
+                              settings.quranDisplay
+                                  .copyWith(fontSizeArabic: value),
+                            );
+                      },
+                    ),
+
+                    const SizedBox(height: AppConstants.spacingXXL),
+                  ],
+                ),
+                loading: () =>
+                    const Center(child: CircularProgressIndicator()),
+                error: (e, _) => Center(child: Text('Error: $e')),
               ),
             ),
           ],
         ),
       ),
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (_, __) => const Center(child: Text('Error loading settings')),
     );
   }
 }

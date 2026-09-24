@@ -372,6 +372,8 @@ class _HomePageState extends ConsumerState<HomePage> {
       child: Consumer(
         builder: (context, ref, _) {
           final randomHadithAsync = ref.watch(randomHadithProvider);
+          final settings =
+              ref.watch(settingsProvider).valueOrNull ?? const AppSettings();
 
           return randomHadithAsync.when(
             data: (hadith) {
@@ -383,8 +385,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                     vertical: AppConstants.spacingMD),
                 child: _RandomHadithCard(
                   hadith: hadith,
+                  showTranslation: settings.hadithDisplay.showTranslation,
                   onTap: () => context.go(
-                      '/hadith/collection/${hadith.collectionId}/hadith/${hadith.hadithNumber}'),
+                      '/hadith/collection/${hadith.collectionId}/book/${hadith.bookNumber}/hadith/${hadith.hadithNumber}'),
                   onRefresh: () => ref.refresh(randomHadithProvider),
                 ),
               );
@@ -662,11 +665,13 @@ class _CollectionCard extends StatelessWidget {
 /// Random Hadith Card
 class _RandomHadithCard extends StatelessWidget {
   final Hadith hadith;
+  final bool showTranslation;
   final VoidCallback onTap;
   final VoidCallback onRefresh;
 
   const _RandomHadithCard({
     required this.hadith,
+    this.showTranslation = true,
     required this.onTap,
     required this.onRefresh,
   });
@@ -675,6 +680,11 @@ class _RandomHadithCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final quranHadithTheme = theme.quranHadith;
+    final translationText = hadith.getTranslation('en');
+    final displayText = (showTranslation && translationText.isNotEmpty)
+        ? translationText
+        : hadith.arabicText;
+    final isArabic = !showTranslation || translationText.isEmpty;
 
     return InkWell(
       onTap: onTap,
@@ -724,11 +734,15 @@ class _RandomHadithCard extends StatelessWidget {
             ),
             const SizedBox(height: AppConstants.spacingMD),
             Text(
-              hadith.getTranslation('en'),
+              displayText,
               style: theme.textTheme.bodyLarge?.copyWith(
                 color: Colors.white,
-                height: 1.6,
+                fontFamily: isArabic ? 'Amiri' : null,
+                height: isArabic ? 1.8 : 1.6,
               ),
+              textDirection:
+                  isArabic ? TextDirection.rtl : TextDirection.ltr,
+              textAlign: isArabic ? TextAlign.right : TextAlign.left,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
             ),

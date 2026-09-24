@@ -118,6 +118,14 @@ class SettingsNotifier extends AsyncNotifier<AppSettings> {
     await updateSettings(current.copyWith(hadithDisplay: hadithDisplay));
   }
 
+  Future<void> toggleTranslation(bool enabled) async {
+    final current = state.valueOrNull ?? const AppSettings();
+    await updateSettings(current.copyWith(
+      quranDisplay: current.quranDisplay.copyWith(showTranslation: enabled),
+      hadithDisplay: current.hadithDisplay.copyWith(showTranslation: enabled),
+    ));
+  }
+
   Future<void> updateNotifications(NotificationSettings notifications) async {
     final current = state.valueOrNull ?? const AppSettings();
     await updateSettings(current.copyWith(notifications: notifications));

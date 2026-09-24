@@ -9,6 +9,7 @@ import '../../../presentation/providers/app_providers.dart';
 import '../../../shared/models/quran_models.dart';
 import '../../../shared/models/settings_models.dart';
 import '../../widgets/common/app_scaffold.dart';
+import '../../widgets/common/reading_settings_sheet.dart';
 import '../../widgets/common/section_header.dart';
 import '../../widgets/quran/ayah_list_item.dart';
 import '../../widgets/audio/audio_controls.dart';
@@ -49,14 +50,12 @@ class _SurahPageState extends ConsumerState<SurahPage>
       title: 'Surah $surahNumber',
       actions: [
         IconButton(
-          icon: const Icon(Icons.download_outlined),
-          onPressed: () => _showDownloadOptions(),
-          tooltip: 'Download for offline',
-        ),
-        IconButton(
-          icon: const Icon(Icons.bookmark_add_outlined),
-          onPressed: () => _bookmarkSurah(),
-          tooltip: 'Bookmark Surah',
+          icon: const Icon(Icons.tune_rounded),
+          tooltip: 'Reading Settings',
+          onPressed: () => showReadingSettingsSheet(
+            context,
+            ReadingSettingsMode.quran,
+          ),
         ),
       ],
       child: Consumer(
@@ -288,7 +287,7 @@ class _SurahPageState extends ConsumerState<SurahPage>
           return AyahListItem(
             ayah: ayah,
             settings: settings.quranDisplay,
-            showTranslation: true,
+            showTranslation: settings.quranDisplay.showTranslation,
             translationText: translationText,
             onTap: () => _showAyahActions(context, ayah),
             onLongPress: () => _showAyahActions(context, ayah),

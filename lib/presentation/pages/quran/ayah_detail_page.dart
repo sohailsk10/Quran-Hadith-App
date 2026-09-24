@@ -8,6 +8,7 @@ import '../../../presentation/providers/app_providers.dart';
 import '../../../shared/models/quran_models.dart';
 import '../../../shared/models/settings_models.dart';
 import '../../widgets/common/app_scaffold.dart';
+import '../../widgets/common/reading_settings_sheet.dart';
 
 class AyahDetailPage extends ConsumerStatefulWidget {
   final int surahNumber;
@@ -42,12 +43,12 @@ class _AyahDetailPageState extends ConsumerState<AyahDetailPage>
       title: 'Ayah Detail',
       actions: [
         IconButton(
-          icon: const Icon(Icons.share_outlined),
-          onPressed: () => _shareAyah(),
-        ),
-        IconButton(
-          icon: const Icon(Icons.bookmark_add_outlined),
-          onPressed: () => _bookmarkAyah(),
+          icon: const Icon(Icons.tune_rounded),
+          tooltip: 'Reading Settings',
+          onPressed: () => showReadingSettingsSheet(
+            context,
+            ReadingSettingsMode.quran,
+          ),
         ),
       ],
       child: Consumer(
@@ -223,18 +224,20 @@ class _AyahDetailPageState extends ConsumerState<AyahDetailPage>
           const SizedBox(height: AppConstants.spacingLG),
 
           // Arabic Text
-          Text(
-            ayah.textUthmani,
-            style: theme.textTheme.displaySmall?.copyWith(
-              fontFamily: 'Uthmani',
-              fontSize: settings.quranDisplay.fontSize + 4,
-              height: 2.0,
+          if (settings.quranDisplay.showArabic) ...[
+            Text(
+              ayah.textUthmani,
+              style: theme.textTheme.displaySmall?.copyWith(
+                fontFamily: 'Uthmani',
+                fontSize: settings.quranDisplay.fontSizeArabic + 4,
+                height: 2.0,
+              ),
+              textAlign: TextAlign.center,
+              textDirection: TextDirection.rtl,
             ),
-            textAlign: TextAlign.center,
-            textDirection: TextDirection.rtl,
-          ),
+          ],
 
-          if (translation.isNotEmpty) ...[
+          if (settings.quranDisplay.showTranslation && translation.isNotEmpty) ...[
             const SizedBox(height: AppConstants.spacingLG),
             Container(
               width: double.infinity,
@@ -246,7 +249,7 @@ class _AyahDetailPageState extends ConsumerState<AyahDetailPage>
               child: Text(
                 translation,
                 style: theme.textTheme.bodyLarge?.copyWith(
-                  fontSize: settings.quranDisplay.translationFontSize + 2,
+                  fontSize: settings.quranDisplay.fontSizeTranslation + 2,
                   height: 1.6,
                 ),
                 textAlign: TextAlign.center,

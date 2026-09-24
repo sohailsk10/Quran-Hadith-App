@@ -125,12 +125,12 @@ class AyahListItem extends StatelessWidget {
             const SizedBox(height: AppConstants.spacingMD),
 
             // Arabic Text
-            if (ayah.text.isNotEmpty) ...[
+            if (ayah.text.isNotEmpty && settings.showArabic) ...[
               Text(
                 ayah.text,
                 style: theme.textTheme.bodyLarge?.copyWith(
                   fontFamily: 'Uthmani',
-                  fontSize: settings.fontSize,
+                  fontSize: settings.fontSizeArabic,
                   height: 2.0,
                   fontWeight: FontWeight.w400,
                 ),
@@ -151,6 +151,7 @@ class AyahListItem extends StatelessWidget {
 
             // Translation
             if (showTranslation &&
+                settings.showTranslation &&
                 translationText != null &&
                 translationText!.isNotEmpty) ...[
               Container(
