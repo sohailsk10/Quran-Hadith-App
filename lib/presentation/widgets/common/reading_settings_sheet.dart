@@ -5,9 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/utils/translation_country_mapper.dart';
+import '../../../core/utils/reciter_country_mapper.dart';
+import '../../../core/services/quran_audio_service.dart';
 import '../../../presentation/providers/app_providers.dart';
 import '../../../shared/models/settings_models.dart';
 import '../quran/country_wise_translation_selector.dart';
+import '../audio/country_wise_reciter_selector.dart';
 
 enum ReadingSettingsMode { quran, hadith }
 
@@ -217,6 +220,75 @@ class _ReadingSettingsSheet extends ConsumerWidget {
                               Padding(
                                 padding: EdgeInsets.all(AppConstants.spacingMD),
                                 child: CountryWiseTranslationSelector(
+                                  showSearch: true,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+
+                // ── RECITATIONS (AUDIO) section ───────────────────
+                if (isQuran) ...[
+                  const SizedBox(height: AppConstants.spacingLG),
+                  _sectionLabel(theme, 'Recitations (Audio)'),
+                  const SizedBox(height: AppConstants.spacingSM),
+                  Consumer(
+                    builder: (context, ref, _) {
+                      final recitersAsync = ref.watch(recitersProvider);
+                      final audioState = ref.watch(quranAudioProvider);
+                      final currentId = audioState.currentReciterId;
+                      final standard =
+                          ReciterCountryMapper.getStandardReciters();
+                      final allReciters =
+                          recitersAsync.valueOrNull ?? standard;
+                      final currentR = allReciters
+                              .where((r) =>
+                                  r.id == currentId ||
+                                  r.apiId.toString() == currentId ||
+                                  (currentId == 'ar.alafasy' && r.id == '7') ||
+                                  (currentId == 'ar.abdulbasit' &&
+                                      r.id == '2') ||
+                                  (currentId == 'ar.sudais' && r.id == '3') ||
+                                  (currentId == 'ar.husary' && r.id == '6') ||
+                                  (currentId == 'ar.minshawi' && r.id == '9'))
+                              .firstOrNull ??
+                          standard.first;
+
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surfaceContainerHigh,
+                          borderRadius:
+                              BorderRadius.circular(AppConstants.radiusMD),
+                          border: Border.all(
+                            color: theme.colorScheme.outlineVariant
+                                .withValues(alpha: 0.5),
+                          ),
+                        ),
+                        child: ClipRRect(
+                          borderRadius:
+                              BorderRadius.circular(AppConstants.radiusMD),
+                          child: ExpansionTile(
+                            leading:
+                                const Icon(Icons.record_voice_over_rounded),
+                            title: Text(
+                              '${currentR.countryFlag} ${currentR.name}',
+                              style: theme.textTheme.bodyMedium
+                                  ?.copyWith(fontWeight: FontWeight.w600),
+                            ),
+                            subtitle: Text(
+                              '${currentR.countryName} • ${currentR.style.name.toUpperCase()}',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                            children: const [
+                              Padding(
+                                padding: EdgeInsets.all(AppConstants.spacingMD),
+                                child: CountryWiseReciterSelector(
                                   showSearch: true,
                                 ),
                               ),

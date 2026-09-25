@@ -1,8 +1,8 @@
 /// Common app scaffold with consistent styling
 
 import 'package:flutter/material.dart';
-import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../router/app_router.dart';
 
 class AppScaffold extends StatelessWidget {
   final String title;
@@ -35,7 +35,12 @@ class AppScaffold extends StatelessWidget {
                 icon: const Icon(Icons.arrow_back_rounded),
                 onPressed: () => Navigator.of(context).pop(),
               )
-            : null,
+            : IconButton(
+                icon: const Icon(Icons.menu_rounded),
+                onPressed: () {
+                  MainShell.scaffoldKey.currentState?.openDrawer();
+                },
+              ),
         actions: actions,
         elevation: 0,
         scrolledUnderElevation: AppConstants.spacingXS,

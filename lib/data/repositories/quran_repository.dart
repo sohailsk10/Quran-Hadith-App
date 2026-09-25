@@ -5,6 +5,7 @@ import '../datasources/remote/quran_remote_datasource.dart';
 import '../../shared/models/quran_models.dart';
 import '../../shared/models/settings_models.dart';
 import '../../core/constants/app_constants.dart';
+import '../../core/utils/reciter_country_mapper.dart';
 
 class QuranRepository {
   final QuranLocalDataSource _localDataSource;
@@ -147,14 +148,33 @@ class QuranRepository {
   // ============ RECITERS ============
 
   Future<List<ReciterInfo>> getAllReciters({bool forceRefresh = false}) async {
+    final standard = ReciterCountryMapper.getStandardReciters();
     if (!forceRefresh) {
       final local = _localDataSource.getAllReciters();
-      if (local.isNotEmpty) return local;
+      if (local.isNotEmpty) {
+        final missing =
+            standard.where((s) => !local.any((r) => r.id == s.id)).toList();
+        if (missing.isEmpty) return local;
+        final merged = [...local, ...missing];
+        await _localDataSource.saveReciters(merged);
+        return merged;
+      }
     }
 
-    final remote = await _remoteDataSource.fetchReciters();
-    await _localDataSource.saveReciters(remote);
-    return remote;
+    try {
+      final remote = await _remoteDataSource.fetchReciters();
+      final combined = [...remote];
+      for (final s in standard) {
+        if (!combined.any((r) => r.id == s.id || r.name == s.name)) {
+          combined.add(s);
+        }
+      }
+      await _localDataSource.saveReciters(combined);
+      return combined;
+    } catch (_) {
+      await _localDataSource.saveReciters(standard);
+      return standard;
+    }
   }
 
   // ============ AUDIO ============

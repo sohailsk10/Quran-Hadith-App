@@ -105,6 +105,19 @@ final routerProvider = Provider<GoRouter>((ref) {
                 },
                 routes: [
                   GoRoute(
+                    path: 'hadith/:hadithNumber',
+                    name: 'collection-hadith-detail',
+                    builder: (context, state) {
+                      final collectionId =
+                          state.pathParameters['collectionId']!;
+                      final hadithNumber =
+                          int.parse(state.pathParameters['hadithNumber']!);
+                      return HadithDetailPage(
+                          collectionId: collectionId,
+                          hadithNumber: hadithNumber);
+                    },
+                  ),
+                  GoRoute(
                     path: 'book/:bookNumber',
                     name: 'book',
                     builder: (context, state) {
@@ -200,94 +213,189 @@ final routerProvider = Provider<GoRouter>((ref) {
   );
 });
 
-/// Main shell with bottom navigation
+/// Main shell with hamburger menu drawer
 class MainShell extends ConsumerWidget {
   final Widget child;
 
   const MainShell({super.key, required this.child});
 
+  static final GlobalKey<ScaffoldState> scaffoldKey =
+      GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
+      key: scaffoldKey,
+      drawer: const _AppDrawer(),
       body: child,
-      bottomNavigationBar: _BottomNavBar(),
     );
   }
 }
 
-class _BottomNavBar extends ConsumerWidget {
+class _AppDrawer extends ConsumerWidget {
+  const _AppDrawer();
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final location = GoRouterState.of(context).uri.toString();
+
+    return Drawer(
+      child: Column(
+        children: [
+          // Drawer Header
+          DrawerHeader(
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primary,
+            ),
+            child: SizedBox(
+              width: double.infinity,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Icon(
+                    Icons.auto_stories_rounded,
+                    size: 48,
+                    color: theme.colorScheme.onPrimary,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Quran & Hadith',
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      color: theme.colorScheme.onPrimary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Learn • Read • Reflect',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onPrimary.withValues(alpha: 0.8),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Menu Items
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                _DrawerItem(
+                  icon: Icons.home_outlined,
+                  selectedIcon: Icons.home,
+                  label: 'Home',
+                  isSelected: location == '/home' || location == '/',
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    context.go('/home');
+                  },
+                ),
+                _DrawerItem(
+                  icon: Icons.menu_book_outlined,
+                  selectedIcon: Icons.menu_book,
+                  label: 'Quran',
+                  isSelected: location.startsWith('/quran'),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    context.go('/quran');
+                  },
+                ),
+                _DrawerItem(
+                  icon: Icons.library_books_outlined,
+                  selectedIcon: Icons.library_books,
+                  label: 'Hadith',
+                  isSelected: location.startsWith('/hadith'),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    context.go('/hadith');
+                  },
+                ),
+                _DrawerItem(
+                  icon: Icons.search_outlined,
+                  selectedIcon: Icons.search,
+                  label: 'Search',
+                  isSelected: location.startsWith('/search'),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    context.go('/search');
+                  },
+                ),
+                _DrawerItem(
+                  icon: Icons.bookmark_outline,
+                  selectedIcon: Icons.bookmark,
+                  label: 'Bookmarks',
+                  isSelected: location.startsWith('/bookmarks'),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    context.go('/bookmarks');
+                  },
+                ),
+                const Divider(),
+                _DrawerItem(
+                  icon: Icons.settings_outlined,
+                  selectedIcon: Icons.settings,
+                  label: 'Settings',
+                  isSelected: location.startsWith('/settings'),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    context.go('/settings');
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DrawerItem extends StatelessWidget {
+  final IconData icon;
+  final IconData selectedIcon;
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _DrawerItem({
+    required this.icon,
+    required this.selectedIcon,
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    int currentIndex = 0;
-    if (location.startsWith('/quran'))
-      currentIndex = 1;
-    else if (location.startsWith('/hadith'))
-      currentIndex = 2;
-    else if (location.startsWith('/search'))
-      currentIndex = 3;
-    else if (location.startsWith('/bookmarks'))
-      currentIndex = 4;
-    else if (location.startsWith('/settings')) currentIndex = 5;
-
-    return NavigationBar(
-      selectedIndex: currentIndex,
-      onDestinationSelected: (index) {
-        switch (index) {
-          case 0:
-            context.go('/home');
-            break;
-          case 1:
-            context.go('/quran');
-            break;
-          case 2:
-            context.go('/hadith');
-            break;
-          case 3:
-            context.go('/search');
-            break;
-          case 4:
-            context.go('/bookmarks');
-            break;
-          case 5:
-            context.go('/settings');
-            break;
-        }
-      },
-      destinations: [
-        NavigationDestination(
-          icon: const Icon(Icons.home_outlined),
-          selectedIcon: const Icon(Icons.home),
-          label: 'Home',
+    return ListTile(
+      leading: Icon(
+        isSelected ? selectedIcon : icon,
+        color: isSelected
+            ? theme.colorScheme.primary
+            : theme.colorScheme.onSurfaceVariant,
+      ),
+      title: Text(
+        label,
+        style: theme.textTheme.bodyLarge?.copyWith(
+          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+          color: isSelected
+              ? theme.colorScheme.primary
+              : theme.colorScheme.onSurface,
         ),
-        NavigationDestination(
-          icon: const Icon(Icons.menu_book_outlined),
-          selectedIcon: const Icon(Icons.menu_book),
-          label: 'Quran',
-        ),
-        NavigationDestination(
-          icon: const Icon(Icons.library_books_outlined),
-          selectedIcon: const Icon(Icons.library_books),
-          label: 'Hadith',
-        ),
-        NavigationDestination(
-          icon: const Icon(Icons.search_outlined),
-          selectedIcon: const Icon(Icons.search),
-          label: 'Search',
-        ),
-        NavigationDestination(
-          icon: const Icon(Icons.bookmark_outline),
-          selectedIcon: const Icon(Icons.bookmark),
-          label: 'Bookmarks',
-        ),
-        NavigationDestination(
-          icon: const Icon(Icons.settings_outlined),
-          selectedIcon: const Icon(Icons.settings),
-          label: 'Settings',
-        ),
-      ],
+      ),
+      selected: isSelected,
+      selectedTileColor: theme.colorScheme.primaryContainer,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+      onTap: onTap,
     );
   }
 }

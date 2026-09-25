@@ -1,9 +1,11 @@
 /// Ayah list item widget
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quran/quran.dart' as quran;
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../core/services/quran_audio_service.dart';
 import '../../../shared/models/quran_models.dart';
 import '../../../shared/models/settings_models.dart';
 
@@ -63,6 +65,83 @@ class AyahListItem extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
+                ),
+
+                const SizedBox(width: AppConstants.spacingSM),
+
+                // Ayah Audio Play Button
+                Consumer(
+                  builder: (context, ref, _) {
+                    final audioState = ref.watch(quranAudioProvider);
+                    final isThisAyah = audioState.surahNumber == ayah.surahNumber &&
+                        audioState.ayahNumber == ayah.numberInSurah;
+                    final isPlaying = isThisAyah && audioState.isPlaying;
+                    final isLoading = isThisAyah && audioState.isLoading;
+
+                    return InkWell(
+                      onTap: () {
+                        if (isPlaying) {
+                          ref.read(quranAudioProvider.notifier).pause();
+                        } else if (isThisAyah && audioState.hasTrack) {
+                          ref.read(quranAudioProvider.notifier).resume();
+                        } else {
+                          final surahName = quran.getSurahName(ayah.surahNumber);
+                          ref.read(quranAudioProvider.notifier).playAyah(
+                                surahNumber: ayah.surahNumber,
+                                ayahNumber: ayah.numberInSurah,
+                                surahName: surahName.isNotEmpty ? surahName : 'Surah ${ayah.surahNumber}',
+                              );
+                        }
+                      },
+                      borderRadius: BorderRadius.circular(AppConstants.radiusFull),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: isPlaying
+                              ? theme.colorScheme.primary.withValues(alpha: 0.15)
+                              : theme.colorScheme.surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(AppConstants.radiusFull),
+                          border: Border.all(
+                            color: isPlaying
+                                ? theme.colorScheme.primary
+                                : theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (isLoading)
+                              SizedBox(
+                                width: 12,
+                                height: 12,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: theme.colorScheme.primary,
+                                ),
+                              )
+                            else
+                              Icon(
+                                isPlaying ? Icons.pause : Icons.play_arrow_rounded,
+                                size: 14,
+                                color: isPlaying
+                                    ? theme.colorScheme.primary
+                                    : theme.colorScheme.onSurfaceVariant,
+                              ),
+                            const SizedBox(width: 4),
+                            Text(
+                              isPlaying ? 'Playing' : 'Audio',
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: isPlaying
+                                    ? theme.colorScheme.primary
+                                    : theme.colorScheme.onSurfaceVariant,
+                                fontWeight: isPlaying ? FontWeight.w700 : FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
                 ),
 
                 // Sajdah Marker

@@ -97,8 +97,6 @@ class _SearchPageState extends ConsumerState<SearchPage>
   }
 
   Widget _buildSearchBar() {
-    final theme = Theme.of(context);
-
     return Padding(
       padding: const EdgeInsets.all(AppConstants.spacingMD),
       child: TextField(
@@ -168,55 +166,68 @@ class _SearchPageState extends ConsumerState<SearchPage>
       return _buildEmptyState();
     }
 
-    return quranAsync.when(
-      data: (quranResults) => hadithAsync.when(
-        data: (hadithResults) {
-          if (quranResults.isEmpty && hadithResults.isEmpty) {
-            return _buildNoResultsState();
-          }
+    final quranData = quranAsync.valueOrNull;
+    final hadithData = hadithAsync.valueOrNull;
+    final isLoading = quranAsync.isLoading || hadithAsync.isLoading;
+    final hasData = (quranData != null && quranData.isNotEmpty) ||
+        (hadithData != null && hadithData.isNotEmpty);
 
-          return RefreshIndicator(
-            onRefresh: _performSearch,
-            child: ListView(
-              controller: _scrollController,
-              padding: const EdgeInsets.all(AppConstants.spacingMD),
-              children: [
-                if (quranResults.isNotEmpty) ...[
-                  SectionHeader(
-                    title: 'Quran Results',
-                    subtitle: '${quranResults.length} verses found',
-                  ),
-                  const SizedBox(height: AppConstants.spacingMD),
-                  ...quranResults.map((result) => _QuranSearchResultItem(
-                        ayah: result,
-                        query: _currentQuery,
-                        onTap: () => context.go(
-                            '/quran/surah/${result.ayah.surahNumber}/ayah/${result.ayah.ayahInSurah}'),
-                      )),
-                  const SizedBox(height: AppConstants.spacingLG),
-                ],
-                if (hadithResults.isNotEmpty) ...[
-                  SectionHeader(
-                    title: 'Hadith Results',
-                    subtitle: '${hadithResults.length} hadiths found',
-                  ),
-                  const SizedBox(height: AppConstants.spacingMD),
-                  ...hadithResults.map((hadith) => _HadithSearchResultItem(
-                        hadith: hadith,
-                        query: _currentQuery,
-                        onTap: () => context.go(
-                            '/hadith/collection/${hadith.collectionId}/hadith/${hadith.hadithNumber}'),
-                      )),
-                ],
-              ],
+    if (isLoading && !hasData) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (quranAsync.hasError && hadithAsync.hasError && !hasData) {
+      return _buildErrorState(quranAsync.error ?? hadithAsync.error!);
+    }
+
+    final quranResults = quranData ?? [];
+    final hadithResults = hadithData ?? [];
+
+    if (!isLoading && quranResults.isEmpty && hadithResults.isEmpty) {
+      if (quranAsync.hasError && !hadithAsync.hasValue) {
+        return _buildErrorState(quranAsync.error!);
+      }
+      if (hadithAsync.hasError && !quranAsync.hasValue) {
+        return _buildErrorState(hadithAsync.error!);
+      }
+      return _buildNoResultsState();
+    }
+
+    return RefreshIndicator(
+      onRefresh: _performSearch,
+      child: ListView(
+        controller: _scrollController,
+        padding: const EdgeInsets.all(AppConstants.spacingMD),
+        children: [
+          if (quranResults.isNotEmpty) ...[
+            SectionHeader(
+              title: 'Quran Results',
+              subtitle: '${quranResults.length} verses found',
             ),
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => _buildErrorState(error),
+            const SizedBox(height: AppConstants.spacingMD),
+            ...quranResults.map((result) => _QuranSearchResultItem(
+                  ayah: result,
+                  query: _currentQuery,
+                  onTap: () => context.go(
+                      '/quran/surah/${result.ayah.surahNumber}/ayah/${result.ayah.ayahInSurah}'),
+                )),
+            const SizedBox(height: AppConstants.spacingLG),
+          ],
+          if (hadithResults.isNotEmpty) ...[
+            SectionHeader(
+              title: 'Hadith Results',
+              subtitle: '${hadithResults.length} hadiths found',
+            ),
+            const SizedBox(height: AppConstants.spacingMD),
+            ...hadithResults.map((hadith) => _HadithSearchResultItem(
+                  hadith: hadith,
+                  query: _currentQuery,
+                  onTap: () => context.go(
+                      '/hadith/collection/${hadith.collectionId}/hadith/${hadith.hadithNumber}'),
+                )),
+          ],
+        ],
       ),
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => _buildErrorState(error),
     );
   }
 
@@ -462,6 +473,21 @@ class _QuranSearchResultItem extends StatelessWidget {
               textAlign: TextAlign.right,
               textDirection: TextDirection.rtl,
             ),
+            if (ayah.matchedText.isNotEmpty ||
+                ayah.ayah.translations.isNotEmpty) ...[
+              const SizedBox(height: AppConstants.spacingSM),
+              Text(
+                ayah.matchedText.isNotEmpty
+                    ? ayah.matchedText
+                    : ayah.ayah.getTranslation(ayah.translationId),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  height: 1.6,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                maxLines: 4,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ],
         ),
       ),

@@ -4,11 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../core/services/quran_audio_service.dart';
 import '../../../presentation/providers/app_providers.dart';
 import '../../../shared/models/quran_models.dart';
 import '../../../shared/models/settings_models.dart';
 import '../../widgets/common/app_scaffold.dart';
 import '../../widgets/common/reading_settings_sheet.dart';
+import '../../widgets/audio/country_wise_reciter_selector.dart';
+import '../../widgets/audio/quran_audio_player_bar.dart';
 
 class AyahDetailPage extends ConsumerStatefulWidget {
   final int surahNumber;
@@ -51,48 +54,58 @@ class _AyahDetailPageState extends ConsumerState<AyahDetailPage>
           ),
         ),
       ],
-      child: Consumer(
-        builder: (context, ref, _) {
-          final ayahAsync =
-              ref.watch(ayahProvider((widget.surahNumber, widget.ayahNumber)));
-          final tafsirAsync = ref
-              .watch(tafsirProvider((widget.surahNumber, widget.ayahNumber)));
-          final settings = ref.watch(settingsProvider);
+      child: Stack(
+        children: [
+          Consumer(
+            builder: (context, ref, _) {
+              final ayahAsync =
+                  ref.watch(ayahProvider((widget.surahNumber, widget.ayahNumber)));
+              final tafsirAsync = ref
+                  .watch(tafsirProvider((widget.surahNumber, widget.ayahNumber)));
+              final settings = ref.watch(settingsProvider);
 
-          return settings.when(
-            data: (settings) => ayahAsync.when(
-              data: (ayah) {
-                if (ayah == null) {
-                  return _buildErrorState('Ayah not found');
-                }
-                return tafsirAsync.when(
-                  data: (tafsirs) => _buildDetailContent(
-                    context,
-                    ayah,
-                    tafsirs,
-                    settings,
-                  ),
-                  loading: () => _buildDetailContent(
-                    context,
-                    ayah,
-                    [],
-                    settings,
-                  ),
-                  error: (error, stack) => _buildDetailContent(
-                    context,
-                    ayah,
-                    [],
-                    settings,
-                  ),
-                );
-              },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stack) => _buildErrorState(error),
-            ),
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, stack) => _buildErrorState(error),
-          );
-        },
+              return settings.when(
+                data: (settings) => ayahAsync.when(
+                  data: (ayah) {
+                    if (ayah == null) {
+                      return _buildErrorState('Ayah not found');
+                    }
+                    return tafsirAsync.when(
+                      data: (tafsirs) => _buildDetailContent(
+                        context,
+                        ayah,
+                        tafsirs,
+                        settings,
+                      ),
+                      loading: () => _buildDetailContent(
+                        context,
+                        ayah,
+                        [],
+                        settings,
+                      ),
+                      error: (error, stack) => _buildDetailContent(
+                        context,
+                        ayah,
+                        [],
+                        settings,
+                      ),
+                    );
+                  },
+                  loading: () => const Center(child: CircularProgressIndicator()),
+                  error: (error, stack) => _buildErrorState(error),
+                ),
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (error, stack) => _buildErrorState(error),
+              );
+            },
+          ),
+          const Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: QuranAudioPlayerBar(),
+          ),
+        ],
       ),
     );
   }
@@ -325,145 +338,198 @@ class _AyahDetailPageState extends ConsumerState<AyahDetailPage>
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppConstants.spacingMD),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Reciter Selection
-          _buildReciterSelector(),
+          // Ayah Audio Player Card
+          _buildAyahAudioPlayer(ayah),
 
           const SizedBox(height: AppConstants.spacingLG),
 
-          // Audio Controls
-          // AudioControls(
-          // ),
+          // Reciter Selection Grouped by Country
+          Text(
+            'Reciter (Grouped by Country)',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
+          const SizedBox(height: AppConstants.spacingSM),
+          Container(
+            padding: const EdgeInsets.all(AppConstants.spacingMD),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHigh,
+              borderRadius: BorderRadius.circular(AppConstants.radiusMD),
+              border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+            ),
+            child: const CountryWiseReciterSelector(),
+          ),
 
           const SizedBox(height: AppConstants.spacingLG),
 
           // Playback Speed
           _buildPlaybackSpeedControl(),
 
-          const SizedBox(height: AppConstants.spacingLG),
-
-          // Repeat Options
-          _buildRepeatOptions(),
+          const SizedBox(height: 80), // Space for floating bottom bar
         ],
       ),
     );
   }
 
-  Widget _buildReciterSelector() {
+  Widget _buildAyahAudioPlayer(Ayah ayah) {
+    final theme = Theme.of(context);
     return Consumer(
       builder: (context, ref, _) {
-        final recitersAsync = ref.watch(recitersProvider);
-        final settingsAsync = ref.watch(settingsProvider);
+        final audioState = ref.watch(quranAudioProvider);
+        final isThisAyah = audioState.surahNumber == widget.surahNumber &&
+            audioState.ayahNumber == widget.ayahNumber;
+        final isPlaying = isThisAyah && audioState.isPlaying;
+        final isLoading = isThisAyah && audioState.isLoading;
 
-        return settingsAsync.when(
-          data: (settings) => recitersAsync.when(
-            data: (reciters) => Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Select Reciter',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                ),
-                const SizedBox(height: AppConstants.spacingMD),
-                SizedBox(
-                  height: 100,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: reciters.length,
-                    separatorBuilder: (_, __) =>
-                        const SizedBox(width: AppConstants.spacingMD),
-                    itemBuilder: (context, index) {
-                      final reciter = reciters[index];
-                      final isSelected =
-                          reciter.id == settings.audio.selectedReciterId;
-                      return InkWell(
-                        onTap: () {
-                          ref
-                              .read(settingsProvider.notifier)
-                              .updateAudioSettings(
-                                settings.audio
-                                    .copyWith(selectedReciterId: reciter.id),
-                              );
-                        },
-                        borderRadius:
-                            BorderRadius.circular(AppConstants.radiusMD),
-                        child: Container(
-                          width: 140,
-                          padding: const EdgeInsets.all(AppConstants.spacingMD),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? Theme.of(context).colorScheme.primaryContainer
-                                : Theme.of(context)
-                                    .colorScheme
-                                    .surfaceContainerHigh,
-                            borderRadius:
-                                BorderRadius.circular(AppConstants.radiusMD),
-                            border: Border.all(
-                              color: isSelected
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Theme.of(context)
-                                      .colorScheme
-                                      .outlineVariant,
-                            ),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.person,
-                                color: isSelected
-                                    ? Theme.of(context)
-                                        .colorScheme
-                                        .onPrimaryContainer
-                                    : Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
-                              ),
-                              const SizedBox(height: AppConstants.spacingXS),
-                              Text(
-                                reciter.name,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall
-                                    ?.copyWith(
-                                      fontWeight: FontWeight.w500,
-                                      color: isSelected
-                                          ? Theme.of(context)
-                                              .colorScheme
-                                              .onPrimaryContainer
-                                          : Theme.of(context)
-                                              .colorScheme
-                                              .onSurface,
-                                    ),
-                                textAlign: TextAlign.center,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
+        final pos = isThisAyah ? audioState.position : Duration.zero;
+        final dur = isThisAyah ? audioState.duration : Duration.zero;
+        final maxSeconds =
+            dur.inMilliseconds > 0 ? dur.inMilliseconds.toDouble() : 1.0;
+        final currentSeconds =
+            pos.inMilliseconds.toDouble().clamp(0.0, maxSeconds);
+
+        return Container(
+          padding: const EdgeInsets.all(AppConstants.spacingLG),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surfaceContainerHigh,
+            borderRadius: BorderRadius.circular(AppConstants.radiusLG),
+            border: Border.all(
+              color: isPlaying
+                  ? theme.colorScheme.primary.withValues(alpha: 0.5)
+                  : theme.colorScheme.outlineVariant,
+            ),
+          ),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: isPlaying
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.primaryContainer,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      isPlaying ? Icons.volume_up_rounded : Icons.headphones_rounded,
+                      color: isPlaying
+                          ? theme.colorScheme.onPrimary
+                          : theme.colorScheme.onPrimaryContainer,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: AppConstants.spacingMD),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Verse ${widget.surahNumber}:${widget.ayahNumber}',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
-                      );
+                        Text(
+                          audioState.currentReciterName,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (isLoading)
+                    const SizedBox(
+                      width: 32,
+                      height: 32,
+                      child: CircularProgressIndicator(strokeWidth: 2.5),
+                    )
+                  else
+                    IconButton.filled(
+                      icon: Icon(
+                        isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                        size: 28,
+                      ),
+                      onPressed: () {
+                        if (isPlaying) {
+                          ref.read(quranAudioProvider.notifier).pause();
+                        } else if (isThisAyah && audioState.hasTrack) {
+                          ref.read(quranAudioProvider.notifier).resume();
+                        } else {
+                          ref.read(quranAudioProvider.notifier).playAyah(
+                                surahNumber: widget.surahNumber,
+                                ayahNumber: widget.ayahNumber,
+                                surahName: 'Surah ${widget.surahNumber}',
+                              );
+                        }
+                      },
+                    ),
+                ],
+              ),
+              if (isThisAyah && dur.inMilliseconds > 0) ...[
+                const SizedBox(height: AppConstants.spacingMD),
+                SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    trackHeight: 3,
+                    thumbShape:
+                        const RoundSliderThumbShape(enabledThumbRadius: 6),
+                    overlayShape:
+                        const RoundSliderOverlayShape(overlayRadius: 14),
+                  ),
+                  child: Slider(
+                    value: currentSeconds,
+                    max: maxSeconds,
+                    onChanged: (val) {
+                      ref.read(quranAudioProvider.notifier).seek(
+                            Duration(milliseconds: val.round()),
+                          );
                     },
                   ),
                 ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        _formatTime(pos),
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      Text(
+                        _formatTime(dur),
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
-            ),
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (_, __) => const SizedBox.shrink(),
+            ],
           ),
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (_, __) => const SizedBox.shrink(),
         );
       },
     );
   }
 
+  String _formatTime(Duration d) {
+    final m = d.inMinutes;
+    final s = d.inSeconds % 60;
+    return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
+  }
+
   Widget _buildPlaybackSpeedControl() {
     return Consumer(
       builder: (context, ref, _) {
-        final audioState = ref.watch(audioPlayerStateProvider);
+        final audioState = ref.watch(quranAudioProvider);
         final speeds = [
           PlaybackSpeed.x0_5,
           PlaybackSpeed.x0_75,
@@ -487,14 +553,15 @@ class _AyahDetailPageState extends ConsumerState<AyahDetailPage>
               spacing: AppConstants.spacingSM,
               runSpacing: AppConstants.spacingSM,
               children: speeds.map((speed) {
-                final isSelected = audioState.playbackSpeed == speed;
+                final isSelected =
+                    (audioState.speed - speed.value).abs() < 0.05;
                 return FilterChip(
                   label: Text(speed.label),
                   selected: isSelected,
                   onSelected: (_) {
                     ref
-                        .read(audioPlayerStateProvider.notifier)
-                        .setPlaybackSpeed(speed);
+                        .read(quranAudioProvider.notifier)
+                        .setSpeed(speed.value);
                   },
                   selectedColor: Theme.of(context).colorScheme.primaryContainer,
                   checkmarkColor:
@@ -506,59 +573,6 @@ class _AyahDetailPageState extends ConsumerState<AyahDetailPage>
         );
       },
     );
-  }
-
-  Widget _buildRepeatOptions() {
-    return Consumer(
-      builder: (context, ref, _) {
-        final audioState = ref.watch(audioPlayerStateProvider);
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Repeat Mode',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-            ),
-            const SizedBox(height: AppConstants.spacingMD),
-            Wrap(
-              spacing: AppConstants.spacingSM,
-              runSpacing: AppConstants.spacingSM,
-              children: AudioRepeatMode.values.map((mode) {
-                final isSelected = audioState.repeatMode == mode;
-                return FilterChip(
-                  label: Text(_getRepeatModeLabel(mode)),
-                  selected: isSelected,
-                  onSelected: (_) {
-                    ref
-                        .read(audioPlayerStateProvider.notifier)
-                        .setRepeatMode(mode);
-                  },
-                  selectedColor: Theme.of(context).colorScheme.primaryContainer,
-                  checkmarkColor:
-                      Theme.of(context).colorScheme.onPrimaryContainer,
-                );
-              }).toList(),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  String _getRepeatModeLabel(AudioRepeatMode mode) {
-    switch (mode) {
-      case AudioRepeatMode.none:
-        return 'Off';
-      case AudioRepeatMode.ayah:
-        return 'Repeat Ayah';
-      case AudioRepeatMode.surah:
-        return 'Repeat Surah';
-      case AudioRepeatMode.all:
-        return 'Repeat All';
-    }
   }
 
   Widget _buildErrorState(Object error) {

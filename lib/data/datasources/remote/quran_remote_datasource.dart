@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:quran/quran.dart' as quran;
 import '../../../shared/models/quran_models.dart';
 import '../../../core/constants/app_constants.dart';
 
@@ -186,18 +187,26 @@ class QuranRemoteDataSource {
     int perPage = 20,
   }) async {
     try {
+      final tId = _mapTranslationId(translationId);
       final response = await _dio.get(
         '/search',
         queryParameters: {
           'q': query,
-          'translations': translationId ?? 'en.sahih',
+          'translations': tId,
           'page': page,
           'per_page': perPage,
         },
       );
       final body = _decodeResponse(response.data);
-      final data = body['search']['results'] as List;
-      return data.map((json) => _parseSearchResult(json)).toList();
+      final searchObj = body['search'];
+      if (searchObj == null || searchObj['results'] == null) {
+        return [];
+      }
+      final data = searchObj['results'] as List;
+      return data
+          .whereType<Map<String, dynamic>>()
+          .map((json) => _parseSearchResult(json))
+          .toList();
     } catch (e) {
       throw Exception('Failed to search: $e');
     }
@@ -447,30 +456,128 @@ class QuranRemoteDataSource {
   }
 
   QuranSearchResult _parseSearchResult(Map<String, dynamic> json) {
-    final verse = json['verse'];
+    final Map<String, dynamic> verseMap = json['verse'] is Map<String, dynamic>
+        ? json['verse'] as Map<String, dynamic>
+        : json;
+
+    final verseKey = (verseMap['verse_key'] as String?) ?? '';
+    int surahNum = 1;
+    int ayahNum = 1;
+    if (verseKey.contains(':')) {
+      final parts = verseKey.split(':');
+      surahNum = int.tryParse(parts[0]) ?? 1;
+      ayahNum = int.tryParse(parts[1]) ?? 1;
+    } else {
+      surahNum = verseMap['chapter_id'] as int? ?? 1;
+      ayahNum = verseMap['verse_number'] as int? ?? 1;
+    }
+
+    final globalId = verseMap['verse_id'] as int? ??
+        verseMap['id'] as int? ??
+        ayahNum;
+
+    // Parse translations map
+    final translations = <String, String>{};
+    String matchedText = '';
+    String translationId = 'en.sahih';
+
+    if (verseMap['translations'] is List) {
+      for (final t in verseMap['translations'] as List) {
+        if (t is Map<String, dynamic>) {
+          final tText = t['text'] as String? ?? '';
+          final rId = t['resource_id']?.toString() ?? 'default';
+          final name = t['name'] as String? ?? '';
+          translations[rId] = tText;
+          if (name.isNotEmpty) translations[name] = tText;
+          translations['default'] = tText;
+
+          if (matchedText.isEmpty && tText.isNotEmpty) {
+            matchedText = tText;
+            translationId = rId;
+          }
+        }
+      }
+    }
+
+    if (matchedText.isEmpty) {
+      matchedText = json['highlight'] as String? ??
+          json['highlighted'] as String? ??
+          '';
+    }
+
+    // Clean matchedText of HTML tags if present for plain display
+    final cleanMatchedText = matchedText.replaceAll(RegExp(r'<[^>]*>'), '');
+
+    // Arabic text
+    var arabicText = verseMap['text'] as String? ??
+        verseMap['text_uthmani'] as String? ??
+        verseMap['text_imlaei_simple'] as String? ??
+        '';
+
+    if (arabicText.isEmpty) {
+      try {
+        arabicText = quran.getVerse(surahNum, ayahNum, verseEndSymbol: true);
+      } catch (_) {}
+    }
+
+    final ayah = Ayah(
+      number: globalId,
+      surahNumber: surahNum,
+      ayahInSurah: ayahNum,
+      textArabic: arabicText,
+      textUthmani: arabicText,
+      textSimple: verseMap['text_imlaei_simple'] as String? ?? arabicText,
+      translations: translations,
+      juzNumber: verseMap['juz_number'] as int? ?? 1,
+      hizbNumber: verseMap['hizb_number'] as int? ?? 1,
+      rubNumber: verseMap['rub_number'] as int? ?? 1,
+      pageNumber: verseMap['page_number'] as int? ?? 1,
+      isSajdah: verseMap['sajdah'] != null && verseMap['sajdah'] != false,
+      audioUrl: '',
+      audioUrls: const {},
+      rukuNumber: 1,
+      manzilNumber: 1,
+    );
+
+    // Get Surah details using offline quran package
+    String surahNameEn = '';
+    String surahNameAr = '';
+    String surahTranslation = '';
+    int ayahCount = 0;
+    try {
+      surahNameEn = quran.getSurahName(surahNum);
+      surahNameAr = quran.getSurahNameArabic(surahNum);
+      surahTranslation = quran.getSurahNameEnglish(surahNum);
+      ayahCount = quran.getVerseCount(surahNum);
+    } catch (_) {
+      surahNameEn = 'Surah $surahNum';
+    }
+
+    final surah = Surah(
+      number: surahNum,
+      nameArabic: surahNameAr,
+      nameTransliteration: surahNameEn,
+      nameTranslation: surahTranslation,
+      ayahCount: ayahCount,
+      revelationOrder: 0,
+      revelationType: RevelationType.meccan,
+      juzNumber: ayah.juzNumber,
+      hizbNumber: ayah.hizbNumber,
+      rubNumber: ayah.rubNumber,
+      bismillahArabic: '',
+      bismillahTranslation: '',
+      hasSajdah: ayah.isSajdah,
+      sajdahAyahNumbers: const [],
+      pageStart: ayah.pageNumber,
+      pageEnd: ayah.pageNumber,
+      description: '',
+    );
+
     return QuranSearchResult(
-      ayah: _parseAyah(verse, null),
-      surah: Surah(
-        number: verse['chapter_id'] as int,
-        nameArabic: '',
-        nameTransliteration: '',
-        nameTranslation: '',
-        ayahCount: 0,
-        revelationOrder: 0,
-        revelationType: RevelationType.meccan,
-        juzNumber: 0,
-        hizbNumber: 0,
-        rubNumber: 0,
-        bismillahArabic: '',
-        bismillahTranslation: '',
-        hasSajdah: false,
-        sajdahAyahNumbers: [],
-        pageStart: 0,
-        pageEnd: 0,
-        description: '',
-      ),
-      matchedText: json['highlight'] as String? ?? '',
-      translationId: json['translation_id'] as String? ?? 'en.sahih',
+      ayah: ayah,
+      surah: surah,
+      matchedText: cleanMatchedText,
+      translationId: translationId,
     );
   }
 }

@@ -10,9 +10,9 @@ import '../../../shared/models/quran_models.dart';
 import '../../../shared/models/settings_models.dart';
 import '../../widgets/common/app_scaffold.dart';
 import '../../widgets/common/reading_settings_sheet.dart';
-import '../../widgets/common/section_header.dart';
 import '../../widgets/quran/ayah_list_item.dart';
-import '../../widgets/audio/audio_controls.dart';
+import '../../../core/services/quran_audio_service.dart';
+import '../../widgets/audio/quran_audio_player_bar.dart';
 
 class SurahPage extends ConsumerStatefulWidget {
   final int surahNumber;
@@ -43,12 +43,16 @@ class _SurahPageState extends ConsumerState<SurahPage>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final surahNumber = widget.surahNumber;
 
     return AppScaffold(
       title: 'Surah $surahNumber',
       actions: [
+        IconButton(
+          icon: const Icon(Icons.bookmark_border_rounded),
+          tooltip: 'Bookmark Surah',
+          onPressed: _bookmarkSurah,
+        ),
         IconButton(
           icon: const Icon(Icons.tune_rounded),
           tooltip: 'Reading Settings',
@@ -99,40 +103,48 @@ class _SurahPageState extends ConsumerState<SurahPage>
   ) {
     final theme = Theme.of(context);
 
-    return Column(
+    return Stack(
       children: [
-        // Surah Header
-        _buildSurahHeader(surah, theme),
+        Column(
+          children: [
+            // Surah Header
+            _buildSurahHeader(surah, theme),
 
-        // Tab Bar for Arabic/Translation
-        TabBar(
-          controller: _tabController,
-          tabs: [
-            Tab(
-              icon: const Icon(Icons.format_quote),
-              text: 'Arabic',
+            // Tab Bar for Arabic/Translation
+            TabBar(
+              controller: _tabController,
+              tabs: [
+                const Tab(
+                  icon: Icon(Icons.format_quote),
+                  text: 'Arabic',
+                ),
+                const Tab(
+                  icon: Icon(Icons.translate),
+                  text: 'Translation',
+                ),
+              ],
             ),
-            Tab(
-              icon: const Icon(Icons.translate),
-              text: 'Translation',
+
+            // Ayah List
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildArabicTab(ayahs, settings),
+                  _buildTranslationTab(ayahs, settings),
+                ],
+              ),
             ),
           ],
         ),
 
-        // Ayah List
-        Expanded(
-          child: TabBarView(
-            controller: _tabController,
-            children: [
-              _buildArabicTab(ayahs, settings),
-              _buildTranslationTab(ayahs, settings),
-            ],
-          ),
+        // Persistent floating Audio Player Bar
+        const Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: QuranAudioPlayerBar(),
         ),
-
-        // Audio Controls
-        // AudioControls(
-        // ),
       ],
     );
   }
@@ -240,6 +252,85 @@ class _SurahPageState extends ConsumerState<SurahPage>
               ),
             ],
           ),
+
+          const SizedBox(height: AppConstants.spacingMD),
+
+          // Play Surah Button with current reciter
+          Consumer(
+            builder: (context, ref, _) {
+              final audioState = ref.watch(quranAudioProvider);
+              final isThisSurahPlaying = audioState.isPlaying &&
+                  audioState.currentSurahNumber == surah.number &&
+                  audioState.currentAyahNumber == null;
+              final isThisSurahLoading = audioState.isLoading &&
+                  audioState.currentSurahNumber == surah.number &&
+                  audioState.currentAyahNumber == null;
+
+              return InkWell(
+                onTap: () {
+                  ref.read(quranAudioProvider.notifier).playSurah(
+                        surahNumber: surah.number,
+                        surahName: surah.nameTransliteration,
+                      );
+                },
+                borderRadius: BorderRadius.circular(AppConstants.radiusMD),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppConstants.spacingMD,
+                    vertical: AppConstants.spacingSM + 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(AppConstants.radiusMD),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.12),
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (isThisSurahLoading)
+                        SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            color: quranHadithTheme.quranGradient.colors.first,
+                          ),
+                        )
+                      else
+                        Icon(
+                          isThisSurahPlaying
+                              ? Icons.pause_circle_filled_rounded
+                              : Icons.play_circle_fill_rounded,
+                          color: quranHadithTheme.quranGradient.colors.first,
+                          size: 26,
+                        ),
+                      const SizedBox(width: AppConstants.spacingSM),
+                      Flexible(
+                        child: Text(
+                          isThisSurahPlaying
+                              ? 'Pause Recitation (${audioState.currentReciterName})'
+                              : 'Play Surah (${audioState.currentReciterName})',
+                          style: TextStyle(
+                            color: quranHadithTheme.quranGradient.colors.first,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
         ],
       ),
     );
@@ -321,12 +412,6 @@ class _SurahPageState extends ConsumerState<SurahPage>
       context: context,
       builder: (context) =>
           _AyahActionsSheet(ayah: ayah, surahNumber: widget.surahNumber),
-    );
-  }
-
-  void _showDownloadOptions() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Download feature coming soon')),
     );
   }
 

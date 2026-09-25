@@ -11,6 +11,7 @@ import '../../../shared/models/settings_models.dart';
 import '../../widgets/common/app_scaffold.dart';
 import '../../widgets/common/section_header.dart';
 import '../../widgets/quran/country_wise_translation_selector.dart';
+import '../../widgets/audio/country_wise_reciter_selector.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
@@ -410,35 +411,17 @@ class _SettingsPageState extends ConsumerState<SettingsPage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Default Reciter
-          SectionHeader(title: 'Default Reciter'),
+          // Default Reciter (Grouped by Country)
+          SectionHeader(title: 'Reciter (Grouped by Country)'),
           const SizedBox(height: AppConstants.spacingMD),
-          Consumer(
-            builder: (context, ref, _) {
-              final recitersAsync = ref.watch(recitersProvider);
-              return recitersAsync.when(
-                data: (reciters) => Wrap(
-                  spacing: AppConstants.spacingSM,
-                  runSpacing: AppConstants.spacingSM,
-                  children: reciters.map((r) {
-                    final isSelected = r.id == audioSettings.selectedReciterId;
-                    return FilterChip(
-                      label: Text(r.name),
-                      selected: isSelected,
-                      onSelected: (_) => ref
-                          .read(settingsProvider.notifier)
-                          .updateAudioSettings(
-                            audioSettings.copyWith(selectedReciterId: r.id),
-                          ),
-                      selectedColor: theme.colorScheme.primaryContainer,
-                      checkmarkColor: theme.colorScheme.onPrimaryContainer,
-                    );
-                  }).toList(),
-                ),
-                loading: () => const CircularProgressIndicator(),
-                error: (_, __) => const Text('Error loading reciters'),
-              );
-            },
+          Container(
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerHigh,
+              borderRadius: BorderRadius.circular(AppConstants.radiusMD),
+              border: Border.all(color: theme.colorScheme.outlineVariant),
+            ),
+            padding: const EdgeInsets.all(AppConstants.spacingMD),
+            child: const CountryWiseReciterSelector(),
           ),
           const SizedBox(height: AppConstants.spacingLG),
 
