@@ -240,73 +240,66 @@ class _ReadingSettingsSheet extends ConsumerWidget {
                       final recitersAsync = ref.watch(quranAudioRecitersProvider);
                       final audioState = ref.watch(quranAudioApiProvider);
                       final currentId = audioState.currentReciterId;
+                      final fallbacks = QuranAudioApiNotifier.getFallbackReciters();
 
-                      return recitersAsync.when(
-                        data: (reciters) {
-                          final allReciters = reciters.isNotEmpty
-                              ? reciters
-                              : <ReciterInfo>[];
-                          final currentR = allReciters
-                                  .where((r) => r.id == currentId)
-                                  .firstOrNull ??
-                              (allReciters.isNotEmpty ? allReciters.first : null);
+                      final allReciters = (recitersAsync.valueOrNull != null &&
+                              recitersAsync.valueOrNull!.isNotEmpty)
+                          ? recitersAsync.valueOrNull!
+                          : fallbacks;
 
-                          if (currentR == null) {
-                            return const SizedBox.shrink();
-                          }
+                      final currentR = allReciters
+                              .where((r) => r.id == currentId)
+                              .firstOrNull ??
+                          allReciters.first;
 
-                          // Country flag mapping
-                          final countryFlags = {
-                            'Kuwait': '🇰🇼',
-                            'Saudi Arabia': '🇸🇦',
-                            'Egypt': '🇪🇬',
-                            'Yemen': '🇾🇪',
-                            'United Arab Emirates': '🇦🇪',
-                            'Other': '🌐',
-                          };
-                          final flag = countryFlags[currentR.country] ?? '🌐';
+                      // Country flag mapping
+                      final countryFlags = {
+                        'Kuwait': '🇰🇼',
+                        'Saudi Arabia': '🇸🇦',
+                        'Egypt': '🇪🇬',
+                        'Yemen': '🇾🇪',
+                        'United Arab Emirates': '🇦🇪',
+                        'Other': '🌐',
+                      };
+                      final flag = countryFlags[currentR.country] ?? '🌐';
 
-                          return Container(
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.surfaceContainerHigh,
-                              borderRadius:
-                                  BorderRadius.circular(AppConstants.radiusMD),
-                              border: Border.all(
-                                color: theme.colorScheme.outlineVariant
-                                    .withValues(alpha: 0.5),
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surfaceContainerHigh,
+                          borderRadius:
+                              BorderRadius.circular(AppConstants.radiusMD),
+                          border: Border.all(
+                            color: theme.colorScheme.outlineVariant
+                                .withValues(alpha: 0.5),
+                          ),
+                        ),
+                        child: ClipRRect(
+                          borderRadius:
+                              BorderRadius.circular(AppConstants.radiusMD),
+                          child: ExpansionTile(
+                            leading:
+                                const Icon(Icons.record_voice_over_rounded),
+                            title: Text(
+                              '$flag ${currentR.name}',
+                              style: theme.textTheme.bodyMedium
+                                  ?.copyWith(fontWeight: FontWeight.w600),
+                            ),
+                            subtitle: Text(
+                              '${currentR.country} • ${currentR.style.toUpperCase()}',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
                               ),
                             ),
-                            child: ClipRRect(
-                              borderRadius:
-                                  BorderRadius.circular(AppConstants.radiusMD),
-                              child: ExpansionTile(
-                                leading:
-                                    const Icon(Icons.record_voice_over_rounded),
-                                title: Text(
-                                  '$flag ${currentR.name}',
-                                  style: theme.textTheme.bodyMedium
-                                      ?.copyWith(fontWeight: FontWeight.w600),
+                            children: const [
+                              Padding(
+                                padding: EdgeInsets.all(AppConstants.spacingMD),
+                                child: CountryWiseReciterSelector(
+                                  showSearch: true,
                                 ),
-                                subtitle: Text(
-                                  '${currentR.country} • ${currentR.style.toUpperCase()}',
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: theme.colorScheme.onSurfaceVariant,
-                                  ),
-                                ),
-                                children: const [
-                                  Padding(
-                                    padding: EdgeInsets.all(AppConstants.spacingMD),
-                                    child: CountryWiseReciterSelector(
-                                      showSearch: true,
-                                    ),
-                                  ),
-                                ],
                               ),
-                            ),
-                          );
-                        },
-                        loading: () => const Center(child: CircularProgressIndicator()),
-                        error: (_, __) => const SizedBox.shrink(),
+                            ],
+                          ),
+                        ),
                       );
                     },
                   ),

@@ -39,6 +39,7 @@ app.*.map.json
 env/
 venv/
 .venv/
+env_qh/
 ENV/
 develop-eggs/
 dist/

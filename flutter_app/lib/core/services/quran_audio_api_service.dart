@@ -10,9 +10,11 @@ import 'package:quran/quran.dart' as quran;
 import '../../presentation/providers/app_providers.dart';
 
 /// Base URL for the Python FastAPI backend
-const String _apiBaseUrl = 'http://10.0.2.2:8000'; // Android emulator localhost
-// For iOS simulator: 'http://localhost:8000'
-// For physical device: use your machine's IP address
+String get _apiBaseUrl {
+  if (kIsWeb) return 'http://localhost:8000';
+  if (defaultTargetPlatform == TargetPlatform.android) return 'http://10.0.2.2:8000';
+  return 'http://localhost:8000';
+}
 
 @immutable
 class QuranAudioState {
@@ -296,104 +298,107 @@ class QuranAudioApiNotifier extends Notifier<QuranAudioState> {
       final response = await _dio.get('/api/reciters');
       if (response.statusCode == 200) {
         final data = RecitersResponse.fromJson(response.data as Map<String, dynamic>);
-        _cachedReciters = data.reciters;
-        _cachedCountries = data.countries;
-        debugPrint('Loaded ${_cachedReciters.length} reciters from API');
+        if (data.reciters.isNotEmpty) {
+          _cachedReciters = data.reciters;
+          _cachedCountries = data.countries;
+          debugPrint('Loaded ${_cachedReciters.length} reciters from API');
+          return;
+        }
       }
     } catch (e) {
       debugPrint('Failed to load reciters from API: $e');
-      // Fallback to local data if API fails
-      _cachedReciters = _getFallbackReciters();
     }
+    // Fallback to local data if API fails
+    _cachedReciters = getFallbackReciters();
   }
 
-  List<ReciterInfo> _getFallbackReciters() {
-    return [
-      const ReciterInfo(
+  static List<ReciterInfo> getFallbackReciters() {
+    return const [
+      ReciterInfo(
         id: '7',
         name: 'Mishari Rashid al-`Afasy',
         nameArabic: 'مشاري بن راشد العفاسي',
         style: 'murattal',
         country: 'Kuwait',
       ),
-      const ReciterInfo(
+      ReciterInfo(
         id: '3',
         name: 'Abdur-Rahman as-Sudais',
         nameArabic: 'عبد الرحمن السديس',
         style: 'murattal',
         country: 'Saudi Arabia',
       ),
-      const ReciterInfo(
+      ReciterInfo(
         id: 'ar.dossari',
         name: 'Sheikh Yasser Al-Dosari',
         nameArabic: 'الشيخ ياسر الدوسري',
         style: 'murattal',
         country: 'Saudi Arabia',
       ),
-      const ReciterInfo(
+      ReciterInfo(
         id: '10',
         name: 'Sa`ud ash-Shuraym',
         nameArabic: 'سعود الشريم',
         style: 'murattal',
         country: 'Saudi Arabia',
       ),
-      const ReciterInfo(
+      ReciterInfo(
         id: '4',
         name: 'Abu Bakr al-Shatri',
         nameArabic: 'أبو بكر الشاطري',
         style: 'murattal',
         country: 'Saudi Arabia',
       ),
-      const ReciterInfo(
+      ReciterInfo(
         id: '5',
         name: 'Hani ar-Rifai',
         nameArabic: 'هاني الرفاعي',
         style: 'murattal',
         country: 'Saudi Arabia',
       ),
-      const ReciterInfo(
+      ReciterInfo(
         id: '2',
         name: 'AbdulBaset AbdulSamad (Murattal)',
         nameArabic: 'عبد الباسط عبد الصمد (مرتل)',
         style: 'murattal',
         country: 'Egypt',
       ),
-      const ReciterInfo(
+      ReciterInfo(
         id: '1',
         name: 'AbdulBaset AbdulSamad (Mujawwad)',
         nameArabic: 'عبد الباسط عبد الصمد (مجود)',
         style: 'mujawwad',
         country: 'Egypt',
       ),
-      const ReciterInfo(
+      ReciterInfo(
         id: '6',
         name: 'Mahmoud Khalil Al-Husary (Murattal)',
         nameArabic: 'محمود خليل الحصري (مرتل)',
         style: 'murattal',
         country: 'Egypt',
       ),
-      const ReciterInfo(
+      ReciterInfo(
         id: '12',
         name: 'Mahmoud Khalil Al-Husary (Muallim)',
         nameArabic: 'محمود خليل الحصري (معلم)',
         style: 'murattal',
         country: 'Egypt',
       ),
-      const ReciterInfo(
+      ReciterInfo(
         id: '9',
         name: 'Mohamed Siddiq al-Minshawi (Murattal)',
         nameArabic: 'محمد صديق المنشاوي (مرتل)',
         style: 'murattal',
         country: 'Egypt',
       ),
-      const ReciterInfo(
+      ReciterInfo(
         id: '8',
         name: 'Mohamed Siddiq al-Minshawi (Mujawwad)',
         nameArabic: 'محمد صديق المنشاوي (مجود)',
         style: 'mujawwad',
         country: 'Egypt',
       ),
-      const ReciterInfo(
+      ReciterInfo(
         id: '11',
         name: 'Mohamed al-Tablawi',
         nameArabic: 'محمد محمود الطبلاوي',
@@ -702,24 +707,30 @@ final quranAudioApiProvider =
 final quranAudioRecitersProvider = FutureProvider<List<ReciterInfo>>((ref) async {
   final dio = Dio(BaseOptions(
     baseUrl: _apiBaseUrl,
-    connectTimeout: const Duration(seconds: 10),
+    connectTimeout: const Duration(seconds: 4),
+    receiveTimeout: const Duration(seconds: 4),
   ));
   try {
     final response = await dio.get('/api/reciters');
     if (response.statusCode == 200) {
       final data = RecitersResponse.fromJson(response.data as Map<String, dynamic>);
-      return data.reciters;
+      if (data.reciters.isNotEmpty) {
+        return data.reciters;
+      }
     }
-  } catch (_) {}
-  // Fallback
-  return [];
+  } catch (e) {
+    debugPrint('Could not load reciters from API ($_apiBaseUrl): $e');
+  }
+  // Fallback so the reciter list is always populated
+  return QuranAudioApiNotifier.getFallbackReciters();
 });
 
 // Provider for accessing countries from API
 final quranAudioReciterCountriesProvider = FutureProvider<Map<String, ReciterCountry>>((ref) async {
   final dio = Dio(BaseOptions(
     baseUrl: _apiBaseUrl,
-    connectTimeout: const Duration(seconds: 10),
+    connectTimeout: const Duration(seconds: 4),
+    receiveTimeout: const Duration(seconds: 4),
   ));
   try {
     final response = await dio.get('/api/countries');
@@ -728,6 +739,15 @@ final quranAudioReciterCountriesProvider = FutureProvider<Map<String, ReciterCou
         (key, value) => MapEntry(key, ReciterCountry.fromJson(value as Map<String, dynamic>)),
       );
     }
-  } catch (_) {}
-  return {};
+  } catch (e) {
+    debugPrint('Could not load countries from API ($_apiBaseUrl): $e');
+  }
+  return const {
+    'kuwait': ReciterCountry(name: 'Kuwait', flag: '🇰🇼', priority: 1),
+    'saudi_arabia': ReciterCountry(name: 'Saudi Arabia', flag: '🇸🇦', priority: 2),
+    'egypt': ReciterCountry(name: 'Egypt', flag: '🇪🇬', priority: 3),
+    'yemen': ReciterCountry(name: 'Yemen', flag: '🇾🇪', priority: 4),
+    'uae': ReciterCountry(name: 'United Arab Emirates', flag: '🇦🇪', priority: 5),
+    'other': ReciterCountry(name: 'Other', flag: '🌐', priority: 99),
+  };
 });

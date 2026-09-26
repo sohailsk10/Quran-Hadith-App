@@ -14,38 +14,54 @@ from pydantic import BaseModel, Field
 import httpx
 
 
+import os
+from logging.handlers import RotatingFileHandler
+
 # =============================================================================
 # Logging Configuration
 # =============================================================================
 
+LOG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "app.log")
+
 def setup_logging():
-    """Configure logging for the application."""
+    """Configure logging for the application with console and file output."""
     # Create logger
     logger = logging.getLogger("quran_audio_api")
     logger.setLevel(logging.DEBUG)
 
-    # Create console handler with formatting
-    console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setLevel(logging.DEBUG)
-
-    # Create formatter
+    # Format
     formatter = logging.Formatter(
         fmt="%(asctime)s | %(levelname)-8s | %(name)s | %(funcName)s:%(lineno)d | %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S"
     )
-    console_handler.setFormatter(formatter)
 
-    # Add handler to logger
+    # Create console handler
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setLevel(logging.DEBUG)
+    console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)
 
-    # Also configure uvicorn access logger
+    # Create file handler (writes to app.log)
+    file_handler = RotatingFileHandler(
+        LOG_FILE,
+        maxBytes=10 * 1024 * 1024,  # 10 MB
+        backupCount=5,
+        encoding="utf-8"
+    )
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+
+    # Also configure uvicorn access logger to write to both console and file
     uvicorn_access = logging.getLogger("uvicorn.access")
     uvicorn_access.setLevel(logging.INFO)
+    uvicorn_access.addHandler(file_handler)
 
     # Configure httpx logger
     httpx_logger = logging.getLogger("httpx")
     httpx_logger.setLevel(logging.WARNING)
 
+    logger.info(f"Logging initialized. Writing logs to {LOG_FILE}")
     return logger
 
 

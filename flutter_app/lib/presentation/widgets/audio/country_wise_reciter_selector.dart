@@ -44,23 +44,10 @@ class _CountryWiseReciterSelectorState
     final currentSelectedId = widget.selectedReciterId ??
         audioState.currentReciterId;
 
-    return recitersAsync.when(
-      loading: () => const Center(
-        child: Padding(
-          padding: EdgeInsets.all(AppConstants.spacingLG),
-          child: CircularProgressIndicator(),
-        ),
-      ),
-      error: (_, __) => _buildWithReciterList(
-        const [],
-        currentSelectedId,
-        theme,
-      ),
-      data: (reciters) {
-        final list = reciters.isNotEmpty ? reciters : <ReciterInfo>[];
-        return _buildWithReciterList(list, currentSelectedId, theme);
-      },
-    );
+    final fallbacks = QuranAudioApiNotifier.getFallbackReciters();
+    final reciters = recitersAsync.valueOrNull ?? fallbacks;
+    final list = reciters.isNotEmpty ? reciters : fallbacks;
+    return _buildWithReciterList(list, currentSelectedId, theme);
   }
 
   Widget _buildWithReciterList(
