@@ -1,75 +1,102 @@
-# flutter_application_1
+# Quran & Hadith Application
 
-A new Flutter project.
+A comprehensive, cross-platform Islamic application featuring Quran recitations, Hadith collections, prayer timings, and intelligent search. Built with a Flutter frontend and a Python FastAPI backend.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## Repository Structure
 
-### Prerequisites
-
-- Flutter SDK (^3.5.0)
-- Dart SDK (^3.5.0)
-- Android Studio / VS Code with Flutter extensions
-- Xcode (for iOS development)
-
-### Installation
-
-```bash
-flutter pub get
+```
+flutter_hadith_app/
+├── flutter_app/                  # Flutter application (Mobile, Web, Desktop)
+│   ├── android/                  # Android native project
+│   ├── assets/                   # Fonts, audio, and static assets
+│   ├── ios/                      # iOS native project
+│   ├── lib/                      # Core Flutter/Dart source code
+│   │   ├── core/                 # Constants, theme, audio services, utils
+│   │   ├── data/                 # Datasources (local SQLite & remote REST) & repositories
+│   │   ├── presentation/         # Pages, Riverpod providers, router, widgets
+│   │   └── shared/               # Data models for Quran, Hadith, Settings
+│   ├── linux/                    # Linux desktop runner
+│   ├── macos/                    # macOS desktop runner
+│   ├── test/                     # Unit and widget tests
+│   ├── web/                      # Flutter Web runner
+│   ├── windows/                  # Windows desktop runner
+│   ├── pubspec.yaml              # Flutter dependencies and assets
+│   └── analysis_options.yaml     # Dart analysis rules
+│
+├── python_backend/               # Python FastAPI backend service
+│   ├── main.py                   # FastAPI application & audio endpoints
+│   ├── requirements.txt          # Python dependencies
+│   ├── .env                      # Environment configuration
+│   └── README.md                 # Backend documentation & API spec
+│
+├── .gitignore                    # Unified gitignore for Flutter & Python
+└── README.md                     # Repository overview & setup guide
 ```
 
-### Running the app
+---
+
+## 1. Flutter Application (`flutter_app/`)
+
+### Key Features
+- **Quran Reader**: Surah and Juz views, Uthmani Arabic script, transliteration, and multiple translation languages.
+- **Synchronized Audio Player**: Continuous verse-by-verse recitation with active verse highlighting, dynamic bolding, and auto-scrolling.
+- **Reciter Selection**: Country-grouped reciters (e.g., Sheikh Mishari Rashid, Sheikh Yasser Al-Dosari, Sheikh Sudais, etc.).
+- **Hadith Collections**: Sahih al-Bukhari, Sahih Muslim, Sunan Abi Dawud, Jami` at-Tirmidhi, and more with chapter navigation and narrator chains.
+- **Prayer Timings**: Namaz timing integration with daily prayer schedules.
+- **Reading Settings Panel**: Customizable font sizes and toggles for Arabic, Translation, and Transliteration.
+- **Bookmarks & Offline Support**: Local caching for uninterrupted reading.
+
+### Getting Started
 
 ```bash
-# Mobile
-flutter run
+cd flutter_app
 
-# Web
+# Fetch dependencies
+flutter pub get
+
+# Run on Chrome/Edge (Web)
 flutter run -d chrome
 
-# Desktop
+# Run on Windows Desktop
 flutter run -d windows
-flutter run -d macos
-flutter run -d linux
+
+# Run on Mobile (connected device/emulator)
+flutter run
 ```
 
 ### Testing
 
 ```bash
+cd flutter_app
 flutter test
 ```
 
-### Building
+---
+
+## 2. Python Backend (`python_backend/`)
+
+A lightweight FastAPI service providing Quran reciter discovery, country mapping, and audio URL resolution.
+
+### Getting Started
 
 ```bash
-# Android
-flutter build apk
-flutter build appbundle
+cd python_backend
 
-# iOS
-flutter build ios
+# Create virtual environment (optional)
+python -m venv .venv
+# Windows:
+.venv\Scripts\activate
+# Linux/macOS:
+source .venv/bin/activate
 
-# Web
-flutter build web
+# Install dependencies
+pip install -r requirements.txt
 
-# Desktop
-flutter build windows
-flutter build macos
-flutter build linux
+# Run the API server
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-## Project Structure
-
-```
-lib/
-  main.dart          # Entry point
-test/
-  widget_test.dart   # Widget tests
-android/             # Android configuration
-ios/                 # iOS configuration
-web/                 # Web configuration
-windows/             # Windows configuration
-macos/               # macOS configuration
-linux/               # Linux configuration
-```
+- API Documentation: `http://localhost:8000/docs`
+- Health Check: `http://localhost:8000/health`

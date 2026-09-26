@@ -1,6 +1,6 @@
-# flutter_application_1
+# Quran & Hadith - Flutter App
 
-A new Flutter project.
+A cross-platform Flutter application for reading the Holy Quran and Hadith collections with synchronized audio recitations and prayer timings.
 
 ## Getting Started
 
