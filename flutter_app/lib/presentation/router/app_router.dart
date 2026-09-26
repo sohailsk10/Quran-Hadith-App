@@ -18,6 +18,8 @@ import '../../presentation/pages/audio/audio_player_page.dart';
 import '../../presentation/pages/bookmarks/bookmarks_page.dart';
 import '../../presentation/pages/topic/hadith_topic_page.dart';
 import '../../presentation/pages/namaz/namaz_timings_page.dart';
+import '../../presentation/pages/fatwas/fatwas_page.dart';
+import '../../presentation/pages/fatwas/scholar_fatwas_page.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -191,6 +193,23 @@ final routerProvider = Provider<GoRouter>((ref) {
             name: 'namaz-timings',
             builder: (context, state) => const NamazTimingsPage(),
           ),
+
+          // Fatwa Scholars
+          GoRoute(
+            path: '/scholars',
+            name: 'scholars',
+            builder: (context, state) => const FatwasPage(),
+            routes: [
+              GoRoute(
+                path: 'detail/:scholarName',
+                name: 'scholar-fatwas',
+                builder: (context, state) {
+                  final scholarName = state.pathParameters['scholarName']!;
+                  return ScholarFatwasPage(scholarName: scholarName);
+                },
+              ),
+            ],
+          ),
         ],
       ),
 
@@ -340,6 +359,16 @@ class _AppDrawer extends ConsumerWidget {
                   onTap: () {
                     Navigator.of(context).pop();
                     context.go('/bookmarks');
+                  },
+                ),
+                _DrawerItem(
+                  icon: Icons.access_time_outlined,
+                  selectedIcon: Icons.access_time,
+                  label: 'Fatwas',
+                  isSelected: location.startsWith('/scholars'),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    context.go('/scholars');
                   },
                 ),
                 _DrawerItem(

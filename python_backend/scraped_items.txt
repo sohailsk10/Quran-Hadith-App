@@ -1,0 +1,1842 @@
+<div itemscope="" itemtype="https://schema.org/WebSite">
+<meta content="https://alsalafiyyah.github.io" itemprop="url"/>
+<header class="border-b border-gray-100" itemscope="" itemtype="https://schema.org/WPHeader">
+<nav aria-label="Main Navigation" class="flex justify-between items-center px-8 py-5 max-w-7xl mx-auto uppercase tracking-widest text-xs font-bold" itemscope="" itemtype="https://schema.org/SiteNavigationElement">
+<div class="flex flex-1 items-center gap-8">
+<div class="hidden md:flex gap-8">
+<a class="relative py-1 text-black dark:text-white hover:text-red-500 dark:hover:text-red-500 transition-colors after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-red-500 hover:after:w-full after:transition-all" href="/fatwas/" itemprop="url"><span itemprop="name">Fatwas</span></a>
+<a class="relative py-1 text-black dark:text-white hover:text-red-500 dark:hover:text-red-500 transition-colors after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-red-500 hover:after:w-full after:transition-all" href="/audios/" itemprop="url"><span itemprop="name">Audios</span></a>
+<a class="relative py-1 text-black dark:text-white hover:text-red-500 dark:hover:text-red-500 transition-colors after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-red-500 hover:after:w-full after:transition-all" href="/videos/" itemprop="url"><span itemprop="name">Videos</span></a>
+<a class="relative py-1 text-black dark:text-white hover:text-red-500 dark:hover:text-red-500 transition-colors after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-red-500 hover:after:w-full after:transition-all" href="/quran/" itemprop="url"><span itemprop="name">Al-Qur'an</span></a>
+</div>
+<div class="md:hidden">
+<input class="hidden peer" id="menu-toggle" type="checkbox"/>
+<label class="cursor-pointer z-40 relative" for="menu-toggle">
+<svg class="h-6 w-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 8h16M4 16h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</label>
+<div class="fixed inset-0 bg-black text-white z-50 flex flex-col justify-center items-center gap-8 transition-transform duration-500 translate-x-full peer-checked:translate-x-0">
+<label class="absolute top-12 left-8 cursor-pointer" for="menu-toggle">
+<svg class="h-8 w-8" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</label>
+<a class="text-4xl font-black lowercase tracking-tighter serif italic hover:line-through transition-all" href="/fatwas/" itemprop="url"><span itemprop="name">Fatwas</span></a>
+<a class="text-4xl font-black lowercase tracking-tighter serif italic hover:line-through transition-all" href="/audios/" itemprop="url"><span itemprop="name">Audios</span></a>
+<a class="text-4xl font-black lowercase tracking-tighter serif italic hover:line-through transition-all" href="/videos/" itemprop="url"><span itemprop="name">Videos</span></a>
+<a class="text-4xl font-black lowercase tracking-tighter serif italic hover:line-through transition-all" href="/quran/" itemprop="url"><span itemprop="name">Al-Qur'an</span></a>
+</div>
+</div>
+</div>
+<!-- Logo Section -->
+<div class="flex-none">
+<a class="flex items-center relative z-10" href="/" itemprop="url">
+<img alt="Al-Salafiyyah Logo" class="w-auto h-16 object-contain dark:invert transition-all duration-300" src="/assets/logos/logo.svg?v=1790423839"/>
+<span class="sr-only" itemprop="name">Al-Salafiyyah</span>
+</a>
+</div>
+<div class="flex flex-1 justify-end" itemprop="potentialAction" itemscope="" itemtype="https://schema.org/SearchAction" role="search">
+<form action="/search" class="relative flex items-center group" itemprop="target" method="get">
+<meta content="/search?q={search_term_string}" itemprop="urlTemplate"/>
+<label class="cursor-pointer" dir="ltr" for="search-input">
+<svg class="h-5 w-5 md:h-3 md:w-3 opacity-40 group-focus-within:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+</svg>
+</label>
+<input class="bg-transparent border-b-2 border-black/30 md:border-gray-300 focus:border-red-500 dark:border-zinc-700 dark:focus:border-white outline-none transition-all duration-300 w-0 focus:w-36 ml-1 md:ml-4 md:w-28 md:focus:w-52 text-[10px] md:text-xs py-1.5 font-bold tracking-widest text-black dark:text-white" id="search-input" itemprop="query-input" name="q" placeholder="Search" type="search"/>
+</form>
+</div>
+</nav>
+</header>
+</div>
+--------------------------------------------------
+<div class="flex flex-1 items-center gap-8">
+<div class="hidden md:flex gap-8">
+<a class="relative py-1 text-black dark:text-white hover:text-red-500 dark:hover:text-red-500 transition-colors after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-red-500 hover:after:w-full after:transition-all" href="/fatwas/" itemprop="url"><span itemprop="name">Fatwas</span></a>
+<a class="relative py-1 text-black dark:text-white hover:text-red-500 dark:hover:text-red-500 transition-colors after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-red-500 hover:after:w-full after:transition-all" href="/audios/" itemprop="url"><span itemprop="name">Audios</span></a>
+<a class="relative py-1 text-black dark:text-white hover:text-red-500 dark:hover:text-red-500 transition-colors after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-red-500 hover:after:w-full after:transition-all" href="/videos/" itemprop="url"><span itemprop="name">Videos</span></a>
+<a class="relative py-1 text-black dark:text-white hover:text-red-500 dark:hover:text-red-500 transition-colors after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-red-500 hover:after:w-full after:transition-all" href="/quran/" itemprop="url"><span itemprop="name">Al-Qur'an</span></a>
+</div>
+<div class="md:hidden">
+<input class="hidden peer" id="menu-toggle" type="checkbox"/>
+<label class="cursor-pointer z-40 relative" for="menu-toggle">
+<svg class="h-6 w-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 8h16M4 16h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</label>
+<div class="fixed inset-0 bg-black text-white z-50 flex flex-col justify-center items-center gap-8 transition-transform duration-500 translate-x-full peer-checked:translate-x-0">
+<label class="absolute top-12 left-8 cursor-pointer" for="menu-toggle">
+<svg class="h-8 w-8" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</label>
+<a class="text-4xl font-black lowercase tracking-tighter serif italic hover:line-through transition-all" href="/fatwas/" itemprop="url"><span itemprop="name">Fatwas</span></a>
+<a class="text-4xl font-black lowercase tracking-tighter serif italic hover:line-through transition-all" href="/audios/" itemprop="url"><span itemprop="name">Audios</span></a>
+<a class="text-4xl font-black lowercase tracking-tighter serif italic hover:line-through transition-all" href="/videos/" itemprop="url"><span itemprop="name">Videos</span></a>
+<a class="text-4xl font-black lowercase tracking-tighter serif italic hover:line-through transition-all" href="/quran/" itemprop="url"><span itemprop="name">Al-Qur'an</span></a>
+</div>
+</div>
+</div>
+--------------------------------------------------
+<div class="hidden md:flex gap-8">
+<a class="relative py-1 text-black dark:text-white hover:text-red-500 dark:hover:text-red-500 transition-colors after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-red-500 hover:after:w-full after:transition-all" href="/fatwas/" itemprop="url"><span itemprop="name">Fatwas</span></a>
+<a class="relative py-1 text-black dark:text-white hover:text-red-500 dark:hover:text-red-500 transition-colors after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-red-500 hover:after:w-full after:transition-all" href="/audios/" itemprop="url"><span itemprop="name">Audios</span></a>
+<a class="relative py-1 text-black dark:text-white hover:text-red-500 dark:hover:text-red-500 transition-colors after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-red-500 hover:after:w-full after:transition-all" href="/videos/" itemprop="url"><span itemprop="name">Videos</span></a>
+<a class="relative py-1 text-black dark:text-white hover:text-red-500 dark:hover:text-red-500 transition-colors after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-red-500 hover:after:w-full after:transition-all" href="/quran/" itemprop="url"><span itemprop="name">Al-Qur'an</span></a>
+</div>
+--------------------------------------------------
+<div class="md:hidden">
+<input class="hidden peer" id="menu-toggle" type="checkbox"/>
+<label class="cursor-pointer z-40 relative" for="menu-toggle">
+<svg class="h-6 w-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 8h16M4 16h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</label>
+<div class="fixed inset-0 bg-black text-white z-50 flex flex-col justify-center items-center gap-8 transition-transform duration-500 translate-x-full peer-checked:translate-x-0">
+<label class="absolute top-12 left-8 cursor-pointer" for="menu-toggle">
+<svg class="h-8 w-8" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</label>
+<a class="text-4xl font-black lowercase tracking-tighter serif italic hover:line-through transition-all" href="/fatwas/" itemprop="url"><span itemprop="name">Fatwas</span></a>
+<a class="text-4xl font-black lowercase tracking-tighter serif italic hover:line-through transition-all" href="/audios/" itemprop="url"><span itemprop="name">Audios</span></a>
+<a class="text-4xl font-black lowercase tracking-tighter serif italic hover:line-through transition-all" href="/videos/" itemprop="url"><span itemprop="name">Videos</span></a>
+<a class="text-4xl font-black lowercase tracking-tighter serif italic hover:line-through transition-all" href="/quran/" itemprop="url"><span itemprop="name">Al-Qur'an</span></a>
+</div>
+</div>
+--------------------------------------------------
+<div class="fixed inset-0 bg-black text-white z-50 flex flex-col justify-center items-center gap-8 transition-transform duration-500 translate-x-full peer-checked:translate-x-0">
+<label class="absolute top-12 left-8 cursor-pointer" for="menu-toggle">
+<svg class="h-8 w-8" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</label>
+<a class="text-4xl font-black lowercase tracking-tighter serif italic hover:line-through transition-all" href="/fatwas/" itemprop="url"><span itemprop="name">Fatwas</span></a>
+<a class="text-4xl font-black lowercase tracking-tighter serif italic hover:line-through transition-all" href="/audios/" itemprop="url"><span itemprop="name">Audios</span></a>
+<a class="text-4xl font-black lowercase tracking-tighter serif italic hover:line-through transition-all" href="/videos/" itemprop="url"><span itemprop="name">Videos</span></a>
+<a class="text-4xl font-black lowercase tracking-tighter serif italic hover:line-through transition-all" href="/quran/" itemprop="url"><span itemprop="name">Al-Qur'an</span></a>
+</div>
+--------------------------------------------------
+<div class="flex-none">
+<a class="flex items-center relative z-10" href="/" itemprop="url">
+<img alt="Al-Salafiyyah Logo" class="w-auto h-16 object-contain dark:invert transition-all duration-300" src="/assets/logos/logo.svg?v=1790423839"/>
+<span class="sr-only" itemprop="name">Al-Salafiyyah</span>
+</a>
+</div>
+--------------------------------------------------
+<div class="flex flex-1 justify-end" itemprop="potentialAction" itemscope="" itemtype="https://schema.org/SearchAction" role="search">
+<form action="/search" class="relative flex items-center group" itemprop="target" method="get">
+<meta content="/search?q={search_term_string}" itemprop="urlTemplate"/>
+<label class="cursor-pointer" dir="ltr" for="search-input">
+<svg class="h-5 w-5 md:h-3 md:w-3 opacity-40 group-focus-within:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+</svg>
+</label>
+<input class="bg-transparent border-b-2 border-black/30 md:border-gray-300 focus:border-red-500 dark:border-zinc-700 dark:focus:border-white outline-none transition-all duration-300 w-0 focus:w-36 ml-1 md:ml-4 md:w-28 md:focus:w-52 text-[10px] md:text-xs py-1.5 font-bold tracking-widest text-black dark:text-white" id="search-input" itemprop="query-input" name="q" placeholder="Search" type="search"/>
+</form>
+</div>
+--------------------------------------------------
+<div class="max-w-7xl">
+<h2 class="text-3xl md:text-[3vw] leading-[0.9] font-black uppercase tracking-tighter serif mt-8" itemprop="headline">
+              Fatwas
+           </h2>
+</div>
+--------------------------------------------------
+<div class="border-t-2 border-black dark:border-white pt-4">
+<span class="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-5">Latest Fatwas</span>
+<ul class="space-y-6">
+<li>
+<a class="group block" href="/audios/the-echoes-of-jahiliyyah-a-warning-against-mistreating-daughters/">
+<span class="text-[10px] font-bold opacity-50 block mb-1">
+                       1448-04-14 \ 2026-09-25
+                    </span>
+<span class="text-lg font-bold group-hover:underline">The Echoes of Jahiliyyah: A Warning Against Mistreating Daughters</span>
+</a>
+</li>
+<li>
+<a class="group block" href="/audios/struggling-with-smoking-and-repentance-what-should-i-do/">
+<span class="text-[10px] font-bold opacity-50 block mb-1">
+                       1448-04-14 \ 2026-09-25
+                    </span>
+<span class="text-lg font-bold group-hover:underline">Struggling with Smoking and Repentance: What Should I Do?</span>
+</a>
+</li>
+<li>
+<a class="group block" href="/audios/ruling-on-a-muslim-woman-visiting-her-non-muslim-family/">
+<span class="text-[10px] font-bold opacity-50 block mb-1">
+                       1448-04-14 \ 2026-09-25
+                    </span>
+<span class="text-lg font-bold group-hover:underline">Ruling on a Muslim Woman Visiting Her Non-Muslim Family</span>
+</a>
+</li>
+</ul>
+</div>
+--------------------------------------------------
+<div class="border-t-2 border-black dark:border-white pt-4">
+<span class="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-2">Categories</span>
+<div class="relative group">
+<select class="w-full bg-transparent border-2 border-black dark:border-white px-4 py-3 text-[10px] font-black uppercase tracking-widest appearance-none cursor-pointer focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black transition-all outline-none" dir="ltr" onchange="window.location.href=this.value">
+<option disabled="" selected="" value="">Select Category</option>
+<option value="/category/ablution/">
+                        Wudu' (Ablution)
+                    </option>
+<option value="/category/adhab-qabr/">
+                        Adhab Al-Qabr (The Punishment of The Graves)
+                    </option>
+<option value="/category/adhan/">
+                        Adhan (Call to prayer)
+                    </option>
+<option value="/category/afterlife/">
+                        Afterlife (Akhirah)
+                    </option>
+<option value="/category/ahl-fatrah/">
+                        Ahl Al-Fatrah (the People of the Interregnum)
+                    </option>
+<option value="/category/amar-maruf/">
+                        Enjoining Good and Forbidding Evil
+                    </option>
+<option value="/category/animals/">
+                        Animals
+                    </option>
+<option value="/category/apostasy/">
+                        Apostasy
+                    </option>
+<option value="/category/aqidah/">
+                        Aqidah (Creed)
+                    </option>
+<option value="/category/audios/">
+                        Audios
+                    </option>
+<option value="/category/bidah/">
+                        Bid'ah (Deviant Innovation)
+                    </option>
+<option value="/category/biography/">
+                        Biography
+                    </option>
+<option value="/category/books/">
+                        Books
+                    </option>
+<option value="/category/buyu/">
+                        Al-Buyu' (Sales)
+                    </option>
+<option value="/category/charity/">
+                        Charity, Sadaqah, Zakah
+                    </option>
+<option value="/category/daif/">
+                        Mawdu' (Fabricated) and Da'if (Weak) Hadiths
+                    </option>
+<option value="/category/darwinian/">
+                        Darwinism
+                    </option>
+<option value="/category/darwinism/">
+                        Darwinism
+                    </option>
+<option value="/category/dawah/">
+                        Da'wah (Calling to Islam)
+                    </option>
+<option value="/category/diviner/">
+                        Diviner and fortune-telling
+                    </option>
+<option value="/category/divorce/">
+                        Divorce
+                    </option>
+<option value="/category/doomsday/">
+                        Doomsday
+                    </option>
+<option value="/category/drugs/">
+                        Drugs
+                    </option>
+<option value="/category/engagement/">
+                        Engagement
+                    </option>
+<option value="/category/fasting/">
+                        Shawm (Fasting)
+                    </option>
+<option value="/category/fatwas/">
+                        Fatwas (Legal ruling)
+                    </option>
+<option value="/category/fawaid/">
+                        Fawaid
+                    </option>
+<option value="/category/festivals/">
+                        Festifals &amp; Celebrations
+                    </option>
+<option value="/category/fiqh/">
+                        Usul Al-Fiqh (Principles of Islamic jurisprudence)
+                    </option>
+<option value="/category/fitnahs/">
+                        Fitnahs
+                    </option>
+<option value="/category/food/">
+                        Food
+                    </option>
+<option value="/category/foundling/">
+                        Foundling
+                    </option>
+<option value="/category/funerals/">
+                        Funerals
+                    </option>
+<option value="/category/general/">
+                        General
+                    </option>
+<option value="/category/ghibah/">
+                        Ghibah (Backbiting) and Namimah (tale-bearing)
+                    </option>
+<option value="/category/hadiths/">
+                        Hadits Explanation
+                    </option>
+<option value="/category/hajj-umrah/">
+                        Hajj &amp; 'Umrah
+                    </option>
+<option value="/category/hajj/">
+                        Hajj &amp; 'Umrah
+                    </option>
+<option value="/category/hijab/">
+                        Hijab
+                    </option>
+<option value="/category/hijrah/">
+                        Hijrah
+                    </option>
+<option value="/category/hisbah/">
+                        Hisbah
+                    </option>
+<option value="/category/history/">
+                        History
+                    </option>
+<option value="/category/homosexual/">
+                        Homosexual
+                    </option>
+<option value="/category/hudud/">
+                        Hudud
+                    </option>
+<option value="/category/hunting/">
+                        Hunting
+                    </option>
+<option value="/category/ikhwanism/">
+                        Ikhwanism - the Muslim Brotherhood (Al-Ikhwan al-Muslimun) Group
+                    </option>
+<option value="/category/inheritance/">
+                        Inheritance
+                    </option>
+<option value="/category/intoxicants/">
+                        Intoxicants
+                    </option>
+<option value="/category/iqamah/">
+                        Iqamah (Second call to prayer)
+                    </option>
+<option value="/category/jihad/">
+                        Jihad
+                    </option>
+<option value="/category/khawarij/">
+                        Khawarij Sect
+                    </option>
+<option value="/category/khutbah/">
+                        Khutbah (Sermon)
+                    </option>
+<option value="/category/knowledge/">
+                        'Ilm (Knowledge)
+                    </option>
+<option value="/category/lesbianism/">
+                        Lesbianism
+                    </option>
+<option value="/category/loan/">
+                        Loan
+                    </option>
+<option value="/category/luqatah/">
+                        Luqatah (Lost property)
+                    </option>
+<option value="/category/madhabs/">
+                        Madhabs
+                    </option>
+<option value="/category/manhaj/">
+                        Manhaj (Methodology)
+                    </option>
+<option value="/category/marriage/">
+                        Al-Nikah (Marriage)
+                    </option>
+<option value="/category/masturbation/">
+                        Masturbation
+                    </option>
+<option value="/category/mawdu-daif/">
+                        Mawdu &amp; Daif Hadiths
+                    </option>
+<option value="/category/mawlid/">
+                        Mawlid (Prophet's Birthday, Festival, Celebrations)
+                    </option>
+<option value="/category/mawlids/">
+                        Mawlids (Celebrations)
+                    </option>
+<option value="/category/misc/">
+                        Miscellaneous
+                    </option>
+<option value="/category/muqolat/">
+                        Muqolat (Articles)
+                    </option>
+<option value="/category/music/">
+                        Music
+                    </option>
+<option value="/category/mutazilah/">
+                        The Deviant Sect: Mu'tazilah
+                    </option>
+<option value="/category/nawaqid/">
+                        Nawaqid Al-Islam (Nullifiers of Islam)
+                    </option>
+<option value="/category/niqab/">
+                        Niqab
+                    </option>
+<option value="/category/non-muslim/">
+                        Non-Muslim
+                    </option>
+<option value="/category/non-muslims/">
+                        Non-Muslims
+                    </option>
+<option value="/category/oaths/">
+                        Oaths &amp; Vows
+                    </option>
+<option value="/category/palestine/">
+                        Palestine
+                    </option>
+<option value="/category/parenting/">
+                        Parenting
+                    </option>
+<option value="/category/politics/">
+                        Politics
+                    </option>
+<option value="/category/prophets/">
+                        Prophets and Messengers
+                    </option>
+<option value="/category/quburiyyun/">
+                        Quburiyyun (Grave-Worshippers)
+                    </option>
+<option value="/category/quran/">
+                        Qur'an Exegesis
+                    </option>
+<option value="/category/quranism/">
+                        Qur'anism &amp; Rejecters of Sunnah
+                    </option>
+<option value="/category/refutals/">
+                        Refutals
+                    </option>
+<option value="/category/riba/">
+                        Riba
+                    </option>
+<option value="/category/riddah/">
+                        Riddah (Apostasy)
+                    </option>
+<option value="/category/rulership/">
+                        Rulership
+                    </option>
+<option value="/category/sacrifice/">
+                        Udhiyah (Sacrifice)
+                    </option>
+<option value="/category/sahabah/">
+                        Companions of the Prophet
+                    </option>
+<option value="/category/salah/">
+                        Salah (Prayer)
+                    </option>
+<option value="/category/sects/">
+                        The Sects &amp; Groups
+                    </option>
+<option value="/category/shia/">
+                        Shia (Shiites)
+                    </option>
+<option value="/category/shirk/">
+                        Shirk (Polytheism)
+                    </option>
+<option value="/category/sufism/">
+                        Sufism
+                    </option>
+<option value="/category/sunnah/">
+                        Sunnah
+                    </option>
+<option value="/category/superstitions/">
+                        Superstitions
+                    </option>
+<option value="/category/tafsir/">
+                        Tafsir
+                    </option>
+<option value="/category/taharah/">
+                        Taharah (Purification)
+                    </option>
+<option value="/category/takfir/">
+                        Takfir (Labeling people as disbelievers)
+                    </option>
+<option value="/category/taswir/">
+                        Taswir (painting, drawing, sculpture, photography, etc)
+                    </option>
+<option value="/category/tawassul/">
+                        Tawassul
+                    </option>
+<option value="/category/tawhid/">
+                        Tawhid
+                    </option>
+<option value="/category/terminology/">
+                        Terminology
+                    </option>
+<option value="/category/terrorism/">
+                        Terrorism
+                    </option>
+<option value="/category/transaction/">
+                        Transaction
+                    </option>
+<option value="/category/treatments/">
+                        Treatments
+                    </option>
+<option value="/category/udhiyah/">
+                        Udhiyah (Animal sacrifice)
+                    </option>
+<option value="/category/unseen/">
+                        Ghaib (Unseen)
+                    </option>
+<option value="/category/videos/">
+                        Videos
+                    </option>
+<option value="/category/wahhabism/">
+                        Wahhabiyah (Wahhabism)
+                    </option>
+<option value="/category/walabara/">
+                        Al-Wala' Wal-Bara' (loyalty and disassociation for Allah's Sake)
+                    </option>
+<option value="/category/waqf/">
+                        Waqf (Endowments)
+                    </option>
+<option value="/category/women/">
+                        Women
+                    </option>
+<option value="/category/zina/">
+                        Zina (adultery or sexual intercourse outside marriage)
+                    </option>
+</select>
+<div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" dir="ltr">
+<svg class="h-3 w-3" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path>
+</svg>
+</div>
+</div>
+</div>
+--------------------------------------------------
+<div class="relative group">
+<select class="w-full bg-transparent border-2 border-black dark:border-white px-4 py-3 text-[10px] font-black uppercase tracking-widest appearance-none cursor-pointer focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black transition-all outline-none" dir="ltr" onchange="window.location.href=this.value">
+<option disabled="" selected="" value="">Select Category</option>
+<option value="/category/ablution/">
+                        Wudu' (Ablution)
+                    </option>
+<option value="/category/adhab-qabr/">
+                        Adhab Al-Qabr (The Punishment of The Graves)
+                    </option>
+<option value="/category/adhan/">
+                        Adhan (Call to prayer)
+                    </option>
+<option value="/category/afterlife/">
+                        Afterlife (Akhirah)
+                    </option>
+<option value="/category/ahl-fatrah/">
+                        Ahl Al-Fatrah (the People of the Interregnum)
+                    </option>
+<option value="/category/amar-maruf/">
+                        Enjoining Good and Forbidding Evil
+                    </option>
+<option value="/category/animals/">
+                        Animals
+                    </option>
+<option value="/category/apostasy/">
+                        Apostasy
+                    </option>
+<option value="/category/aqidah/">
+                        Aqidah (Creed)
+                    </option>
+<option value="/category/audios/">
+                        Audios
+                    </option>
+<option value="/category/bidah/">
+                        Bid'ah (Deviant Innovation)
+                    </option>
+<option value="/category/biography/">
+                        Biography
+                    </option>
+<option value="/category/books/">
+                        Books
+                    </option>
+<option value="/category/buyu/">
+                        Al-Buyu' (Sales)
+                    </option>
+<option value="/category/charity/">
+                        Charity, Sadaqah, Zakah
+                    </option>
+<option value="/category/daif/">
+                        Mawdu' (Fabricated) and Da'if (Weak) Hadiths
+                    </option>
+<option value="/category/darwinian/">
+                        Darwinism
+                    </option>
+<option value="/category/darwinism/">
+                        Darwinism
+                    </option>
+<option value="/category/dawah/">
+                        Da'wah (Calling to Islam)
+                    </option>
+<option value="/category/diviner/">
+                        Diviner and fortune-telling
+                    </option>
+<option value="/category/divorce/">
+                        Divorce
+                    </option>
+<option value="/category/doomsday/">
+                        Doomsday
+                    </option>
+<option value="/category/drugs/">
+                        Drugs
+                    </option>
+<option value="/category/engagement/">
+                        Engagement
+                    </option>
+<option value="/category/fasting/">
+                        Shawm (Fasting)
+                    </option>
+<option value="/category/fatwas/">
+                        Fatwas (Legal ruling)
+                    </option>
+<option value="/category/fawaid/">
+                        Fawaid
+                    </option>
+<option value="/category/festivals/">
+                        Festifals &amp; Celebrations
+                    </option>
+<option value="/category/fiqh/">
+                        Usul Al-Fiqh (Principles of Islamic jurisprudence)
+                    </option>
+<option value="/category/fitnahs/">
+                        Fitnahs
+                    </option>
+<option value="/category/food/">
+                        Food
+                    </option>
+<option value="/category/foundling/">
+                        Foundling
+                    </option>
+<option value="/category/funerals/">
+                        Funerals
+                    </option>
+<option value="/category/general/">
+                        General
+                    </option>
+<option value="/category/ghibah/">
+                        Ghibah (Backbiting) and Namimah (tale-bearing)
+                    </option>
+<option value="/category/hadiths/">
+                        Hadits Explanation
+                    </option>
+<option value="/category/hajj-umrah/">
+                        Hajj &amp; 'Umrah
+                    </option>
+<option value="/category/hajj/">
+                        Hajj &amp; 'Umrah
+                    </option>
+<option value="/category/hijab/">
+                        Hijab
+                    </option>
+<option value="/category/hijrah/">
+                        Hijrah
+                    </option>
+<option value="/category/hisbah/">
+                        Hisbah
+                    </option>
+<option value="/category/history/">
+                        History
+                    </option>
+<option value="/category/homosexual/">
+                        Homosexual
+                    </option>
+<option value="/category/hudud/">
+                        Hudud
+                    </option>
+<option value="/category/hunting/">
+                        Hunting
+                    </option>
+<option value="/category/ikhwanism/">
+                        Ikhwanism - the Muslim Brotherhood (Al-Ikhwan al-Muslimun) Group
+                    </option>
+<option value="/category/inheritance/">
+                        Inheritance
+                    </option>
+<option value="/category/intoxicants/">
+                        Intoxicants
+                    </option>
+<option value="/category/iqamah/">
+                        Iqamah (Second call to prayer)
+                    </option>
+<option value="/category/jihad/">
+                        Jihad
+                    </option>
+<option value="/category/khawarij/">
+                        Khawarij Sect
+                    </option>
+<option value="/category/khutbah/">
+                        Khutbah (Sermon)
+                    </option>
+<option value="/category/knowledge/">
+                        'Ilm (Knowledge)
+                    </option>
+<option value="/category/lesbianism/">
+                        Lesbianism
+                    </option>
+<option value="/category/loan/">
+                        Loan
+                    </option>
+<option value="/category/luqatah/">
+                        Luqatah (Lost property)
+                    </option>
+<option value="/category/madhabs/">
+                        Madhabs
+                    </option>
+<option value="/category/manhaj/">
+                        Manhaj (Methodology)
+                    </option>
+<option value="/category/marriage/">
+                        Al-Nikah (Marriage)
+                    </option>
+<option value="/category/masturbation/">
+                        Masturbation
+                    </option>
+<option value="/category/mawdu-daif/">
+                        Mawdu &amp; Daif Hadiths
+                    </option>
+<option value="/category/mawlid/">
+                        Mawlid (Prophet's Birthday, Festival, Celebrations)
+                    </option>
+<option value="/category/mawlids/">
+                        Mawlids (Celebrations)
+                    </option>
+<option value="/category/misc/">
+                        Miscellaneous
+                    </option>
+<option value="/category/muqolat/">
+                        Muqolat (Articles)
+                    </option>
+<option value="/category/music/">
+                        Music
+                    </option>
+<option value="/category/mutazilah/">
+                        The Deviant Sect: Mu'tazilah
+                    </option>
+<option value="/category/nawaqid/">
+                        Nawaqid Al-Islam (Nullifiers of Islam)
+                    </option>
+<option value="/category/niqab/">
+                        Niqab
+                    </option>
+<option value="/category/non-muslim/">
+                        Non-Muslim
+                    </option>
+<option value="/category/non-muslims/">
+                        Non-Muslims
+                    </option>
+<option value="/category/oaths/">
+                        Oaths &amp; Vows
+                    </option>
+<option value="/category/palestine/">
+                        Palestine
+                    </option>
+<option value="/category/parenting/">
+                        Parenting
+                    </option>
+<option value="/category/politics/">
+                        Politics
+                    </option>
+<option value="/category/prophets/">
+                        Prophets and Messengers
+                    </option>
+<option value="/category/quburiyyun/">
+                        Quburiyyun (Grave-Worshippers)
+                    </option>
+<option value="/category/quran/">
+                        Qur'an Exegesis
+                    </option>
+<option value="/category/quranism/">
+                        Qur'anism &amp; Rejecters of Sunnah
+                    </option>
+<option value="/category/refutals/">
+                        Refutals
+                    </option>
+<option value="/category/riba/">
+                        Riba
+                    </option>
+<option value="/category/riddah/">
+                        Riddah (Apostasy)
+                    </option>
+<option value="/category/rulership/">
+                        Rulership
+                    </option>
+<option value="/category/sacrifice/">
+                        Udhiyah (Sacrifice)
+                    </option>
+<option value="/category/sahabah/">
+                        Companions of the Prophet
+                    </option>
+<option value="/category/salah/">
+                        Salah (Prayer)
+                    </option>
+<option value="/category/sects/">
+                        The Sects &amp; Groups
+                    </option>
+<option value="/category/shia/">
+                        Shia (Shiites)
+                    </option>
+<option value="/category/shirk/">
+                        Shirk (Polytheism)
+                    </option>
+<option value="/category/sufism/">
+                        Sufism
+                    </option>
+<option value="/category/sunnah/">
+                        Sunnah
+                    </option>
+<option value="/category/superstitions/">
+                        Superstitions
+                    </option>
+<option value="/category/tafsir/">
+                        Tafsir
+                    </option>
+<option value="/category/taharah/">
+                        Taharah (Purification)
+                    </option>
+<option value="/category/takfir/">
+                        Takfir (Labeling people as disbelievers)
+                    </option>
+<option value="/category/taswir/">
+                        Taswir (painting, drawing, sculpture, photography, etc)
+                    </option>
+<option value="/category/tawassul/">
+                        Tawassul
+                    </option>
+<option value="/category/tawhid/">
+                        Tawhid
+                    </option>
+<option value="/category/terminology/">
+                        Terminology
+                    </option>
+<option value="/category/terrorism/">
+                        Terrorism
+                    </option>
+<option value="/category/transaction/">
+                        Transaction
+                    </option>
+<option value="/category/treatments/">
+                        Treatments
+                    </option>
+<option value="/category/udhiyah/">
+                        Udhiyah (Animal sacrifice)
+                    </option>
+<option value="/category/unseen/">
+                        Ghaib (Unseen)
+                    </option>
+<option value="/category/videos/">
+                        Videos
+                    </option>
+<option value="/category/wahhabism/">
+                        Wahhabiyah (Wahhabism)
+                    </option>
+<option value="/category/walabara/">
+                        Al-Wala' Wal-Bara' (loyalty and disassociation for Allah's Sake)
+                    </option>
+<option value="/category/waqf/">
+                        Waqf (Endowments)
+                    </option>
+<option value="/category/women/">
+                        Women
+                    </option>
+<option value="/category/zina/">
+                        Zina (adultery or sexual intercourse outside marriage)
+                    </option>
+</select>
+<div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" dir="ltr">
+<svg class="h-3 w-3" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path>
+</svg>
+</div>
+</div>
+--------------------------------------------------
+<div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" dir="ltr">
+<svg class="h-3 w-3" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path>
+</svg>
+</div>
+--------------------------------------------------
+<div class="flex flex-row justify-between items-center text-[12px] font-black uppercase tracking-[0.1em] w-full">
+<!-- Post Date Layout -->
+<span class="text-zinc-400 dark:text-zinc-600 tabular-nums">
+                1448-04-14 \ 2026-09-25
+            </span>
+<!-- Post Type Indicator -->
+<span class="inline-flex items-center gap-1.5 font-semibold text-purple-600 dark:text-purple-400">
+<svg class="w-3 h-3 transition-colors duration-200" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Audio Fatwa</title><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="23"></line><line x1="8" x2="16" y1="23" y2="23"></line></svg>
+                 Audio
+             </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-col gap-2">
+<!-- Scholar Name -->
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn uthaymeen
+                </span>
+</div>
+<!-- Title -->
+<h3 class="text-2xl font-sans md:text-3xl font-black font-extrabold capitalize tracking-tight leading-snug text-black dark:text-white group-hover:underline decoration-2 underline-offset-4">
+                The Echoes of Jahiliyyah: A Warning Against Mistreating Daughters
+            </h3>
+<p class="text-sm text-zinc-500 dark:text-zinc-400 lowercase normal-case leading-relaxed max-w-2xl line-clamp-2 font-normal">
+                As for the father, I advise him to be a helper to his children—both sons and daughters—in enabling them to honor him, to be gentle with t...
+            </p>
+</div>
+--------------------------------------------------
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn uthaymeen
+                </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-row justify-between items-center text-[12px] font-black uppercase tracking-[0.1em] w-full">
+<!-- Post Date Layout -->
+<span class="text-zinc-400 dark:text-zinc-600 tabular-nums">
+                1448-04-14 \ 2026-09-25
+            </span>
+<!-- Post Type Indicator -->
+<span class="inline-flex items-center gap-1.5 font-semibold text-purple-600 dark:text-purple-400">
+<svg class="w-3 h-3 transition-colors duration-200" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Audio Fatwa</title><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="23"></line><line x1="8" x2="16" y1="23" y2="23"></line></svg>
+                 Audio
+             </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-col gap-2">
+<!-- Scholar Name -->
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn uthaymeen
+                </span>
+</div>
+<!-- Title -->
+<h3 class="text-2xl font-sans md:text-3xl font-black font-extrabold capitalize tracking-tight leading-snug text-black dark:text-white group-hover:underline decoration-2 underline-offset-4">
+                Struggling with Smoking and Repentance: What Should I Do?
+            </h3>
+<p class="text-sm text-zinc-500 dark:text-zinc-400 lowercase normal-case leading-relaxed max-w-2xl line-clamp-2 font-normal">
+                Whenever your soul prompts you to smoke it, drink juice instead to alleviate the craving. Or, if you fear that your soul will persistentl...
+            </p>
+</div>
+--------------------------------------------------
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn uthaymeen
+                </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-row justify-between items-center text-[12px] font-black uppercase tracking-[0.1em] w-full">
+<!-- Post Date Layout -->
+<span class="text-zinc-400 dark:text-zinc-600 tabular-nums">
+                1448-04-14 \ 2026-09-25
+            </span>
+<!-- Post Type Indicator -->
+<span class="inline-flex items-center gap-1.5 font-semibold text-purple-600 dark:text-purple-400">
+<svg class="w-3 h-3 transition-colors duration-200" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Audio Fatwa</title><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="23"></line><line x1="8" x2="16" y1="23" y2="23"></line></svg>
+                 Audio
+             </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-col gap-2">
+<!-- Scholar Name -->
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn uthaymeen
+                </span>
+</div>
+<!-- Title -->
+<h3 class="text-2xl font-sans md:text-3xl font-black font-extrabold capitalize tracking-tight leading-snug text-black dark:text-white group-hover:underline decoration-2 underline-offset-4">
+                Ruling on a Muslim Woman Visiting Her Non-Muslim Family
+            </h3>
+<p class="text-sm text-zinc-500 dark:text-zinc-400 lowercase normal-case leading-relaxed max-w-2xl line-clamp-2 font-normal">
+                Maintaining ties of kinship is not considered allegiance. Rather, allegiance is one thing, and maintaining ties of kinship is something e...
+            </p>
+</div>
+--------------------------------------------------
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn uthaymeen
+                </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-row justify-between items-center text-[12px] font-black uppercase tracking-[0.1em] w-full">
+<!-- Post Date Layout -->
+<span class="text-zinc-400 dark:text-zinc-600 tabular-nums">
+                1448-04-14 \ 2026-09-25
+            </span>
+<!-- Post Type Indicator -->
+<span class="inline-flex items-center gap-1.5 font-semibold text-purple-600 dark:text-purple-400">
+<svg class="w-3 h-3 transition-colors duration-200" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Audio Fatwa</title><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="23"></line><line x1="8" x2="16" y1="23" y2="23"></line></svg>
+                 Audio
+             </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-col gap-2">
+<!-- Scholar Name -->
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn uthaymeen
+                </span>
+</div>
+<!-- Title -->
+<h3 class="text-2xl font-sans md:text-3xl font-black font-extrabold capitalize tracking-tight leading-snug text-black dark:text-white group-hover:underline decoration-2 underline-offset-4">
+                How to Treat Non-Muslim Parents and Kin After Embracing Islam
+            </h3>
+<p class="text-sm text-zinc-500 dark:text-zinc-400 lowercase normal-case leading-relaxed max-w-2xl line-clamp-2 font-normal">
+                The duty of a Muslim child toward their parents is to treat them with righteousness and kindness in matters concerning worldly life.
+            </p>
+</div>
+--------------------------------------------------
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn uthaymeen
+                </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-row justify-between items-center text-[12px] font-black uppercase tracking-[0.1em] w-full">
+<!-- Post Date Layout -->
+<span class="text-zinc-400 dark:text-zinc-600 tabular-nums">
+                1448-04-14 \ 2026-09-25
+            </span>
+<!-- Post Type Indicator -->
+<span class="inline-flex items-center gap-1.5 font-semibold text-purple-600 dark:text-purple-400">
+<svg class="w-3 h-3 transition-colors duration-200" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Audio Fatwa</title><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="23"></line><line x1="8" x2="16" y1="23" y2="23"></line></svg>
+                 Audio
+             </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-col gap-2">
+<!-- Scholar Name -->
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn uthaymeen
+                </span>
+</div>
+<!-- Title -->
+<h3 class="text-2xl font-sans md:text-3xl font-black font-extrabold capitalize tracking-tight leading-snug text-black dark:text-white group-hover:underline decoration-2 underline-offset-4">
+                Forcing a Son to Marry: Ruling on Parental Pressure and Marriage Choice
+            </h3>
+<p class="text-sm text-zinc-500 dark:text-zinc-400 lowercase normal-case leading-relaxed max-w-2xl line-clamp-2 font-normal">
+                It is not permissible for a father to force his son to marry a woman he does not want, nor to prevent him from marrying a woman he desire...
+            </p>
+</div>
+--------------------------------------------------
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn uthaymeen
+                </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-row justify-between items-center text-[12px] font-black uppercase tracking-[0.1em] w-full">
+<!-- Post Date Layout -->
+<span class="text-zinc-400 dark:text-zinc-600 tabular-nums">
+                1448-04-10 \ 2026-09-21
+            </span>
+<!-- Post Type Indicator -->
+<span class="inline-flex items-center gap-1.5 font-semibold text-purple-600 dark:text-purple-400">
+<svg class="w-3 h-3 transition-colors duration-200" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Audio Fatwa</title><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="23"></line><line x1="8" x2="16" y1="23" y2="23"></line></svg>
+                 Audio
+             </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-col gap-2">
+<!-- Scholar Name -->
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn uthaymeen
+                </span>
+</div>
+<!-- Title -->
+<h3 class="text-2xl font-sans md:text-3xl font-black font-extrabold capitalize tracking-tight leading-snug text-black dark:text-white group-hover:underline decoration-2 underline-offset-4">
+                Ruling on Using the Term 'Mutaslim' for Muslims and Preachers
+            </h3>
+<p class="text-sm text-zinc-500 dark:text-zinc-400 lowercase normal-case leading-relaxed max-w-2xl line-clamp-2 font-normal">
+                We do not have that here; with us, there is a Muslim, not a Mutaslim. But do not be surprised, do not be surprised, do not be surprised.
+            </p>
+</div>
+--------------------------------------------------
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn uthaymeen
+                </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-row justify-between items-center text-[12px] font-black uppercase tracking-[0.1em] w-full">
+<!-- Post Date Layout -->
+<span class="text-zinc-400 dark:text-zinc-600 tabular-nums">
+                1448-04-10 \ 2026-09-21
+            </span>
+<!-- Post Type Indicator -->
+<span class="inline-flex items-center gap-1.5 font-semibold text-purple-600 dark:text-purple-400">
+<svg class="w-3 h-3 transition-colors duration-200" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Audio Fatwa</title><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="23"></line><line x1="8" x2="16" y1="23" y2="23"></line></svg>
+                 Audio
+             </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-col gap-2">
+<!-- Scholar Name -->
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn uthaymeen
+                </span>
+</div>
+<!-- Title -->
+<h3 class="text-2xl font-sans md:text-3xl font-black font-extrabold capitalize tracking-tight leading-snug text-black dark:text-white group-hover:underline decoration-2 underline-offset-4">
+                Ruling on the Children's Chant: 'My Mother's Smile is the Secret of My Existence'
+            </h3>
+<p class="text-sm text-zinc-500 dark:text-zinc-400 lowercase normal-case leading-relaxed max-w-2xl line-clamp-2 font-normal">
+                This is a rejected, Sufi-inspired statement. The One who brought creation into existence is Allah.
+            </p>
+</div>
+--------------------------------------------------
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn uthaymeen
+                </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-row justify-between items-center text-[12px] font-black uppercase tracking-[0.1em] w-full">
+<!-- Post Date Layout -->
+<span class="text-zinc-400 dark:text-zinc-600 tabular-nums">
+                1448-04-10 \ 2026-09-21
+            </span>
+<!-- Post Type Indicator -->
+<span class="inline-flex items-center gap-1.5 font-semibold text-purple-600 dark:text-purple-400">
+<svg class="w-3 h-3 transition-colors duration-200" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Audio Fatwa</title><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="23"></line><line x1="8" x2="16" y1="23" y2="23"></line></svg>
+                 Audio
+             </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-col gap-2">
+<!-- Scholar Name -->
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn uthaymeen
+                </span>
+</div>
+<!-- Title -->
+<h3 class="text-2xl font-sans md:text-3xl font-black font-extrabold capitalize tracking-tight leading-snug text-black dark:text-white group-hover:underline decoration-2 underline-offset-4">
+                Ruling on Calling Makkah 'The Land of the Heavenly Religions'
+            </h3>
+<p class="text-sm text-zinc-500 dark:text-zinc-400 lowercase normal-case leading-relaxed max-w-2xl line-clamp-2 font-normal">
+                This is a false expression, because the prophets of the Children of Israel—among whom are Moses and Jesus—were actually in the Levant reg...
+            </p>
+</div>
+--------------------------------------------------
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn uthaymeen
+                </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-row justify-between items-center text-[12px] font-black uppercase tracking-[0.1em] w-full">
+<!-- Post Date Layout -->
+<span class="text-zinc-400 dark:text-zinc-600 tabular-nums">
+                1448-04-10 \ 2026-09-21
+            </span>
+<!-- Post Type Indicator -->
+<span class="inline-flex items-center gap-1.5 font-semibold text-purple-600 dark:text-purple-400">
+<svg class="w-3 h-3 transition-colors duration-200" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Audio Fatwa</title><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="23"></line><line x1="8" x2="16" y1="23" y2="23"></line></svg>
+                 Audio
+             </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-col gap-2">
+<!-- Scholar Name -->
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn uthaymeen
+                </span>
+</div>
+<!-- Title -->
+<h3 class="text-2xl font-sans md:text-3xl font-black font-extrabold capitalize tracking-tight leading-snug text-black dark:text-white group-hover:underline decoration-2 underline-offset-4">
+                Ruling on Calling a Woman 'Mother of the Believers' and Nicknaming Someone 'Noah'
+            </h3>
+<p class="text-sm text-zinc-500 dark:text-zinc-400 lowercase normal-case leading-relaxed max-w-2xl line-clamp-2 font-normal">
+                As for the first matter—calling a woman 'Mother of the Believers'—this is forbidden because it is a falsehood.
+            </p>
+</div>
+--------------------------------------------------
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn uthaymeen
+                </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-row justify-between items-center text-[12px] font-black uppercase tracking-[0.1em] w-full">
+<!-- Post Date Layout -->
+<span class="text-zinc-400 dark:text-zinc-600 tabular-nums">
+                1448-04-10 \ 2026-09-21
+            </span>
+<!-- Post Type Indicator -->
+<span class="inline-flex items-center gap-1.5 font-semibold text-purple-600 dark:text-purple-400">
+<svg class="w-3 h-3 transition-colors duration-200" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Audio Fatwa</title><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="23"></line><line x1="8" x2="16" y1="23" y2="23"></line></svg>
+                 Audio
+             </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-col gap-2">
+<!-- Scholar Name -->
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn uthaymeen
+                </span>
+</div>
+<!-- Title -->
+<h3 class="text-2xl font-sans md:text-3xl font-black font-extrabold capitalize tracking-tight leading-snug text-black dark:text-white group-hover:underline decoration-2 underline-offset-4">
+                Is it Permissible to Call a Dead Person 'Al-Marhoom'?
+            </h3>
+<p class="text-sm text-zinc-500 dark:text-zinc-400 lowercase normal-case leading-relaxed max-w-2xl line-clamp-2 font-normal">
+                This constitutes testifying to his mercy or forgiveness without knowledge, and testifying without knowledge is forbidden.
+            </p>
+</div>
+--------------------------------------------------
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn uthaymeen
+                </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-row justify-between items-center text-[12px] font-black uppercase tracking-[0.1em] w-full">
+<!-- Post Date Layout -->
+<span class="text-zinc-400 dark:text-zinc-600 tabular-nums">
+                1448-04-10 \ 2026-09-21
+            </span>
+<!-- Post Type Indicator -->
+<span class="inline-flex items-center gap-1.5 font-semibold text-purple-600 dark:text-purple-400">
+<svg class="w-3 h-3 transition-colors duration-200" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Audio Fatwa</title><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="23"></line><line x1="8" x2="16" y1="23" y2="23"></line></svg>
+                 Audio
+             </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-col gap-2">
+<!-- Scholar Name -->
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn baz
+                </span>
+</div>
+<!-- Title -->
+<h3 class="text-2xl font-sans md:text-3xl font-black font-extrabold capitalize tracking-tight leading-snug text-black dark:text-white group-hover:underline decoration-2 underline-offset-4">
+                What is Meant by Hijrah?
+            </h3>
+<p class="text-sm text-zinc-500 dark:text-zinc-400 lowercase normal-case leading-relaxed max-w-2xl line-clamp-2 font-normal">
+                The migration from the lands of shirk (polytheism) to the lands of Islam.
+            </p>
+</div>
+--------------------------------------------------
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn baz
+                </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-row justify-between items-center text-[12px] font-black uppercase tracking-[0.1em] w-full">
+<!-- Post Date Layout -->
+<span class="text-zinc-400 dark:text-zinc-600 tabular-nums">
+                1448-04-10 \ 2026-09-21
+            </span>
+<!-- Post Type Indicator -->
+<span class="inline-flex items-center gap-1.5 font-semibold text-purple-600 dark:text-purple-400">
+<svg class="w-3 h-3 transition-colors duration-200" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Audio Fatwa</title><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="23"></line><line x1="8" x2="16" y1="23" y2="23"></line></svg>
+                 Audio
+             </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-col gap-2">
+<!-- Scholar Name -->
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn baz
+                </span>
+</div>
+<!-- Title -->
+<h3 class="text-2xl font-sans md:text-3xl font-black font-extrabold capitalize tracking-tight leading-snug text-black dark:text-white group-hover:underline decoration-2 underline-offset-4">
+                Ruling on Traveling for Tourism to Non-Muslim Lands
+            </h3>
+<p class="text-sm text-zinc-500 dark:text-zinc-400 lowercase normal-case leading-relaxed max-w-2xl line-clamp-2 font-normal">
+                It is a munkar (reprehensible evil) and is not permissible. It is absolutely not permissible to travel for tourism.
+            </p>
+</div>
+--------------------------------------------------
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn baz
+                </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-row justify-between items-center text-[12px] font-black uppercase tracking-[0.1em] w-full">
+<!-- Post Date Layout -->
+<span class="text-zinc-400 dark:text-zinc-600 tabular-nums">
+                1448-04-10 \ 2026-09-21
+            </span>
+<!-- Post Type Indicator -->
+<span class="inline-flex items-center gap-1.5 font-semibold text-purple-600 dark:text-purple-400">
+<svg class="w-3 h-3 transition-colors duration-200" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Audio Fatwa</title><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="23"></line><line x1="8" x2="16" y1="23" y2="23"></line></svg>
+                 Audio
+             </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-col gap-2">
+<!-- Scholar Name -->
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn baz
+                </span>
+</div>
+<!-- Title -->
+<h3 class="text-2xl font-sans md:text-3xl font-black font-extrabold capitalize tracking-tight leading-snug text-black dark:text-white group-hover:underline decoration-2 underline-offset-4">
+                Ruling on Claiming Disbelievers Are Better Than Muslims
+            </h3>
+<p class="text-sm text-zinc-500 dark:text-zinc-400 lowercase normal-case leading-relaxed max-w-2xl line-clamp-2 font-normal">
+                The statement made by some people that the disbeliever is better than the Muslim or that Christians are better than Muslims is apostasy f...
+            </p>
+</div>
+--------------------------------------------------
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn baz
+                </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-row justify-between items-center text-[12px] font-black uppercase tracking-[0.1em] w-full">
+<!-- Post Date Layout -->
+<span class="text-zinc-400 dark:text-zinc-600 tabular-nums">
+                1448-04-10 \ 2026-09-21
+            </span>
+<!-- Post Type Indicator -->
+<span class="inline-flex items-center gap-1.5 font-semibold text-purple-600 dark:text-purple-400">
+<svg class="w-3 h-3 transition-colors duration-200" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Audio Fatwa</title><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="23"></line><line x1="8" x2="16" y1="23" y2="23"></line></svg>
+                 Audio
+             </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-col gap-2">
+<!-- Scholar Name -->
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn baz
+                </span>
+</div>
+<!-- Title -->
+<h3 class="text-2xl font-sans md:text-3xl font-black font-extrabold capitalize tracking-tight leading-snug text-black dark:text-white group-hover:underline decoration-2 underline-offset-4">
+                Refuting Those Who Say That the Hijab Is Not the Covering of the Face
+            </h3>
+<p class="text-sm text-zinc-500 dark:text-zinc-400 lowercase normal-case leading-relaxed max-w-2xl line-clamp-2 font-normal">
+                Therefore, just as it is obligatory to cover the head, it is also obligatory to cover the face, because the face holds immense significance.
+            </p>
+</div>
+--------------------------------------------------
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn baz
+                </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-row justify-between items-center text-[12px] font-black uppercase tracking-[0.1em] w-full">
+<!-- Post Date Layout -->
+<span class="text-zinc-400 dark:text-zinc-600 tabular-nums">
+                1448-04-10 \ 2026-09-21
+            </span>
+<!-- Post Type Indicator -->
+<span class="inline-flex items-center gap-1.5 font-semibold text-purple-600 dark:text-purple-400">
+<svg class="w-3 h-3 transition-colors duration-200" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Audio Fatwa</title><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="23"></line><line x1="8" x2="16" y1="23" y2="23"></line></svg>
+                 Audio
+             </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-col gap-2">
+<!-- Scholar Name -->
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn baz
+                </span>
+</div>
+<!-- Title -->
+<h3 class="text-2xl font-sans md:text-3xl font-black font-extrabold capitalize tracking-tight leading-snug text-black dark:text-white group-hover:underline decoration-2 underline-offset-4">
+                Refuting the Western Suspicion Regarding the Hijab
+            </h3>
+<p class="text-sm text-zinc-500 dark:text-zinc-400 lowercase normal-case leading-relaxed max-w-2xl line-clamp-2 font-normal">
+                This is a refuted suspicion with no basis whatsoever. This is a refuted suspicion: if the hijab is obligatory among Muslims, then its obl...
+            </p>
+</div>
+--------------------------------------------------
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn baz
+                </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-row justify-between items-center text-[12px] font-black uppercase tracking-[0.1em] w-full">
+<!-- Post Date Layout -->
+<span class="text-zinc-400 dark:text-zinc-600 tabular-nums">
+                1448-04-10 \ 2026-09-21
+            </span>
+<!-- Post Type Indicator -->
+<span class="inline-flex items-center gap-1.5 font-semibold text-purple-600 dark:text-purple-400">
+<svg class="w-3 h-3 transition-colors duration-200" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Audio Fatwa</title><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="23"></line><line x1="8" x2="16" y1="23" y2="23"></line></svg>
+                 Audio
+             </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-col gap-2">
+<!-- Scholar Name -->
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn baz
+                </span>
+</div>
+<!-- Title -->
+<h3 class="text-2xl font-sans md:text-3xl font-black font-extrabold capitalize tracking-tight leading-snug text-black dark:text-white group-hover:underline decoration-2 underline-offset-4">
+                Biography of Sheikh Ihsan Ilahi Zahir and Fatwa on the Funeral Prayer for Him
+            </h3>
+<p class="text-sm text-zinc-500 dark:text-zinc-400 lowercase normal-case leading-relaxed max-w-2xl line-clamp-2 font-normal">
+                He has many authored works in refuting the Shia, refuting paganism, and refuting other sects of disbelief and misguidance.
+            </p>
+</div>
+--------------------------------------------------
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn baz
+                </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-row justify-between items-center text-[12px] font-black uppercase tracking-[0.1em] w-full">
+<!-- Post Date Layout -->
+<span class="text-zinc-400 dark:text-zinc-600 tabular-nums">
+                1448-04-10 \ 2026-09-21
+            </span>
+<!-- Post Type Indicator -->
+<span class="inline-flex items-center gap-1.5 font-semibold text-blue-600 dark:text-blue-400">
+<svg class="w-3 h-3 transition-colors duration-200" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Text Fatwa</title><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                 Text
+             </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-col gap-2">
+<!-- Scholar Name -->
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn baz
+                </span>
+</div>
+<!-- Title -->
+<h3 class="text-2xl font-sans md:text-3xl font-black font-extrabold capitalize tracking-tight leading-snug text-black dark:text-white group-hover:underline decoration-2 underline-offset-4">
+                Is Kissing the Black Stone a Form of Paganism?
+            </h3>
+<p class="text-sm text-zinc-500 dark:text-zinc-400 lowercase normal-case leading-relaxed max-w-2xl line-clamp-2 font-normal">
+                This is not paganism; this is something prescribed for us by Allah for a profound wisdom, and in this, we are neither imitating the Jahil...
+            </p>
+</div>
+--------------------------------------------------
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn baz
+                </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-row justify-between items-center text-[12px] font-black uppercase tracking-[0.1em] w-full">
+<!-- Post Date Layout -->
+<span class="text-zinc-400 dark:text-zinc-600 tabular-nums">
+                1448-04-10 \ 2026-09-21
+            </span>
+<!-- Post Type Indicator -->
+<span class="inline-flex items-center gap-1.5 font-semibold text-blue-600 dark:text-blue-400">
+<svg class="w-3 h-3 transition-colors duration-200" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Text Fatwa</title><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                 Text
+             </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-col gap-2">
+<!-- Scholar Name -->
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn baz
+                </span>
+</div>
+<!-- Title -->
+<h3 class="text-2xl font-sans md:text-3xl font-black font-extrabold capitalize tracking-tight leading-snug text-black dark:text-white group-hover:underline decoration-2 underline-offset-4">
+                Did Islam Spread by the Sword?
+            </h3>
+<p class="text-sm text-zinc-500 dark:text-zinc-400 lowercase normal-case leading-relaxed max-w-2xl line-clamp-2 font-normal">
+                This statement, in an absolute and unqualified sense, is false. Islam was spread through the call to Allah, the Glorified and Exalted, an...
+            </p>
+</div>
+--------------------------------------------------
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh ibn baz
+                </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-row justify-between items-center text-[12px] font-black uppercase tracking-[0.1em] w-full">
+<!-- Post Date Layout -->
+<span class="text-zinc-400 dark:text-zinc-600 tabular-nums">
+                1448-04-07 \ 2026-09-18
+            </span>
+<!-- Post Type Indicator -->
+<span class="inline-flex items-center gap-1.5 font-semibold text-red-600 dark:text-red-400">
+<svg class="w-3 h-3 transition-colors duration-200" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Video Fatwa</title><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>
+                 Video
+              </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-col gap-2">
+<!-- Scholar Name -->
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh salih ibn fawzan
+                </span>
+</div>
+<!-- Title -->
+<h3 class="text-2xl font-sans md:text-3xl font-black font-extrabold capitalize tracking-tight leading-snug text-black dark:text-white group-hover:underline decoration-2 underline-offset-4">
+                The Ruling on Saying 'Madad' to Husayn or Al-Badawi
+            </h3>
+<p class="text-sm text-zinc-500 dark:text-zinc-400 lowercase normal-case leading-relaxed max-w-2xl line-clamp-2 font-normal">
+                If he is ignorant, it is explained to him. If he persists in that after the explanation, then he is a disbeliever.
+            </p>
+</div>
+--------------------------------------------------
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh salih ibn fawzan
+                </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-row justify-between items-center text-[12px] font-black uppercase tracking-[0.1em] w-full">
+<!-- Post Date Layout -->
+<span class="text-zinc-400 dark:text-zinc-600 tabular-nums">
+                1448-04-07 \ 2026-09-18
+            </span>
+<!-- Post Type Indicator -->
+<span class="inline-flex items-center gap-1.5 font-semibold text-red-600 dark:text-red-400">
+<svg class="w-3 h-3 transition-colors duration-200" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Video Fatwa</title><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>
+                 Video
+              </span>
+</div>
+--------------------------------------------------
+<div class="flex flex-col gap-2">
+<!-- Scholar Name -->
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh salih ibn fawzan
+                </span>
+</div>
+<!-- Title -->
+<h3 class="text-2xl font-sans md:text-3xl font-black font-extrabold capitalize tracking-tight leading-snug text-black dark:text-white group-hover:underline decoration-2 underline-offset-4">
+                The Ruling on Breeding and Selling Wild Animals
+            </h3>
+<p class="text-sm text-zinc-500 dark:text-zinc-400 lowercase normal-case leading-relaxed max-w-2xl line-clamp-2 font-normal">
+                What is his intention behind this? If he sells predators or sells snakes, this is forbidden and not permissible.
+            </p>
+</div>
+--------------------------------------------------
+<div class="text-[10px]">
+<span class="text-zinc-400 uppercase dark:text-zinc-500 group-hover:text-black dark:group-hover:text-white transition-colors">
+                    Shaykh salih ibn fawzan
+                </span>
+</div>
+--------------------------------------------------
+<div class="text-sm font-black uppercase tracking-widest tabular-nums">
+<span>
+            01 / 
+            63
+        </span>
+</div>
+--------------------------------------------------
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden transition-opacity" id="reportModal">
+<div class="relative w-full max-w-lg p-6 bg-white dark:bg-zinc-950 border-4 border-black dark:border-white shadow-2xl transition-all">
+<!-- Modal Header -->
+<div class="flex items-center justify-between pb-4 mb-4 border-b-2 border-black dark:border-white">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 bg-red-600 inline-block"></span>
+<h3 class="text-lg font-bold italic serif dark:text-white">Report an Error</h3>
+</div>
+<button class="text-black dark:text-white font-bold text-xl hover:opacity-60 focus:outline-none px-2" id="closeReportModal" type="button">×</button>
+</div>
+<!-- Form -->
+<form action="https://script.google.com/macros/s/AKfycbwUIXfTBCrH3CUL9PoiwOi_TIl2wevG7fnOTFFMgVs5bR4f4yh4CMD0PzGG1EMrBtyd/exec" class="space-y-4" id="bugReportForm" method="POST">
+<!-- Hidden Dynamic Inputs -->
+<input id="reportInputTitle" name="title" type="hidden" value="Fatwas"/>
+<input id="reportInputUrl" name="url" type="hidden" value=""/>
+<!-- Readonly info summary -->
+<div class="p-3 bg-gray-100 dark:bg-zinc-900 border border-gray-300 dark:border-zinc-800 text-xs text-gray-600 dark:text-gray-400 space-y-1 text-left">
+<p class="text-xs mb-0"><strong>Title:</strong> <span id="reportDisplayTitle">Fatwas</span></p>
+<p class="text-xs"><strong>Url:</strong> <span class="break-all" id="reportDisplayUrl"></span></p>
+</div>
+<!-- User Message Input -->
+<div class="flex flex-col gap-1.5 text-left">
+<label class="text-[11px] font-black uppercase tracking-wider text-black dark:text-white" for="bug-message">Describe the Error</label>
+<textarea class="w-full p-3 border-2 border-black dark:border-white bg-transparent text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all font-medium text-sm resize-none" id="bug-message" name="message" placeholder="e.g. Broken link, typo, video doesn't load, audio missing..." required="" rows="4"></textarea>
+</div>
+<!-- Status Banner -->
+<div class="hidden text-xs font-bold uppercase tracking-wider p-3 border-2" id="bugStatusMsg"></div>
+<!-- Submit Button -->
+<div class="flex justify-end gap-3 pt-2">
+<button class="px-4 py-2 border-2 border-black dark:border-white text-black dark:text-white text-xs font-black uppercase tracking-wider hover:bg-gray-100 dark:hover:bg-zinc-900 focus:outline-none" id="cancelReportModal" type="button">
+                    Cancel
+                </button>
+<button class="px-6 py-2 bg-black text-white dark:bg-white dark:text-black text-xs font-black uppercase tracking-wider hover:opacity-80 disabled:opacity-50 transition-all focus:outline-none" id="submitBugBtn" type="submit">
+                    Submit report
+                </button>
+</div>
+</form>
+</div>
+</div>
+--------------------------------------------------
+<div class="relative w-full max-w-lg p-6 bg-white dark:bg-zinc-950 border-4 border-black dark:border-white shadow-2xl transition-all">
+<!-- Modal Header -->
+<div class="flex items-center justify-between pb-4 mb-4 border-b-2 border-black dark:border-white">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 bg-red-600 inline-block"></span>
+<h3 class="text-lg font-bold italic serif dark:text-white">Report an Error</h3>
+</div>
+<button class="text-black dark:text-white font-bold text-xl hover:opacity-60 focus:outline-none px-2" id="closeReportModal" type="button">×</button>
+</div>
+<!-- Form -->
+<form action="https://script.google.com/macros/s/AKfycbwUIXfTBCrH3CUL9PoiwOi_TIl2wevG7fnOTFFMgVs5bR4f4yh4CMD0PzGG1EMrBtyd/exec" class="space-y-4" id="bugReportForm" method="POST">
+<!-- Hidden Dynamic Inputs -->
+<input id="reportInputTitle" name="title" type="hidden" value="Fatwas"/>
+<input id="reportInputUrl" name="url" type="hidden" value=""/>
+<!-- Readonly info summary -->
+<div class="p-3 bg-gray-100 dark:bg-zinc-900 border border-gray-300 dark:border-zinc-800 text-xs text-gray-600 dark:text-gray-400 space-y-1 text-left">
+<p class="text-xs mb-0"><strong>Title:</strong> <span id="reportDisplayTitle">Fatwas</span></p>
+<p class="text-xs"><strong>Url:</strong> <span class="break-all" id="reportDisplayUrl"></span></p>
+</div>
+<!-- User Message Input -->
+<div class="flex flex-col gap-1.5 text-left">
+<label class="text-[11px] font-black uppercase tracking-wider text-black dark:text-white" for="bug-message">Describe the Error</label>
+<textarea class="w-full p-3 border-2 border-black dark:border-white bg-transparent text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all font-medium text-sm resize-none" id="bug-message" name="message" placeholder="e.g. Broken link, typo, video doesn't load, audio missing..." required="" rows="4"></textarea>
+</div>
+<!-- Status Banner -->
+<div class="hidden text-xs font-bold uppercase tracking-wider p-3 border-2" id="bugStatusMsg"></div>
+<!-- Submit Button -->
+<div class="flex justify-end gap-3 pt-2">
+<button class="px-4 py-2 border-2 border-black dark:border-white text-black dark:text-white text-xs font-black uppercase tracking-wider hover:bg-gray-100 dark:hover:bg-zinc-900 focus:outline-none" id="cancelReportModal" type="button">
+                    Cancel
+                </button>
+<button class="px-6 py-2 bg-black text-white dark:bg-white dark:text-black text-xs font-black uppercase tracking-wider hover:opacity-80 disabled:opacity-50 transition-all focus:outline-none" id="submitBugBtn" type="submit">
+                    Submit report
+                </button>
+</div>
+</form>
+</div>
+--------------------------------------------------
+<div class="flex items-center justify-between pb-4 mb-4 border-b-2 border-black dark:border-white">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 bg-red-600 inline-block"></span>
+<h3 class="text-lg font-bold italic serif dark:text-white">Report an Error</h3>
+</div>
+<button class="text-black dark:text-white font-bold text-xl hover:opacity-60 focus:outline-none px-2" id="closeReportModal" type="button">×</button>
+</div>
+--------------------------------------------------
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 bg-red-600 inline-block"></span>
+<h3 class="text-lg font-bold italic serif dark:text-white">Report an Error</h3>
+</div>
+--------------------------------------------------
+<div class="p-3 bg-gray-100 dark:bg-zinc-900 border border-gray-300 dark:border-zinc-800 text-xs text-gray-600 dark:text-gray-400 space-y-1 text-left">
+<p class="text-xs mb-0"><strong>Title:</strong> <span id="reportDisplayTitle">Fatwas</span></p>
+<p class="text-xs"><strong>Url:</strong> <span class="break-all" id="reportDisplayUrl"></span></p>
+</div>
+--------------------------------------------------
+<div class="flex flex-col gap-1.5 text-left">
+<label class="text-[11px] font-black uppercase tracking-wider text-black dark:text-white" for="bug-message">Describe the Error</label>
+<textarea class="w-full p-3 border-2 border-black dark:border-white bg-transparent text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white transition-all font-medium text-sm resize-none" id="bug-message" name="message" placeholder="e.g. Broken link, typo, video doesn't load, audio missing..." required="" rows="4"></textarea>
+</div>
+--------------------------------------------------
+<div class="hidden text-xs font-bold uppercase tracking-wider p-3 border-2" id="bugStatusMsg"></div>
+--------------------------------------------------
+<div class="flex justify-end gap-3 pt-2">
+<button class="px-4 py-2 border-2 border-black dark:border-white text-black dark:text-white text-xs font-black uppercase tracking-wider hover:bg-gray-100 dark:hover:bg-zinc-900 focus:outline-none" id="cancelReportModal" type="button">
+                    Cancel
+                </button>
+<button class="px-6 py-2 bg-black text-white dark:bg-white dark:text-black text-xs font-black uppercase tracking-wider hover:opacity-80 disabled:opacity-50 transition-all focus:outline-none" id="submitBugBtn" type="submit">
+                    Submit report
+                </button>
+</div>
+--------------------------------------------------
+<div class="flex flex-col gap-4 max-w-sm w-full" itemscope="" itemtype="https://schema.org/Organization">
+<div class="flex items-center justify-between md:justify-start gap-4">
+<!-- Logo Container -->
+<a class="flex-none hover:opacity-50 transition-opacity" href="/">
+<img alt="Al-Salafiyyah Logo" class="w-8 h-8 object-contain dark:invert transition-all duration-300" height="32" src="/assets/logos/logo.svg?v=1790423839" width="32"/>
+</a>
+<button aria-label="Toggle Theme" class="text-black dark:text-white hover:opacity-50 transition-opacity focus:outline-none border-2 border-current p-1.5 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black" id="theme-toggle" type="button">
+<!-- Moon Icon (Dark Mode) -->
+<svg class="hidden w-4 h-4" fill="none" id="theme-toggle-dark-icon" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+</svg>
+<!-- Sun Icon (Light Mode) -->
+<svg class="hidden w-4 h-4" fill="none" id="theme-toggle-light-icon" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<circle cx="12" cy="12" r="5"></circle>
+<line x1="12" x2="12" y1="1" y2="3"></line>
+<line x1="12" x2="12" y1="21" y2="23"></line>
+<line x1="4.22" x2="5.64" y1="4.22" y2="5.64"></line>
+<line x1="18.36" x2="19.78" y1="18.36" y2="19.78"></line>
+<line x1="1" x2="3" y1="12" y2="12"></line>
+<line x1="21" x2="23" y1="12" y2="12"></line>
+<line x1="4.22" x2="5.64" y1="19.78" y2="18.36"></line>
+<line x1="18.36" x2="19.78" y1="5.64" y2="4.22"></line>
+</svg>
+</button>
+<a class="text-black dark:text-white hover:opacity-50 transition-opacity" href="/ar/">
+<svg class="w-8 h-8" fill="currentColor" height="378" preserveaspectratio="xMidYMid meet" version="1.0" viewbox="0 0 283.5 283.500005" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" zoomandpan="magnify">
+<title>Switch to Arabic</title>
+<defs>
+<clippath id="a0737a88c8">
+<path clip-rule="nonzero" d="M 0.21875 1.027344 L 263.039062 1.027344 L 263.039062 263.847656 L 0.21875 263.847656 Z M 0.21875 1.027344 "></path>
+</clippath>
+<clippath id="cb365dba77">
+<rect height="265" width="264" x="0" y="0"></rect>
+</clippath>
+</defs>
+<g transform="matrix(1, 0, 0, 1, 10, 6)">
+<g clip-path="url(#cb365dba77)">
+<g clip-path="url(#a0737a88c8)">
+<!-- Changed fill="#000000" to fill="currentColor" -->
+<path d="M 0.21875 1.027344 L 0.21875 198.140625 L 65.925781 198.140625 L 65.925781 263.847656 L 263.039062 263.847656 L 263.039062 66.730469 L 197.335938 66.730469 L 197.335938 1.027344 Z M 22.121094 22.929688 L 175.433594 22.929688 L 175.433594 73.148438 L 120.402344 128.179688 L 90.671875 44.832031 L 73.6875 44.832031 L 44.023438 128.992188 L 44.023438 143.386719 L 65.925781 143.386719 L 65.925781 132.734375 L 66.03125 132.4375 L 98.671875 132.4375 L 98.777344 132.757812 L 98.777344 143.386719 L 105.195312 143.386719 L 72.34375 176.238281 L 22.121094 176.238281 Z M 82.246094 86.429688 L 90.84375 110.535156 L 73.753906 110.535156 Z M 190.917969 88.632812 L 241.136719 88.632812 L 241.136719 241.945312 L 87.828125 241.945312 L 87.828125 191.726562 Z M 176.71875 121.484375 C 164.769531 121.484375 152.441406 133.347656 152.441406 143.773438 C 152.441406 155.347656 161.894531 164.261719 161.894531 164.261719 C 161.894531 164.261719 142.582031 173.558594 142.582031 192.132812 C 142.582031 210.746094 164.148438 220.042969 181.121094 220.042969 C 206.671875 220.042969 219.238281 207.746094 219.238281 207.746094 C 219.238281 207.746094 176.117188 209.839844 166.128906 188.878906 C 164.082031 184.554688 166.371094 171.851562 176.117188 167.511719 C 189.6875 161.457031 199.261719 170.785156 199.261719 170.785156 L 205.613281 147.859375 C 205.613281 147.859375 195.582031 150.402344 185.957031 150.402344 C 182.5625 150.402344 170.726562 148.246094 170.726562 140.757812 C 170.726562 134.777344 178.398438 132.394531 181.101562 132.394531 C 190.792969 132.394531 199.902344 135.964844 199.902344 135.964844 L 199.902344 127.152344 C 199.902344 127.152344 191.773438 121.484375 176.71875 121.484375 Z M 176.71875 121.484375 " fill="currentColor"></path>
+</g>
+</g>
+</g>
+</svg>
+</a>
+</div>
+<div class="flex flex-col mt-2">
+<p>
+                © 2026 
+                <span itemprop="name">Al-Salafiyyah</span>
+<meta content="https://alsalafiyyah.github.io" itemprop="url"/>
+<link href="/assets/logos/logo.svg" itemprop="logo"/>
+</p>
+<span class="text-zinc-600 dark:text-zinc-400 text-[10px] tracking-[0.4em] mt-1">The Manhaj of The Salaf</span>
+</div>
+</div>
+--------------------------------------------------
+<div class="flex items-center justify-between md:justify-start gap-4">
+<!-- Logo Container -->
+<a class="flex-none hover:opacity-50 transition-opacity" href="/">
+<img alt="Al-Salafiyyah Logo" class="w-8 h-8 object-contain dark:invert transition-all duration-300" height="32" src="/assets/logos/logo.svg?v=1790423839" width="32"/>
+</a>
+<button aria-label="Toggle Theme" class="text-black dark:text-white hover:opacity-50 transition-opacity focus:outline-none border-2 border-current p-1.5 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black" id="theme-toggle" type="button">
+<!-- Moon Icon (Dark Mode) -->
+<svg class="hidden w-4 h-4" fill="none" id="theme-toggle-dark-icon" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+</svg>
+<!-- Sun Icon (Light Mode) -->
+<svg class="hidden w-4 h-4" fill="none" id="theme-toggle-light-icon" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<circle cx="12" cy="12" r="5"></circle>
+<line x1="12" x2="12" y1="1" y2="3"></line>
+<line x1="12" x2="12" y1="21" y2="23"></line>
+<line x1="4.22" x2="5.64" y1="4.22" y2="5.64"></line>
+<line x1="18.36" x2="19.78" y1="18.36" y2="19.78"></line>
+<line x1="1" x2="3" y1="12" y2="12"></line>
+<line x1="21" x2="23" y1="12" y2="12"></line>
+<line x1="4.22" x2="5.64" y1="19.78" y2="18.36"></line>
+<line x1="18.36" x2="19.78" y1="5.64" y2="4.22"></line>
+</svg>
+</button>
+<a class="text-black dark:text-white hover:opacity-50 transition-opacity" href="/ar/">
+<svg class="w-8 h-8" fill="currentColor" height="378" preserveaspectratio="xMidYMid meet" version="1.0" viewbox="0 0 283.5 283.500005" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" zoomandpan="magnify">
+<title>Switch to Arabic</title>
+<defs>
+<clippath id="a0737a88c8">
+<path clip-rule="nonzero" d="M 0.21875 1.027344 L 263.039062 1.027344 L 263.039062 263.847656 L 0.21875 263.847656 Z M 0.21875 1.027344 "></path>
+</clippath>
+<clippath id="cb365dba77">
+<rect height="265" width="264" x="0" y="0"></rect>
+</clippath>
+</defs>
+<g transform="matrix(1, 0, 0, 1, 10, 6)">
+<g clip-path="url(#cb365dba77)">
+<g clip-path="url(#a0737a88c8)">
+<!-- Changed fill="#000000" to fill="currentColor" -->
+<path d="M 0.21875 1.027344 L 0.21875 198.140625 L 65.925781 198.140625 L 65.925781 263.847656 L 263.039062 263.847656 L 263.039062 66.730469 L 197.335938 66.730469 L 197.335938 1.027344 Z M 22.121094 22.929688 L 175.433594 22.929688 L 175.433594 73.148438 L 120.402344 128.179688 L 90.671875 44.832031 L 73.6875 44.832031 L 44.023438 128.992188 L 44.023438 143.386719 L 65.925781 143.386719 L 65.925781 132.734375 L 66.03125 132.4375 L 98.671875 132.4375 L 98.777344 132.757812 L 98.777344 143.386719 L 105.195312 143.386719 L 72.34375 176.238281 L 22.121094 176.238281 Z M 82.246094 86.429688 L 90.84375 110.535156 L 73.753906 110.535156 Z M 190.917969 88.632812 L 241.136719 88.632812 L 241.136719 241.945312 L 87.828125 241.945312 L 87.828125 191.726562 Z M 176.71875 121.484375 C 164.769531 121.484375 152.441406 133.347656 152.441406 143.773438 C 152.441406 155.347656 161.894531 164.261719 161.894531 164.261719 C 161.894531 164.261719 142.582031 173.558594 142.582031 192.132812 C 142.582031 210.746094 164.148438 220.042969 181.121094 220.042969 C 206.671875 220.042969 219.238281 207.746094 219.238281 207.746094 C 219.238281 207.746094 176.117188 209.839844 166.128906 188.878906 C 164.082031 184.554688 166.371094 171.851562 176.117188 167.511719 C 189.6875 161.457031 199.261719 170.785156 199.261719 170.785156 L 205.613281 147.859375 C 205.613281 147.859375 195.582031 150.402344 185.957031 150.402344 C 182.5625 150.402344 170.726562 148.246094 170.726562 140.757812 C 170.726562 134.777344 178.398438 132.394531 181.101562 132.394531 C 190.792969 132.394531 199.902344 135.964844 199.902344 135.964844 L 199.902344 127.152344 C 199.902344 127.152344 191.773438 121.484375 176.71875 121.484375 Z M 176.71875 121.484375 " fill="currentColor"></path>
+</g>
+</g>
+</g>
+</svg>
+</a>
+</div>
+--------------------------------------------------
+<div class="flex flex-col mt-2">
+<p>
+                © 2026 
+                <span itemprop="name">Al-Salafiyyah</span>
+<meta content="https://alsalafiyyah.github.io" itemprop="url"/>
+<link href="/assets/logos/logo.svg" itemprop="logo"/>
+</p>
+<span class="text-zinc-600 dark:text-zinc-400 text-[10px] tracking-[0.4em] mt-1">The Manhaj of The Salaf</span>
+</div>
+--------------------------------------------------
+<div class="flex flex-col sm:flex-row gap-12 md:gap-16 w-full md:w-auto">
+<!-- Column 2: External Link List -->
+<div class="flex flex-col gap-3 min-w-[120px]">
+</div>
+<!-- Column 3: Site Internal Navigation -->
+<div class="flex flex-col gap-3 min-w-[140px]">
+<span class="text-zinc-600 dark:text-zinc-400 text-[9px] tracking-[0.3em]">
+                Navigation
+            </span>
+<div class="flex flex-col gap-2 items-start">
+<a class="hover:line-through transition-all" href="/scholar/" itemprop="sameAs">
+                        Biographies
+                    </a>
+<a class="hover:line-through transition-all" href="https://instagram.com/alsalafiyyah" itemprop="sameAs">
+                        Instagram
+                    </a>
+<a class="hover:line-through transition-all" href="/about/" itemprop="sameAs">
+                        About
+                    </a>
+<a class="hover:line-through transition-all" href="/contact/" itemprop="sameAs">
+                        Contact
+                    </a>
+</div>
+</div>
+</div>
+--------------------------------------------------
+<div class="flex flex-col gap-3 min-w-[120px]">
+</div>
+--------------------------------------------------
+<div class="flex flex-col gap-3 min-w-[140px]">
+<span class="text-zinc-600 dark:text-zinc-400 text-[9px] tracking-[0.3em]">
+                Navigation
+            </span>
+<div class="flex flex-col gap-2 items-start">
+<a class="hover:line-through transition-all" href="/scholar/" itemprop="sameAs">
+                        Biographies
+                    </a>
+<a class="hover:line-through transition-all" href="https://instagram.com/alsalafiyyah" itemprop="sameAs">
+                        Instagram
+                    </a>
+<a class="hover:line-through transition-all" href="/about/" itemprop="sameAs">
+                        About
+                    </a>
+<a class="hover:line-through transition-all" href="/contact/" itemprop="sameAs">
+                        Contact
+                    </a>
+</div>
+</div>
+--------------------------------------------------
+<div class="flex flex-col gap-2 items-start">
+<a class="hover:line-through transition-all" href="/scholar/" itemprop="sameAs">
+                        Biographies
+                    </a>
+<a class="hover:line-through transition-all" href="https://instagram.com/alsalafiyyah" itemprop="sameAs">
+                        Instagram
+                    </a>
+<a class="hover:line-through transition-all" href="/about/" itemprop="sameAs">
+                        About
+                    </a>
+<a class="hover:line-through transition-all" href="/contact/" itemprop="sameAs">
+                        Contact
+                    </a>
+</div>
+--------------------------------------------------
